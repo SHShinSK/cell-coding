@@ -1,4 +1,5 @@
-# GitHub Pages: 저장소 루트의 HTML/문서를 정적 사이트로 배포
+# GitHub Pages: publish staged site HTML/SVG only
+# GitHub Pages: 사이트용 HTML/SVG만 스테이징 후 배포
 name: Deploy GitHub Pages
 
 on:
@@ -25,13 +26,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Stage site files
+        run: |
+          mkdir -p _site
+          touch _site/.nojekyll
+          shopt -s nullglob
+          for f in *.html *.svg; do
+            case "$f" in
+              gemini-code-*.html) echo "Skip internal artifact: $f" ;;
+              *) cp "$f" _site/ ;;
+            esac
+          done
+          echo "Staged files:"
+          ls -la _site/
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment

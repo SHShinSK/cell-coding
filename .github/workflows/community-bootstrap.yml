@@ -1,10 +1,10 @@
 # Community bootstrap — starter issues (+ optional About via PAT)
 #
-# 실행: Actions → Community bootstrap → Run workflow
+# Run: Actions → Community bootstrap → Run workflow
 #
-# About/Topics 자동 설정은 GITHUB_TOKEN으로 불가합니다.
-#   → 저장소 About 톱니에서 수동 입력 (아래 reminder job 참고)
-#   → 또는 Secrets에 REPO_ADMIN_TOKEN(PAT, repo scope) 추가 시 API 시도
+# About/Topics cannot be set with GITHUB_TOKEN alone.
+#   → Set manually in repo About (see reminder job below)
+#   → Or add REPO_ADMIN_TOKEN (PAT, repo scope) secret for API update
 
 name: Community bootstrap
 
@@ -27,7 +27,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: About / Topics — 수동 설정 값
+      - name: About / Topics — manual values · 수동 설정 값
         run: |
           echo "::notice title=About (수동)::저장소 About 톱니 → Edit"
           echo "Description: Physical AI를 위한 이벤트 기반 세포코딩 | Event-driven biological programming for Physical AI"
@@ -83,15 +83,24 @@ jobs:
             "area:runtime:5319e7:Runtime core"
             "area:dsl-compiler:5319e7:DSL compiler"
             "area:docs:0075ca:Documentation"
+            "area:bridge-python:5319e7:Python bridge"
+            "area:viewer:5319e7:Cell viewer"
+            "area:devops:5319e7:DevOps and CI"
+            "priority:critical:b60205:Critical priority"
             "priority:low:c5def5:Low priority"
             "priority:medium:fbca04:Medium priority"
             "priority:high:d93f0b:High priority"
+            "status:needs-triage:ededed:Needs triage"
+            "status:needs-repro:d876e3:Needs reproduction"
+            "status:blocked:d73a4a:Blocked"
+            "status:in-progress:fbca04:In progress"
+            "status:needs-review:0e8a16:Needs review"
           )
           for entry in "${labels[@]}"; do
-            name="${entry%%:*}"
-            rest="${entry#*:}"
-            color="${rest%%:*}"
-            desc="${rest#*:}"
+            desc="${entry##*:}"
+            tmp="${entry%:*}"
+            color="${tmp##*:}"
+            name="${tmp%:*}"
             gh label create "$name" --color "$color" --description "$desc" --force 2>/dev/null || true
           done
 
@@ -107,19 +116,28 @@ jobs:
               echo "Skip (already implemented): $base"
               continue
             fi
-            title=$(head -n1 "$file" | sed 's/^# \[good-first-issue\] //')
+            title=$(head -n1 "$file" | sed 's/^#[[:space:]]*//')
             existing=$(gh issue list --repo "${{ github.repository }}" --search "in:title \"$title\"" --state open --json number --jq 'length')
             if [ "$existing" != "0" ]; then
               echo "Skip (exists): $title"
               continue
             fi
-            echo "Create: $title"
+            label_args=()
+            labels_line=$(grep -m1 '^\*\*Labels:\*\*' "$file" || true)
+            if [ -n "$labels_line" ]; then
+              while IFS= read -r label; do
+                [ -n "$label" ] && label_args+=(--label "$label")
+              done < <(echo "$labels_line" | grep -o '`[^`]*`' | tr -d '`')
+            fi
+            if [ ${#label_args[@]} -eq 0 ]; then
+              label_args=(--label "good first issue" --label "help wanted")
+            fi
+            echo "Create: $title (${#label_args[@]} label args)"
             gh issue create \
               --repo "${{ github.repository }}" \
               --title "$title" \
               --body-file "$file" \
-              --label "good first issue" \
-              --label "help wanted"
+              "${label_args[@]}"
             created=$((created + 1))
             sleep 2
           done

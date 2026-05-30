@@ -9,9 +9,11 @@
 ### 목표
 `typescript/` 컴파일러 초안을 실행 가능한 npm 패키지로 정리합니다.
 
+> **Maintainer note:** `package.json`, `tsconfig.json`, and CI typecheck (`npm run typecheck`) are partially pre-landed in the repo. Remaining work: `npm run check` CLI stub (lexer+parser+checker).
+
 ### 작업
-- [ ] `typescript/package.json` (type: module, typescript devDep)
-- [ ] `tsconfig.json` (ESM, strict)
+- [x] `typescript/package.json` (type: module, typescript devDep) — pre-landed
+- [x] `tsconfig.json` (ESM, strict) — pre-landed
 - [ ] `npm run check` — lexer+parser+checker CLI 스텁
 
 ### 완료 기준
@@ -24,9 +26,11 @@
 ### Goal
 Make the `typescript/` compiler draft runnable as an npm package.
 
+> **Maintainer note:** `package.json`, `tsconfig.json`, and CI typecheck (`npm run typecheck`) are partially pre-landed. Remaining: `npm run check` CLI stub.
+
 ### Tasks
-- [ ] Add `typescript/package.json`
-- [ ] Add `tsconfig.json`
+- [x] Add `typescript/package.json` — pre-landed
+- [x] Add `tsconfig.json` — pre-landed
 - [ ] Add `npm run check` CLI stub (lexer+parser+checker)
 
 ### Done when

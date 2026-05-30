@@ -20,9 +20,9 @@ GitHub에 등록할 첫 기여용 이슈 초안 10개입니다.
 
 ### 수동
 1. GitHub → **Issues** → **New issue**
-2. 제목: 파일 첫 줄 `# [...]` 에서 `[...]` 부분 사용
+2. 제목: 파일 첫 줄에서 `# ` 만 제거 (예: `[good-first-issue] README에 GitHub Pages 배지 추가`)
 3. 본문: 파일 전체 붙여넣기
-4. Labels: `good first issue`, `help wanted` + 파일 상단 권장 라벨
+4. Labels: 파일 3번째 줄 `**Labels:**` 에 나열된 라벨 전부 적용
 
 ### 스크립트 (GitHub CLI 필요)
 ```powershell
