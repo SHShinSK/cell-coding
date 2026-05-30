@@ -1,11 +1,10 @@
-# Community bootstrap — starter issues + repository About
+# Community bootstrap — starter issues (+ optional About via PAT)
 #
-# 실행: GitHub → Actions → "Community bootstrap" → Run workflow
+# 실행: Actions → Community bootstrap → Run workflow
 #
-# About 403 오류 시:
-#   Settings → Actions → General → Workflow permissions →
-#   "Read and write permissions" 선택 후 재실행.
-#   그래도 실패하면 About/Topics는 DISCUSSIONS_SETUP.md 수동 설정.
+# About/Topics 자동 설정은 GITHUB_TOKEN으로 불가합니다.
+#   → 저장소 About 톱니에서 수동 입력 (아래 reminder job 참고)
+#   → 또는 Secrets에 REPO_ADMIN_TOKEN(PAT, repo scope) 추가 시 API 시도
 
 name: Community bootstrap
 
@@ -17,31 +16,34 @@ on:
         type: boolean
         default: true
       update_about:
-        description: "Update repo description, homepage, topics"
+        description: "About reminder (+ PAT update if REPO_ADMIN_TOKEN secret exists)"
         type: boolean
         default: true
 
 jobs:
-  update-about:
+  about-reminder:
     if: inputs.update_about
     runs-on: ubuntu-latest
     permissions:
-      administration: write
       contents: read
     steps:
-      - name: Update repository About
-        id: about
+      - name: About / Topics — 수동 설정 값
+        run: |
+          echo "::notice title=About (수동)::저장소 About 톱니 → Edit"
+          echo "Description: Physical AI를 위한 이벤트 기반 세포코딩 | Event-driven biological programming for Physical AI"
+          echo "Website: https://shshinsk.github.io/cell-coding/"
+          echo "Topics: physical-ai, event-driven-architecture, typescript, python, open-source, dsl, robotics"
+          echo "Guide: .github/DISCUSSIONS_SETUP.md"
+
+      - name: Update About via PAT (optional)
+        if: ${{ secrets.REPO_ADMIN_TOKEN != '' }}
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
         run: |
-          set -e
-          echo "Patching repository metadata..."
           gh api --method PATCH "repos/${{ github.repository }}" \
             -f description='Physical AI를 위한 이벤트 기반 세포코딩 | Event-driven biological programming for Physical AI' \
             -f homepage='https://shshinsk.github.io/cell-coding/'
-
-          echo "Setting topics..."
           gh api --method PUT "repos/${{ github.repository }}/topics" \
             -H "Accept: application/vnd.github+json" \
             -f 'names[]=physical-ai' \
@@ -51,14 +53,7 @@ jobs:
             -f 'names[]=open-source' \
             -f 'names[]=dsl' \
             -f 'names[]=robotics'
-
-      - name: About update failed — manual fallback
-        if: steps.about.outcome == 'failure'
-        run: |
-          echo "::warning::About/Topics API failed (403 = Workflow permissions or org policy)."
-          echo "Manual setup: .github/DISCUSSIONS_SETUP.md sections 2–3"
-          echo "Description: Physical AI를 위한 이벤트 기반 세포코딩 | Event-driven biological programming for Physical AI"
-          echo "Website: https://shshinsk.github.io/cell-coding/"
+          echo "About/Topics updated via REPO_ADMIN_TOKEN."
 
   bootstrap-issues:
     if: inputs.create_issues

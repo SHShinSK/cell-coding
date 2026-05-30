@@ -21,16 +21,16 @@
 
 ### 자동 (Actions)
 
-**Community bootstrap** 워크플로의 `update_about` 옵션.
+**Community bootstrap** 워크플로의 `update_about` 옵션은 **복사할 값을 로그에 출력**합니다.
 
-403 `Resource not accessible by integration` 오류가 나면:
+`GITHUB_TOKEN`만으로는 저장소 About/Topics API 수정이 **지원되지 않습니다** (403).  
+자동화하려면:
 
-1. **Settings** → **Actions** → **General**
-2. **Workflow permissions** → **Read and write permissions** 선택 → Save
-3. 워크플로 **Re-run**  
-   또는 `update_about`만 false로 두고 이슈만 생성
+1. GitHub → **Settings** → **Secrets and variables** → **Actions**
+2. `REPO_ADMIN_TOKEN` — Personal Access Token (`repo` scope)
+3. 워크플로 재실행 → PAT가 있으면 About/Topics API 시도
 
-조직(Organization) 저장소는 관리자 정책으로 API 수정이 막힐 수 있습니다 → 아래 수동 설정.
+대부분은 아래 **수동 설정**이 더 빠릅니다.
 
 ### 수동 (권장 백업)
 
