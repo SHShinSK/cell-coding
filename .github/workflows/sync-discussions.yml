@@ -8,6 +8,7 @@ on:
     paths:
       - .github/discussions/**
       - .github/workflows/sync-discussions.yml
+      - .github/scripts/extract-discussion-body.py
 
 permissions:
   discussions: write
@@ -19,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Sync welcome discussion #1 and seed Q&A
+      - name: "Sync welcome discussion #1 and seed Q&A"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO_OWNER: ${{ github.repository_owner }}
@@ -27,40 +28,34 @@ jobs:
         run: |
           set -euo pipefail
 
-          extract_body() {
-            python3 - "$1" <<'PY'
-          import re, sys
-          from pathlib import Path
-          text = Path(sys.argv[1]).read_text(encoding="utf-8")
-          text = re.sub(r"<!--.*?-->\s*", "", text, flags=re.S)
-          lines = text.splitlines()
-          if lines and lines[0].startswith("# "):
-              lines = lines[1:]
-          while lines and not lines[0].strip():
-              lines.pop(0)
-          print("\n".join(lines).strip())
-          PY
+          gql() {
+            gh api graphql "$@" 2>&1 | tee /tmp/gql-out.json
+            if jq -e '.errors' /tmp/gql-out.json > /dev/null 2>&1; then
+              echo "GraphQL error:" >&2
+              jq '.errors' /tmp/gql-out.json >&2
+              return 1
+            fi
+            cat /tmp/gql-out.json
           }
 
-          DISC_ID=$(gh api graphql -f query='query($o:String!,$n:String!){repository(owner:$o,name:$n){discussion(number:1){id}}}' \
-            -f o="$REPO_OWNER" -f n="$REPO_NAME" --jq '.data.repository.discussion.id')
+          DISC_ID=$(gql -f query='query($o:String!,$n:String!){repository(owner:$o,name:$n){discussion(number:1){id}}}' \
+            -f o="$REPO_OWNER" -f n="$REPO_NAME" | jq -r '.data.repository.discussion.id')
 
           if [ "$DISC_ID" = "null" ] || [ -z "$DISC_ID" ]; then
             echo "Discussion #1 not found — skip update"
           else
-            WELCOME_BODY=$(extract_body ".github/discussions/001-welcome-announcement.md")
-            gh api graphql \
-              -f query='mutation($id:ID!,$body:String!){updateDiscussion(input:{discussionId:$id,body:$body}){discussion{url}}}' \
-              -f id="$DISC_ID" -f body="$WELCOME_BODY" --jq '.data.updateDiscussion.discussion.url'
+            python3 .github/scripts/extract-discussion-body.py .github/discussions/001-welcome-announcement.md > /tmp/welcome-body.md
+            WELCOME_BODY=$(cat /tmp/welcome-body.md)
+            gql -f query='mutation($id:ID!,$body:String!){updateDiscussion(input:{discussionId:$id,body:$body}){discussion{url}}}' \
+              -f id="$DISC_ID" -f body="$WELCOME_BODY" | jq -r '.data.updateDiscussion.discussion.url'
             echo "Updated discussion #1 body"
 
-            gh api graphql \
-              -f query='mutation($id:ID!){pinDiscussion(input:{discussionId:$id}){clientMutationId}}' \
-              -f id="$DISC_ID" --jq '.data.pinDiscussion.clientMutationId' > /dev/null
+            gql -f query='mutation($id:ID!){pinDiscussion(input:{discussionId:$id}){clientMutationId}}' \
+              -f id="$DISC_ID" | jq -r '.data.pinDiscussion.clientMutationId' > /dev/null
             echo "Pinned discussion #1"
           fi
 
-          META=$(gh api graphql -f query='query($o:String!,$n:String!){repository(owner:$o,name:$n){id discussionCategories(first:20){nodes{id slug}}}}' \
+          META=$(gql -f query='query($o:String!,$n:String!){repository(owner:$o,name:$n){id discussionCategories(first:20){nodes{id slug}}}}' \
             -f o="$REPO_OWNER" -f n="$REPO_NAME")
 
           REPO_NODE=$(echo "$META" | jq -r '.data.repository.id')
@@ -72,8 +67,7 @@ jobs:
           fi
 
           QA_TITLE="New here? Ask anything about Cell Coding · 처음이신가요? 세포코딩 질문을 남겨 주세요"
-          EXISTING=$(gh api graphql \
-            -f query='query($o:String!,$n:String!,$cat:ID!){repository(owner:$o,name:$n){discussions(first:30,categoryId:$cat){nodes{title}}}}' \
+          EXISTING=$(gql -f query='query($o:String!,$n:String!,$cat:ID!){repository(owner:$o,name:$n){discussions(first:30,categoryId:$cat){nodes{title}}}}' \
             -f o="$REPO_OWNER" -f n="$REPO_NAME" -f cat="$QA_CAT")
 
           if echo "$EXISTING" | jq -e --arg t "$QA_TITLE" '.data.repository.discussions.nodes[] | select(.title==$t)' > /dev/null; then
@@ -81,8 +75,8 @@ jobs:
             exit 0
           fi
 
-          QA_BODY=$(extract_body ".github/discussions/002-qa-welcome.md")
-          gh api graphql \
-            -f query='mutation($repo:ID!,$cat:ID!,$title:String!,$body:String!){createDiscussion(input:{repositoryId:$repo,categoryId:$cat,title:$title,body:$body}){discussion{url number}}}' \
+          python3 .github/scripts/extract-discussion-body.py .github/discussions/002-qa-welcome.md > /tmp/qa-body.md
+          QA_BODY=$(cat /tmp/qa-body.md)
+          gql -f query='mutation($repo:ID!,$cat:ID!,$title:String!,$body:String!){createDiscussion(input:{repositoryId:$repo,categoryId:$cat,title:$title,body:$body}){discussion{url number}}}' \
             -f repo="$REPO_NODE" -f cat="$QA_CAT" -f title="$QA_TITLE" -f body="$QA_BODY" \
-            --jq '.data.createDiscussion.discussion | "Created Q&A #\(.number): \(.url)"'
+            | jq -r '.data.createDiscussion.discussion | "Created Q&A #\(.number): \(.url)"'
