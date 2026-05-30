@@ -37,16 +37,25 @@ We need software modeled as a network of many specialized functional units.
 Cell Coding defines those units as `Cell`s with explicit `role`, `membrane`, and `signal` contracts.  
 Cell Coding은 그 단위를 `role`, `membrane`, `signal` 계약을 가진 `Cell`로 정의합니다.
 
-## Spider robot example | 거미 로봇 예시
+## Physical AI scenarios | Physical AI 시나리오
 
-A spider robot can ingest vision, hearing, tactile, and chemical context at once.  
-거미 로봇은 시각·청각·촉각·화학적 맥락을 동시에 받아들일 수 있습니다.
+Cell Coding maps embodied systems into functional cell networks, not one monolithic controller.  
+Cell Coding은 구현체 시스템을 단일 거대 컨트롤러가 아니라 기능 세포 네트워크로 매핑합니다.
 
-Its actions are also diverse: locomotion patterns, web-generation behavior, and chemical operations.  
-행동 결과 또한 다양합니다. 보행 패턴, 거미줄 생성 행동, 화학적 작동 같은 결과가 함께 발생합니다.
+### Spider robot | 거미 로봇
 
-This is better modeled as cooperating cells than as a single monolithic pipeline.  
-이는 단일 거대 파이프라인보다 협업하는 세포 구조로 모델링하는 편이 더 적합합니다.
+A spider robot ingests vision, hearing, tactile, and chemical context simultaneously, then produces locomotion patterns, web generation, and chemical actions — sensing and acting cells adapt to terrain rather than following a fixed pipeline.  
+거미 로봇은 시각·청각·촉각·화학적 맥락을 동시에 받아들이고, 보행 패턴·거미줄 생성·화학적 작동을 만들어냅니다. 감각·행동 세포가 고정 파이프라인이 아니라 지형에 적응합니다.
+
+### Humanoid robot | 휴머노이드
+
+A humanoid ingests vision, proprioception, balance, hand tactile, and speech context at once. Its actions span bipedal locomotion, grasping, gestures, facial expression, and speech — better modeled as cooperating organs (balance, manipulation, interaction) than one controller pipeline.  
+휴머노이드는 시각·고유수용감각·균형·손 촉각·음성 맥락을 동시에 처리합니다. 이족 보행, 파지, 제스처, 표정, 발화는 단일 컨트롤러가 아니라 균형·조작·상호작용 기관의 협업으로 표현하는 편이 적합합니다.
+
+### PET robot | 반려(PET) 로봇
+
+A companion PET robot reads owner presence, touch, voice tone, and ambient home context continuously. Its behaviors include following, responsive vocalization, tail/LED expression, and comfort actions — modeled as affect and safety cells, not discrete I/O events.  
+반려(PET) 로봇은 주인 존재, 터치, 음성 톤, 가정 환경 맥락을 연속적으로 읽습니다. 따라가기, 반응형 발성, 꼬리/LED 표현, 위로 행동은 이산 I/O가 아니라 정서·안전 세포 네트워크로 모델링합니다.
 
 ## One-liner | 한 줄 정의
 
