@@ -4,7 +4,8 @@
 
 Physical AI를 위한 이벤트 기반 생물학적 프로그래밍 패러다임.
 
-**저장소:** https://github.com/SHShinSK/cell-coding
+**저장소:** https://github.com/SHShinSK/cell-coding  
+**문서 사이트 (Pages):** https://shshinsk.github.io/cell-coding/ *(Actions 배포 후 활성화)*
 
 Cell Coding은 기존 프레임워크를 대체하는 언어 운동이 아니라, `TypeScript`/`Python`/`React` 위에 얹어 사용할 수 있는 **확장형 아키텍처 모델**을 지향합니다.
 
@@ -54,7 +55,12 @@ Cell Coding은 기존 프레임워크를 대체하는 언어 운동이 아니라
 1. [Issues](https://github.com/SHShinSK/cell-coding/issues) — 버그·기능·질문
 2. [Discussions](https://github.com/SHShinSK/cell-coding/discussions) — 아이디어·사용법
 3. [CONTRIBUTING.md](CONTRIBUTING.md) — 기여 절차
-4. `good first issue` 라벨 — 첫 기여용 작업
+4. `good first issue` 라벨 — [starter issues 초안](.github/issue-drafts/README.md)
+
+## GitHub 설정 (Maintainer)
+
+- [Discussions · About · Topics](.github/DISCUSSIONS_SETUP.md)
+- [Pages 배포](.github/workflows/pages.yml) — Settings → Pages → **GitHub Actions**
 
 ## 문서
 

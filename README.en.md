@@ -34,6 +34,7 @@ Decompose by **role**, declare boundaries with **membrane**, and connect systems
 ## Repository
 
 - GitHub: https://github.com/SHShinSK/cell-coding
+- Site: https://shshinsk.github.io/cell-coding/ *(after Pages deploy)*
 - Issues: https://github.com/SHShinSK/cell-coding/issues
 - Discussions: https://github.com/SHShinSK/cell-coding/discussions
 
