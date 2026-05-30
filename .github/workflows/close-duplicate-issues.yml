@@ -1,6 +1,4 @@
-# One-time cleanup: close duplicate starter issues #2–#19
-# Canonical set: #20–#28 (EN/KR bilingual drafts)
-#
+# Close duplicate starter issues #2–#19 (keep canonical #20–#28)
 # Run: Actions → Close duplicate starter issues → Run workflow
 
 name: Close duplicate starter issues
@@ -20,57 +18,64 @@ jobs:
   close-duplicates:
     runs-on: ubuntu-latest
     steps:
-      - name: Close issues #2–#19
+      - name: Close issues #2–#19 via REST API
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          canonical=(
-            "20:validator.cell"
-            "21:package.json"
-            "22:lexer generic"
-            "23:parser List/Map"
-            "24:transpiler"
-            "25:SECURITY.md"
-            "26:CTA banner"
-            "27:checker signal extends"
-            "28:Physical AI example"
-          )
-          close_with_comment() {
+          set -euo pipefail
+          close_issue() {
             local num=$1
             local canon=$2
             local state
-            state=$(gh issue view "$num" --repo "${{ github.repository }}" --json state --jq .state 2>/dev/null || echo "missing")
+            state=$(curl -sS -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/issues/${num}" \
+              | jq -r '.state // "missing"')
             if [ "$state" != "open" ]; then
-              echo "Skip #$num (state=$state)"
-              return
+              echo "Skip #${num} (state=${state})"
+              return 0
             fi
-            gh issue close "$num" --repo "${{ github.repository }}" \
-              --comment "Duplicate starter issue — superseded by canonical bilingual draft **#$canon**.  
-          중복 스타터 이슈 — 정본 **#$canon** (EN/KR 병렬 초안)으로 대체됨."
-            echo "Closed #$num → canonical #$canon"
+            curl -sS -X PATCH \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/issues/${num}" \
+              -d '{"state":"closed","state_reason":"not_planned"}' > /dev/null
+            curl -sS -X POST \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/issues/${num}/comments" \
+              -d "$(jq -nc --arg b "Duplicate starter issue — superseded by canonical **#${canon}** (EN/KR bilingual draft). 중복 스타터 이슈 — 정본 **#${canon}** 으로 대체됨." '{body:$b}')" > /dev/null
+            echo "Closed #${num} → canonical #${canon}"
             sleep 1
           }
-          # Batch 1 (#2–#10) and batch 2 (#11–#19) → map to #20–#28
           for offset in 0 1 2 3 4 5 6 7 8; do
-            canon_num=$((20 + offset))
-            close_with_comment $((2 + offset)) "$canon_num"
-            close_with_comment $((11 + offset)) "$canon_num"
+            canon=$((20 + offset))
+            close_issue $((2 + offset)) "$canon"
+            close_issue $((11 + offset)) "$canon"
           done
 
       - name: Ensure #22 has bug label
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          labels=$(gh issue view 22 --repo "${{ github.repository }}" --json labels --jq '[.labels[].name] | join(",")')
-          echo "Issue #22 labels: $labels"
-          if echo "$labels" | grep -q 'bug'; then
-            echo "bug label already present on #22"
+          has_bug=$(curl -sS -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${REPO}/issues/22" \
+            | jq '[.labels[].name] | index("bug") != null')
+          if [ "$has_bug" = "true" ]; then
+            echo "Issue #22 already has bug label"
           else
-            gh issue edit 22 --repo "${{ github.repository }}" --add-label "bug"
+            curl -sS -X POST \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/issues/22/labels" \
+              -d '["bug"]' > /dev/null
             echo "Added bug label to #22"
           fi
 
       - name: Summary
         run: |
-          echo "Open starter issues should be #20–#28 only."
-          echo "https://github.com/${{ github.repository }}/issues"
+          echo "Expected open starter issues: #20–#28 (9 items)"
+          echo "https://github.com/${{ github.repository }}/issues?q=is%3Aissue+is%3Aopen"
