@@ -1,30 +1,35 @@
-name: 질문
-description: 사용 방법/설계 이해를 위한 질문
+name: Question · 질문
+description: Usage or design question. 사용 방법/설계 이해를 위한 질문.
 title: "[question] "
 labels:
   - question
 body:
+  - type: markdown
+    attributes:
+      value: |
+        English first · Korean parallel. For general discussion, prefer Discussions.
+        영어 우선 · 한국어 병렬. 일반 토론은 Discussions를 이용해 주세요.
+
   - type: textarea
     id: question
     attributes:
-      label: 질문 내용
-      description: 궁금한 내용을 최대한 구체적으로 작성해 주세요.
+      label: Question · 질문 내용
+      description: Be as specific as possible. 궁금한 내용을 최대한 구체적으로 작성해 주세요.
     validations:
       required: true
 
   - type: textarea
     id: tried
     attributes:
-      label: 시도한 내용
-      description: 이미 확인해 본 문서/코드/실험이 있다면 적어 주세요.
+      label: What you tried · 시도한 내용
+      description: Docs, code, or experiments already checked. 이미 확인해 본 문서/코드/실험.
     validations:
       required: false
 
   - type: textarea
     id: context
     attributes:
-      label: 맥락
-      description: Runtime/Bridge/Viewer/DSL 중 어떤 맥락인지 알려 주세요.
+      label: Context · 맥락
+      description: Runtime / Bridge / Viewer / DSL, etc. 어떤 맥락인지 알려 주세요.
     validations:
       required: false
-

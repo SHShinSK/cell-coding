@@ -1,5 +1,5 @@
-name: 버그 리포트
-description: 재현 가능한 결함을 제보합니다.
+name: Bug report · 버그 리포트
+description: Report a reproducible defect. 재현 가능한 결함을 제보합니다.
 title: "[bug] "
 labels:
   - bug
@@ -7,38 +7,39 @@ body:
   - type: markdown
     attributes:
       value: |
-        감사합니다. 재현 가능한 버그 리포트는 문제 해결 속도를 크게 높입니다.
+        English first · Korean parallel. Reproducible bug reports help us fix issues faster.
+        영어 우선 · 한국어 병렬. 재현 가능한 버그 리포트는 문제 해결 속도를 크게 높입니다.
 
   - type: textarea
     id: summary
     attributes:
-      label: 요약
-      description: 어떤 문제가 발생했는지 한두 문장으로 설명해 주세요.
-      placeholder: 예) MotionDetected 신호를 emit해도 AlarmActuator가 반응하지 않습니다.
+      label: Summary · 요약
+      description: Describe the problem in one or two sentences. 한두 문장으로 문제를 설명해 주세요.
+      placeholder: e.g.) AlarmActuator does not react when MotionDetected is emitted · MotionDetected 신호를 emit해도 AlarmActuator가 반응하지 않습니다.
     validations:
       required: true
 
   - type: textarea
     id: expected
     attributes:
-      label: 기대 동작
-      description: 원래 어떻게 동작해야 하는지 작성해 주세요.
+      label: Expected behavior · 기대 동작
+      description: What should happen? 원래 어떻게 동작해야 하는지 작성해 주세요.
     validations:
       required: true
 
   - type: textarea
     id: actual
     attributes:
-      label: 실제 동작
-      description: 실제로 어떤 동작이 발생했는지 작성해 주세요.
+      label: Actual behavior · 실제 동작
+      description: What actually happened? 실제로 어떤 동작이 발생했는지 작성해 주세요.
     validations:
       required: true
 
   - type: textarea
     id: steps
     attributes:
-      label: 재현 절차
-      description: 최소 재현 절차를 단계별로 작성해 주세요.
+      label: Steps to reproduce · 재현 절차
+      description: Minimal steps to reproduce. 최소 재현 절차를 단계별로 작성해 주세요.
       placeholder: |
         1. ...
         2. ...
@@ -49,8 +50,8 @@ body:
   - type: textarea
     id: logs
     attributes:
-      label: 로그 / 스크린샷 / 추가 정보
-      description: 에러 로그, 스택 트레이스, 화면 캡처 등을 첨부해 주세요.
+      label: Logs / screenshots · 로그 / 스크린샷
+      description: Error logs, stack traces, screenshots, etc. 에러 로그, 스택 트레이스, 화면 캡처 등.
       render: shell
     validations:
       required: false
@@ -58,18 +59,17 @@ body:
   - type: input
     id: version
     attributes:
-      label: 사용 버전
-      description: 앱/패키지 버전을 작성해 주세요.
-      placeholder: 예) v0.1.2
+      label: Version · 사용 버전
+      description: App/package version. 앱/패키지 버전.
+      placeholder: e.g.) v0.1.2
     validations:
       required: true
 
   - type: input
     id: environment
     attributes:
-      label: 실행 환경
-      description: OS, 런타임(Node/Python), 브라우저 등
-      placeholder: 예) Windows 11, Node 20.15, Python 3.11
+      label: Environment · 실행 환경
+      description: OS, runtime (Node/Python), browser, etc. OS, 런타임, 브라우저 등.
+      placeholder: e.g.) Windows 11, Node 20.15, Python 3.11
     validations:
       required: true
-

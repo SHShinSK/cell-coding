@@ -1,33 +1,23 @@
-# [good-first-issue] MotionDetected → AlarmActuator Physical AI 예제 문서화
+# [good-first-issue] Document MotionDetected → AlarmActuator Physical AI example · MotionDetected → AlarmActuator Physical AI 예제 문서화
 
 **Labels:** `good first issue`, `help wanted`, `docs`, `area:runtime`, `priority:medium`
 
 ---
 
-## 한국어
+## Goal · 목표
 
-### 목표
+Document the Physical AI PoC scenario in `examples/`.
+
 Physical AI PoC 시나리오를 `examples/` 문서로 정리합니다.
 
-### 작업
-- [ ] `examples/physical-ai-motion-alarm.md` (한/영)
-- [ ] `gemini-code-1780054880904.html` / Blueprint와 교차 링크
-- [ ] 신호 흐름 다이agram (mermaid) 1개
+## Tasks · 작업
 
-### 완료 기준
-- 신규 기여자가 시나리오를 5분 내 이해 가능
+- [ ] `examples/physical-ai-motion-alarm.md` (EN/KR) · 한/영 문서
+- [ ] Cross-links to Blueprint / PoC HTML · Blueprint·PoC HTML 교차 링크
+- [ ] One mermaid signal-flow diagram · 신호 흐름 mermaid 다이어그램 1개
 
----
+## Definition of done · 완료 기준
 
-## English
-
-### Goal
-Document Physical AI PoC: MotionDetected → AlarmActuator in `examples/`.
-
-### Tasks
-- [ ] `examples/physical-ai-motion-alarm.md` (KO/EN)
-- [ ] Cross-links to Blueprint / PoC HTML
-- [ ] One mermaid signal-flow diagram
-
-### Done when
 New contributors understand the scenario within ~5 minutes.
+
+신규 기여자가 시나리오를 5분 내 이해 가능.

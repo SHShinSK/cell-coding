@@ -77,7 +77,8 @@ iot
 
 ## 6) Starter Issues 등록
 
-`.github/issue-drafts/` 폴더의 10개 파일을 GitHub Issues로 등록하세요.
+`.github/issue-drafts/` 폴더의 10개 파일을 GitHub Issues로 등록하세요.  
+초안은 **English first · Korean parallel** 형식입니다 (제목: `English · 한국어`).
 
 PowerShell (GitHub CLI 설치 시):
 
@@ -86,4 +87,6 @@ cd d:\Claude
 .\.github\scripts\create-starter-issues.ps1
 ```
 
-수동: 각 `.md` 파일 내용을 복사해 **New issue** → 붙여넣기 → 라벨 `good first issue`, `help wanted` 추가.
+또는 **Actions → Community bootstrap → Run workflow** (`create_issues: true`).
+
+수동: 각 `.md` 파일 내용을 복사해 **New issue** → 첫 줄 `# ` 제거 후 제목으로 사용 → `**Labels:**` 줄의 라벨 전부 적용.

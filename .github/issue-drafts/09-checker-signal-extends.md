@@ -1,30 +1,26 @@
-# [good-first-issue] Checker: signal extends 호환성 검증
+# [good-first-issue] Checker: validate signal extends compatibility · Checker: signal extends 호환성 검증
 
 **Labels:** `good first issue`, `help wanted`, `feature`, `area:dsl-compiler`, `priority:medium`
 
 ---
 
-## 한국어
+## Goal · 목표
 
-### 목표
+Add signal `extends` chain support to membrane compatibility checks in `checker.ts`.
+
 `checker.ts`에 signal `extends` 관계를 반영한 막 호환 검사를 추가합니다.
 
-### 작업
-- [ ] SignalDecl 수집 시 `extends` 체인 구축
-- [ ] membrane accepts가 상위 신호 타입도 수용하는지 검증 (명세 §11)
+## Tasks · 작업
 
-### 참고
+- [ ] Build `extends` chain when collecting `SignalDecl` · SignalDecl 수집 시 `extends` 체인 구축
+- [ ] Verify membrane `accepts` accepts supertype signals (spec §11) · membrane accepts 상위 타입 수용 검증
+
+## References · 참고
+
 - `language-specification.html` — signal extends, structural typing
 
-### 완료 기준
-- 하위 신호가 상위를 accepts하는 막에 전달 가능함을 checker가 인지
+## Definition of done · 완료 기준
 
----
+Checker recognizes subtype signals for `accepts` validation per spec §11.
 
-## English
-
-### Goal
-Add signal `extends` chain to membrane compatibility checks in `checker.ts`.
-
-### Done when
-Checker recognizes subtype signals for accepts validation per spec §11.
+하위 신호가 상위를 accepts하는 막에 전달 가능함을 checker가 인지.
