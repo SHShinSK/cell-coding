@@ -1,0 +1,76 @@
+# One-time cleanup: close duplicate starter issues #2–#19
+# Canonical set: #20–#28 (EN/KR bilingual drafts)
+#
+# Run: Actions → Close duplicate starter issues → Run workflow
+
+name: Close duplicate starter issues
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/close-duplicate-issues.yml
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  close-duplicates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close issues #2–#19
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          canonical=(
+            "20:validator.cell"
+            "21:package.json"
+            "22:lexer generic"
+            "23:parser List/Map"
+            "24:transpiler"
+            "25:SECURITY.md"
+            "26:CTA banner"
+            "27:checker signal extends"
+            "28:Physical AI example"
+          )
+          close_with_comment() {
+            local num=$1
+            local canon=$2
+            local state
+            state=$(gh issue view "$num" --repo "${{ github.repository }}" --json state --jq .state 2>/dev/null || echo "missing")
+            if [ "$state" != "open" ]; then
+              echo "Skip #$num (state=$state)"
+              return
+            fi
+            gh issue close "$num" --repo "${{ github.repository }}" \
+              --comment "Duplicate starter issue — superseded by canonical bilingual draft **#$canon**.  
+          중복 스타터 이슈 — 정본 **#$canon** (EN/KR 병렬 초안)으로 대체됨."
+            echo "Closed #$num → canonical #$canon"
+            sleep 1
+          }
+          # Batch 1 (#2–#10) and batch 2 (#11–#19) → map to #20–#28
+          for offset in 0 1 2 3 4 5 6 7 8; do
+            canon_num=$((20 + offset))
+            close_with_comment $((2 + offset)) "$canon_num"
+            close_with_comment $((11 + offset)) "$canon_num"
+          done
+
+      - name: Ensure #22 has bug label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          labels=$(gh issue view 22 --repo "${{ github.repository }}" --json labels --jq '[.labels[].name] | join(",")')
+          echo "Issue #22 labels: $labels"
+          if echo "$labels" | grep -q 'bug'; then
+            echo "bug label already present on #22"
+          else
+            gh issue edit 22 --repo "${{ github.repository }}" --add-label "bug"
+            echo "Added bug label to #22"
+          fi
+
+      - name: Summary
+        run: |
+          echo "Open starter issues should be #20–#28 only."
+          echo "https://github.com/${{ github.repository }}/issues"
