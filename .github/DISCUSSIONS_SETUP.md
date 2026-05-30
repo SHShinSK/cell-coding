@@ -75,7 +75,17 @@ iot
 - `area:runtime`, `area:dsl-compiler`, `area:docs`
 - `priority:low`, `priority:medium`, `priority:high`
 
-## 6) Starter Issues 등록
+## 7) Welcome 공지 동기화 (Actions)
+
+`.github/discussions/001-welcome-announcement.md` 수정 후 push하면 **Sync community discussions** 워크플로가:
+
+1. Discussion **#1** 본문 업데이트 + **Pin**
+2. **Q&A** 시드 스레드 생성 (`.github/discussions/002-qa-welcome.md`)
+
+`GITHUB_TOKEN`만으로 GraphQL이 거부되면(403) Actions secrets에 **`REPO_ADMIN_TOKEN`** (PAT, `repo` scope)을 추가한 뒤 워크플로를 재실행하세요.  
+실패 시 Actions Summary에 수동 붙여넣기 안내가 표시됩니다.
+
+## 8) Starter Issues 등록
 
 `.github/issue-drafts/` 폴더의 10개 파일을 GitHub Issues로 등록하세요.  
 초안은 **English first · Korean parallel** 형식입니다 (제목: `English · 한국어`).
