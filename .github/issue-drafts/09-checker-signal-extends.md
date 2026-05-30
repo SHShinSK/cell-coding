@@ -14,7 +14,7 @@
 - [ ] membrane accepts가 상위 신호 타입도 수용하는지 검증 (명세 §11)
 
 ### 참고
-- `개발명세서.html` — signal extends, structural typing
+- `language-specification.html` — signal extends, structural typing
 
 ### 완료 기준
 - 하위 신호가 상위를 accepts하는 막에 전달 가능함을 checker가 인지

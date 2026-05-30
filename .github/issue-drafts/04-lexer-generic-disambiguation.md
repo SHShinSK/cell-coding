@@ -15,7 +15,7 @@
 
 ### 참고 파일
 - `typescript/lexer.ts`
-- `개발명세서.html` §11 타입 시스템
+- `language-specification.html` §11 타입 시스템
 
 ### 완료 기준
 - 두 패턴 모두 올바른 토큰으로 분리됨

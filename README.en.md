@@ -115,7 +115,7 @@ See [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html
 | [index.html](https://shshinsk.github.io/cell-coding/) | [README.en.md](README.en.md) |
 | [concept-overview.html](https://shshinsk.github.io/cell-coding/concept-overview.html) | — |
 | [cell-coding.html](https://shshinsk.github.io/cell-coding/cell-coding.html) | — |
-| [개발명세서.html](https://shshinsk.github.io/cell-coding/%EA%B0%9C%EB%B0%9C%EB%AA%85%EC%84%B8%EC%84%9C.html) | — |
+| [language-specification.html](https://shshinsk.github.io/cell-coding/language-specification.html) | — |
 | [roadmap.html](https://shshinsk.github.io/cell-coding/roadmap.html) | [ROADMAP.en.md](ROADMAP.en.md) |
 | [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) | [CONTRIBUTING.en.md](CONTRIBUTING.en.md) |
 | — | [OPEN_SOURCE_CHARTER.en.md](OPEN_SOURCE_CHARTER.en.md) |
@@ -128,7 +128,7 @@ See [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html
 
 - [concept-overview.html](concept-overview.html) — integrated process diagram / 통합 프로세스 다이어그램
 - [cell-coding.html](cell-coding.html) — paradigm overview
-- [개발명세서.html](개발명세서.html) — language specification v0.1
+- [language-specification.html](language-specification.html) — language specification v0.1
 - [roadmap.html](roadmap.html) — implementation roadmap
 - [contributing.html](contributing.html) — contributing guide
 - [Cell Coding Blueprint.html](Cell%20Coding%20Blueprint.html) — Physical AI blueprint

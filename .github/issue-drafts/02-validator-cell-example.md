@@ -14,7 +14,7 @@
 - [ ] `examples/README.md`에 예제 설명 (한/영 1문단)
 
 ### 참고
-- `개발명세서.html` §2 cell 해부 구조
+- `language-specification.html` §2 cell 해부 구조
 - `typescript/` 파서가 파싱 가능한 문법만 사용
 
 ### 완료 기준
