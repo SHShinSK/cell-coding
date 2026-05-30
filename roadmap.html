@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cell Coding — Implementation Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #070a0f;
+  --bg2:      #0d1219;
+  --bg3:      #131b26;
+  --green:    #00e5a0;
+  --purple:   #a78bfa;
+  --amber:    #fbbf24;
+  --coral:    #fb7185;
+  --blue:     #60a5fa;
+  --text:     #e2e8f0;
+  --dim:      rgba(226,232,240,0.45);
+  --mute:     rgba(226,232,240,0.18);
+  --border:   rgba(255,255,255,0.07);
+  --p1:       #00e5a0;
+  --p2:       #a78bfa;
+  --p3:       #fbbf24;
+  --p4:       #fb7185;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+}
+
+/* canvas bg */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.18;}
+
+/* layout */
+.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 40px;}
+
+/* hero */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:100px 0 60px;
+}
+.hero-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--green);
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:32px;
+}
+.hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--green);}
+.hero-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:clamp(44px,7vw,88px);
+  font-weight:700;line-height:.95;
+  letter-spacing:-.03em;
+  margin-bottom:20px;
+}
+.hero-title .accent{
+  display:block;
+  background:linear-gradient(90deg,var(--green),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;color:var(--dim);
+  line-height:1.8;
+  border-left:2px solid rgba(0,229,160,.3);
+  padding-left:16px;
+  margin-bottom:48px;
+  max-width:480px;
+}
+.hero-meta{
+  display:flex;gap:32px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--mute);
+  letter-spacing:.1em;
+}
+.hero-meta span{display:flex;align-items:center;gap:8px;}
+.hero-meta span::before{content:'';width:6px;height:6px;border-radius:50%;}
+.hero-meta .m1::before{background:var(--p1);}
+.hero-meta .m2::before{background:var(--p2);}
+.hero-meta .m3::before{background:var(--p3);}
+.hero-meta .m4::before{background:var(--p4);}
+
+/* section */
+.section{padding:80px 0;}
+.section-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--dim);margin-bottom:48px;
+  display:flex;align-items:center;gap:12px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* phases */
+.phase{margin-bottom:4px;border-radius:2px;overflow:hidden;}
+
+.phase-header{
+  display:grid;grid-template-columns:200px 1fr;
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:border-color .3s;
+  user-select:none;
+}
+.phase-header:hover{border-color:rgba(255,255,255,.15);}
+
+.phase-num{
+  padding:28px 32px;
+  display:flex;flex-direction:column;justify-content:center;
+  border-right:1px solid var(--border);
+}
+.phase-badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.phase-timeline{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--dim);
+}
+.phase-info{
+  padding:28px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.phase-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:20px;font-weight:500;
+}
+.phase-title-en{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--dim);letter-spacing:.08em;margin-top:4px;
+}
+.phase-toggle{
+  font-size:20px;color:var(--dim);
+  transition:transform .3s;
+}
+
+.phase-body{
+  display:grid;grid-template-rows:0fr;
+  transition:grid-template-rows .4s ease;
+  border:1px solid var(--border);border-top:none;
+  background:var(--bg2);
+}
+.phase-body.open{grid-template-rows:1fr;}
+.phase-body-inner{overflow:hidden;}
+
+.phase-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border);
+  padding:1px;
+}
+.task{
+  background:var(--bg3);
+  padding:28px 24px;
+  transition:background .2s;
+  cursor:default;
+}
+.task:hover{background:#1a2535;}
+.task-icon{font-size:24px;margin-bottom:14px;}
+.task-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:14px;font-weight:500;
+  margin-bottom:10px;
+}
+.task-items{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.task-items li{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--dim);
+  display:flex;align-items:center;gap:8px;
+}
+.task-items li::before{content:'›';font-size:14px;flex-shrink:0;}
+
+.phase-checkpoint{
+  padding:20px 24px;
+  border-top:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--dim);
+  display:flex;align-items:flex-start;gap:10px;
+  line-height:1.7;
+}
+.checkpoint-label{
+  font-size:9px;letter-spacing:.2em;text-transform:uppercase;
+  padding:3px 8px;border-radius:2px;
+  white-space:nowrap;margin-top:1px;flex-shrink:0;
+}
+
+/* phase colors */
+.ph1 .phase-badge{color:var(--p1);}
+.ph1 .phase-header{background:rgba(0,229,160,.04);}
+.ph1 .phase-header:hover{background:rgba(0,229,160,.07);}
+.ph1 .task-items li::before{color:var(--p1);}
+.ph1 .checkpoint-label{background:rgba(0,229,160,.12);color:var(--p1);}
+.ph1 .phase-title{color:var(--p1);}
+
+.ph2 .phase-badge{color:var(--p2);}
+.ph2 .phase-header{background:rgba(167,139,250,.04);}
+.ph2 .phase-header:hover{background:rgba(167,139,250,.07);}
+.ph2 .task-items li::before{color:var(--p2);}
+.ph2 .checkpoint-label{background:rgba(167,139,250,.12);color:var(--p2);}
+.ph2 .phase-title{color:var(--p2);}
+
+.ph3 .phase-badge{color:var(--p3);}
+.ph3 .phase-header{background:rgba(251,191,36,.04);}
+.ph3 .phase-header:hover{background:rgba(251,191,36,.07);}
+.ph3 .task-items li::before{color:var(--p3);}
+.ph3 .checkpoint-label{background:rgba(251,191,36,.12);color:var(--p3);}
+.ph3 .phase-title{color:var(--p3);}
+
+.ph4 .phase-badge{color:var(--p4);}
+.ph4 .phase-header{background:rgba(251,113,133,.04);}
+.ph4 .phase-header:hover{background:rgba(251,113,133,.07);}
+.ph4 .task-items li::before{color:var(--p4);}
+.ph4 .checkpoint-label{background:rgba(251,113,133,.12);color:var(--p4);}
+.ph4 .phase-title{color:var(--p4);}
+
+/* now section */
+.now-section{
+  background:var(--bg2);
+  border:1px solid rgba(0,229,160,.2);
+  border-radius:2px;
+  padding:40px;
+  display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;
+  margin-top:64px;
+}
+.now-title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:22px;font-weight:500;margin-bottom:12px;color:var(--green);
+}
+.now-body{font-size:14px;line-height:1.85;color:var(--dim);}
+.now-code{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  background:#010409;border:1px solid rgba(0,229,160,.15);
+  padding:20px 24px;white-space:nowrap;
+  border-radius:2px;color:var(--green);line-height:2;
+}
+.now-code .dim{color:rgba(0,229,160,.4);}
+
+/* footer */
+footer{
+  border-top:1px solid var(--border);
+  padding:32px 0;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--mute);letter-spacing:.1em;
+}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;}
+
+/* fade in */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.in{opacity:1;transform:none;}
+
+@media(max-width:700px){
+  .wrap{padding:0 20px;}
+  .phase-header{grid-template-columns:1fr;}
+  .phase-num{border-right:none;border-bottom:1px solid var(--border);padding:20px;}
+  .phase-grid{grid-template-columns:1fr;}
+  .now-section{grid-template-columns:1fr;}
+  .hero-meta{flex-wrap:wrap;gap:16px;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrap">
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-eyebrow">Implementation Roadmap</div>
+    <h1 class="hero-title">
+      세포코딩<br>
+      <span class="accent">구현 로드맵</span>
+    </h1>
+    <p class="hero-sub">
+      언어 스펙에서 플랫폼까지<br>
+      단계별 실전 구현 가이드 · Cell Coding v0.1
+    </p>
+    <div class="hero-meta">
+      <span class="m1">Phase 1 · 언어 핵심 · 3–6mo</span>
+      <span class="m2">Phase 2 · 런타임 · 4–6mo</span>
+      <span class="m3">Phase 3 · 개발도구 · 4–6mo</span>
+      <span class="m4">Phase 4 · 플랫폼 · 6mo+</span>
+    </div>
+  </section>
+
+  <hr style="border:none;border-top:1px solid var(--border)">
+
+  <!-- ── PHASES ── -->
+  <section class="section">
+    <div class="section-label">Four Phases</div>
+
+    <!-- Phase 1 -->
+    <div class="phase ph1 reveal">
+      <div class="phase-header" onclick="toggle(this)">
+        <div class="phase-num">
+          <div class="phase-badge">Phase 01</div>
+          <div class="phase-timeline">3 – 6 개월</div>
+        </div>
+        <div class="phase-info">
+          <div>
+            <div class="phase-title">언어 핵심 구현</div>
+            <div class="phase-title-en">Lexer · Parser · AST · Transpiler</div>
+          </div>
+          <div class="phase-toggle">↓</div>
+        </div>
+      </div>
+      <div class="phase-body open">
+        <div class="phase-body-inner">
+          <div class="phase-grid">
+            <div class="task">
+              <div class="task-icon">🔤</div>
+              <div class="task-title">Lexer</div>
+              <ul class="task-items">
+                <li>24개 키워드 토큰화</li>
+                <li>cell / signal / membrane</li>
+                <li>on / emit / absorb</li>
+                <li>organism / organ / tissue</li>
+                <li>genome / nervous / immune</li>
+              </ul>
+            </div>
+            <div class="task">
+              <div class="task-icon">🌳</div>
+              <div class="task-title">Parser + AST</div>
+              <ul class="task-items">
+                <li>CellNode 구조 정의</li>
+                <li>MembraneNode 파싱</li>
+                <li>SignalNode 파싱</li>
+                <li>HandlerNode (on 블록)</li>
+                <li>OrganismNode 계층</li>
+              </ul>
+            </div>
+            <div class="task">
+              <div class="task-icon">⚡</div>
+              <div class="task-title">Type Checker + Transpiler</div>
+              <ul class="task-items">
+                <li>막 계약 신호 타입 검증</li>
+                <li>role 필수 필드 체크</li>
+                <li>직접 참조 금지 규칙</li>
+                <li>.cell → TypeScript 출력</li>
+                <li>.cell → Python 출력</li>
+              </ul>
+            </div>
+          </div>
+          <div class="phase-checkpoint">
+            <span class="checkpoint-label">체크포인트</span>
+            <span><code>cell Validator { role: "...", membrane { accepts: X, emits: Y }, on(X input) { emit Y } }</code> 를 파싱해 TypeScript 클래스로 출력할 수 있으면 완료</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase ph2 reveal">
+      <div class="phase-header" onclick="toggle(this)">
+        <div class="phase-num">
+          <div class="phase-badge">Phase 02</div>
+          <div class="phase-timeline">4 – 6 개월</div>
+        </div>
+        <div class="phase-info">
+          <div>
+            <div class="phase-title">런타임 & 신호 버스</div>
+            <div class="phase-title-en">Cell Runtime · Signal Bus · Immune System</div>
+          </div>
+          <div class="phase-toggle">↓</div>
+        </div>
+      </div>
+      <div class="phase-body open">
+        <div class="phase-body-inner">
+          <div class="phase-grid">
+            <div class="task">
+              <div class="task-icon">🔄</div>
+              <div class="task-title">Cell Runtime</div>
+              <ul class="task-items">
+                <li>생존 주기 상태 머신</li>
+                <li>genesis → dormant</li>
+                <li>active → apoptosis</li>
+                <li>격리 샌드박스</li>
+                <li>세포 레지스트리 (로컬)</li>
+              </ul>
+            </div>
+            <div class="task">
+              <div class="task-icon">📡</div>
+              <div class="task-title">Signal Bus</div>
+              <ul class="task-items">
+                <li>emit / absorb 구현</li>
+                <li>broadcast 라우팅</li>
+                <li>우선순위 큐 (critical→low)</li>
+                <li>인메모리 → Redis 어댑터</li>
+                <li>신호 불변성 보장</li>
+              </ul>
+            </div>
+            <div class="task">
+              <div class="task-icon">🛡️</div>
+              <div class="task-title">Immune System</div>
+              <ul class="task-items">
+                <li>오류 세포 격리</li>
+                <li>retry / exponential backoff</li>
+                <li>circuit breaker 패턴</li>
+                <li>dead letter 보관소</li>
+                <li>escalation 정책</li>
+              </ul>
+            </div>
+          </div>
+          <div class="phase-checkpoint">
+            <span class="checkpoint-label">체크포인트</span>
+            <span>세포 A의 emit 신호를 세포 B, C 가 동시에 받아 각자 처리하고, 세포 D 가 오류를 격리하는 예제가 실행되면 완료</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase ph3 reveal">
+      <div class="phase-header" onclick="toggle(this)">
+        <div class="phase-num">
+          <div class="phase-badge">Phase 03</div>
+          <div class="phase-timeline">4 – 6 개월</div>
+        </div>
+        <div class="phase-info">
+          <div>
+            <div class="phase-title">개발자 도구</div>
+            <div class="phase-title-en">CLI · Cell Viewer · Cell Lab</div>
+          </div>
+          <div class="phase-toggle">↓</div>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-body-inner">
+          <div class="phase-grid">
+            <div class="task">
+              <div class="task-icon">⌨️</div>
+              <div class="task-title">CLI Tool</div>
+              <ul class="task-items">
+                <li>cell init (프로젝트 생성)</li>
+                <li>cell build (트랜스파일)</li>
+                <li>cell run (실행)</li>
+                <li>cell inspect (세포 분석)</li>
+                <li>cell test (Cell Lab 실행)</li>
+              </ul>
+            </div>
+            <div class="task">
+              <div class="task-icon">🔬</div>
+              <div class="task-title">Cell Viewer</div>
+              <ul class="task-items">
+                <li>VS Code 확장 플러그인</li>
+                <li>실시간 신호 흐름 시각화</li>
+                <li>세포 생존 상태 모니터</li>
+                <li>막 계약 위반 경고</li>
+                <li>organism 계층 뷰</li>
+              </ul>
+            </div>
+            <div class="task">
+              <div class="task-icon">🧪</div>
+              <div class="task-title">Cell Lab</div>
+              <ul class="task-items">
+                <li>세포 격리 테스트 러너</li>
+                <li>신호 주입 시뮬레이터</li>
+                <li>emit 결과 단언(assert)</li>
+                <li>세포 TDD 지원</li>
+                <li>신호 커버리지 리포트</li>
+              </ul>
+            </div>
+          </div>
+          <div class="phase-checkpoint">
+            <span class="checkpoint-label">체크포인트</span>
+            <span><code>cell test auth-tissue</code> 명령 하나로 AuthTissue 내 모든 세포가 격리 테스트되고, VS Code에서 신호 흐름이 실시간으로 보이면 완료</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase ph4 reveal">
+      <div class="phase-header" onclick="toggle(this)">
+        <div class="phase-num">
+          <div class="phase-badge">Phase 04</div>
+          <div class="phase-timeline">6 개월 ~</div>
+        </div>
+        <div class="phase-info">
+          <div>
+            <div class="phase-title">플랫폼 & 생태계</div>
+            <div class="phase-title-en">Registry · Cloud Runtime · OSS Community</div>
+          </div>
+          <div class="phase-toggle">↓</div>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-body-inner">
+          <div class="phase-grid">
+            <div class="task">
+              <div class="task-icon">📦</div>
+              <div class="task-title">Cell Registry</div>
+              <ul class="task-items">
+                <li>세포 공개 허브 (npm 유사)</li>
+                <li>cell install auth-tissue</li>
+                <li>버전 관리 & 의존성</li>
+                <li>막 호환성 자동 검사</li>
+                <li>genome 라이브러리 마켓</li>
+              </ul>
+            </div>
+            <div class="task">
+              <div class="task-icon">☁️</div>
+              <div class="task-title">Cloud Runtime</div>
+              <ul class="task-items">
+                <li>organ → Kubernetes Pod</li>
+                <li>cell divide 자동 스케일</li>
+                <li>신호 버스 (Redis Streams)</li>
+                <li>OpenTelemetry 연동</li>
+                <li>서비스 메시 통합</li>
+              </ul>
+            </div>
+            <div class="task">
+              <div class="task-icon">🌐</div>
+              <div class="task-title">OSS & Community</div>
+              <ul class="task-items">
+                <li>언어 스펙 오픈소스화</li>
+                <li>RFC 거버넌스 프로세스</li>
+                <li>컨트리뷰터 가이드</li>
+                <li>다중 언어 트랜스파일러</li>
+                <li>공식 문서 사이트</li>
+              </ul>
+            </div>
+          </div>
+          <div class="phase-checkpoint">
+            <span class="checkpoint-label">체크포인트</span>
+            <span><code>cell install @community/auth-organ</code> 으로 다른 사람이 만든 organ을 내 organism에 붙이고 클라우드에 배포할 수 있으면 완료</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOW -->
+    <div class="now-section reveal">
+      <div>
+        <div class="now-title">지금 바로 시작할 수 있는 것</div>
+        <p class="now-body">
+          Phase 1의 최소 트랜스파일러가 이미 TypeScript로 구현되어 있습니다.<br>
+          <code>cell-coding-transpiler.ts</code> 를 실행해 첫 번째 세포를 파싱해보세요.
+        </p>
+      </div>
+      <div class="now-code">
+        <div><span class="dim">$</span> npx ts-node cell-coding-transpiler.ts</div>
+        <div><span class="dim">$</span> cell build ./src/validator.cell</div>
+        <div><span class="dim">$</span> cell test ./src/validator.cell</div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <span>Cell Coding · Implementation Roadmap</span>
+      <span>v0.1-draft · 2025</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── canvas particle bg ── */
+const cv=document.getElementById('bg-canvas');
+const cx=cv.getContext('2d');
+function resize(){cv.width=innerWidth;cv.height=innerHeight;}
+resize();addEventListener('resize',resize);
+const pts=Array.from({length:35},()=>({
+  x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+  vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,
+  r:1+Math.random()*2,
+  c:['0,229,160','167,139,250','251,191,36','251,113,133'][Math.floor(Math.random()*4)]
+}));
+function frame(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  pts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=cv.width;if(p.x>cv.width)p.x=0;
+    if(p.y<0)p.y=cv.height;if(p.y>cv.height)p.y=0;
+    cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    cx.fillStyle=`rgba(${p.c},0.5)`;cx.fill();
+  });
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+    const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);
+    if(d<120){
+      cx.beginPath();cx.moveTo(pts[i].x,pts[i].y);cx.lineTo(pts[j].x,pts[j].y);
+      cx.strokeStyle=`rgba(255,255,255,${.04*(1-d/120)})`;cx.lineWidth=.5;cx.stroke();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+frame();
+
+/* ── accordion ── */
+function toggle(header){
+  const body=header.closest('.phase').querySelector('.phase-body');
+  const icon=header.querySelector('.phase-toggle');
+  body.classList.toggle('open');
+  icon.textContent=body.classList.contains('open')?'↑':'↓';
+}
+
+/* ── scroll reveal ── */
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');});
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

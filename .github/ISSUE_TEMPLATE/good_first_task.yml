@@ -1,0 +1,57 @@
+name: 첫 기여 작업
+description: 신규 기여자가 빠르게 시작할 수 있는 작업 제안
+title: "[good-first-issue] "
+labels:
+  - good first issue
+  - help wanted
+body:
+  - type: markdown
+    attributes:
+      value: |
+        첫 기여 작업은 1~3시간 내 완료 가능한 범위를 권장합니다.
+
+  - type: input
+    id: objective
+    attributes:
+      label: 작업 목표
+      description: 한 문장으로 작업 목표를 작성해 주세요.
+      placeholder: 예) README의 빠른 시작 명령을 최신 구조로 갱신
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: 배경
+      description: 왜 필요한 작업인지 설명해 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 세부 작업
+      description: 체크리스트 형태로 작성해 주세요.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: 참고 파일/링크
+      description: 초보 기여자가 바로 접근할 수 있게 경로를 남겨 주세요.
+      placeholder: 예) README.md, ROADMAP.md
+    validations:
+      required: false
+
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 기준
+      description: 리뷰어가 확인할 기준을 구체적으로 작성해 주세요.
+    validations:
+      required: true
+

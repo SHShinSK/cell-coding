@@ -1,0 +1,59 @@
+name: RFC 제안
+description: 중요한 설계/정책 변경을 제안합니다.
+title: "[rfc] "
+labels:
+  - rfc
+body:
+  - type: markdown
+    attributes:
+      value: |
+        DSL 문법, Runtime 의미론, 공용 API 변경 등은 RFC 프로세스를 따라 주세요.
+
+  - type: input
+    id: rfc_title
+    attributes:
+      label: RFC 제목
+      placeholder: 예) membrane query 의미론 통일 제안
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 문제 정의
+      description: 현재 설계의 한계나 충돌을 설명해 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 제안 요약
+      description: 핵심 제안을 5~10줄 내로 요약해 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: 하위 호환성 영향
+      description: 브레이킹 변경 여부와 마이그레이션 방법을 작성해 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 대안 및 트레이드오프
+      description: 대안들과 비교해 어떤 점이 더 나은지 작성해 주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: rollout
+    attributes:
+      label: 도입 계획
+      description: 단계적 적용/실험 플래그/롤백 계획을 작성해 주세요.
+    validations:
+      required: true
+

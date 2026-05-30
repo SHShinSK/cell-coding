@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cell Coding Implementation Blueprint</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg-base: #09090b;
+      --bg-surface: #18181b;
+      --border-color: #27272a;
+      --text-main: #fafafa;
+      --text-muted: #a1a1aa;
+      --accent: #2dff8f;
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding: 4rem 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 4rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 2rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--bg-base);
+      background-color: var(--accent);
+      padding: 0.25rem 0.5rem;
+      border-radius: 2px;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+
+    /* Phase Cards */
+    .phase-list {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .phase-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 2.5rem;
+      position: relative;
+    }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .phase-icon {
+      color: var(--accent);
+    }
+
+    .phase-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+    }
+
+    .phase-meta {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .phase-body {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    /* Tasks / Spec List */
+    .task-list {
+      list-style: none;
+      border-top: 1px solid var(--border-color);
+      padding-top: 1.5rem;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .task-bullet {
+      color: var(--accent);
+      margin-top: 0.25rem;
+    }
+
+    .task-text {
+      font-size: 0.95rem;
+    }
+
+    .task-text strong {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* Code Block */
+    pre {
+      background-color: var(--bg-base);
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e4e4e7;
+      overflow-x: auto;
+      margin-top: 1.5rem;
+    }
+
+    .code-comment { color: #71717a; }
+    .code-keyword { color: var(--accent); }
+    .code-string { color: #a1a1aa; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge">Implementation Spec v1.0</div>
+      <h1>Cell Coding Blueprint</h1>
+      <p class="subtitle">피지컬 AI 환경을 위한 하이브리드(TypeScript + Python) 세포코딩 아키텍처 구현 스펙</p>
+    </header>
+
+    <div class="phase-list">
+      
+      <div class="phase-card">
+        <div class="phase-header">
+          <i data-lucide="cpu" class="phase-icon" width="32" height="32"></i>
+          <h2 class="phase-title">Phase 1: Core Runtime (TypeScript)</h2>
+        </div>
+        <div class="phase-meta">
+          <div class="meta-item"><i data-lucide="code" width="16" height="16"></i> TypeScript / Node.js</div>
+          <div class="meta-item"><i data-lucide="box" width="16" height="16"></i> Foundation</div>
+        </div>
+        <p class="phase-body">
+          비동기 이벤트 처리와 타입 안정성을 위해 TypeScript로 코어 엔진을 구축합니다. 언어 컴파일러를 새로 만드는 대신, TS의 Class와 Decorator를 활용하여 세포코딩의 개념을 런타임 라이브러리로 구현합니다.
+        </p>
+        <ul class="task-list">
+          <li class="task-item">
+            <i data-lucide="check-square" class="task-bullet" width="18" height="18"></i>
+            <span class="task-text"><strong>Signal Bus (Nervous System):</strong> RxJS 기반의 중앙 집중식 이벤트 메시지 버스 구현. 모든 신호는 불변 객체(Immutable Object)로 라우팅.</span>
+          </li>
+          <li class="task-item">
+            <i data-lucide="check-square" class="task-bullet" width="18" height="18"></i>
+            <span class="task-text"><strong>Base Cell Class:</strong> <code>@cell</code>, <code>@membrane(accepts, emits)</code> 데코레이터 구현. 막(Membrane)을 통과하지 않는 신호는 런타임에 차단.</span>
+          </li>
+        </ul>
+<pre>
+<span class="code-comment">// TypeScript Core Implementation Example</span>
+<span class="code-keyword">@cell</span>({ role: <span class="code-string">"데이터 정제"</span> })
+<span class="code-keyword">export class</span> SanitizerCell <span class="code-keyword">extends</span> BaseCell {
+  <span class="code-keyword">@membrane</span>({ accepts: [RawDataSignal], emits: [CleanDataSignal] })
+  <span class="code-keyword">onSignal</span>(signal: RawDataSignal) {
+    <span class="code-keyword">const</span> cleanData = sanitize(signal.payload);
+    <span class="code-keyword">this</span>.emit(<span class="code-keyword">new</span> CleanDataSignal(cleanData));
+  }
+}
+</pre>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <i data-lucide="webcam" class="phase-icon" width="32" height="32"></i>
+          <h2 class="phase-title">Phase 2: Sensory Edge (Python)</h2>
+        </div>
+        <div class="phase-meta">
+          <div class="meta-item"><i data-lucide="code" width="16" height="16"></i> Python 3.11+</div>
+          <div class="meta-item"><i data-lucide="mic" width="16" height="16"></i> Physical AI Interface</div>
+        </div>
+        <p class="phase-body">
+          AI 모델 생태계 및 물리적 센서 제어에 최적화된 Python을 사용하여 외부 환경과 상호작용하는 감각 세포(Sensory Cells)를 구축합니다. TypeScript 코어와는 Redis Pub/Sub 또는 gRPC로 통신합니다.
+        </p>
+        <ul class="task-list">
+          <li class="task-item">
+            <i data-lucide="check-square" class="task-bullet" width="18" height="18"></i>
+            <span class="task-text"><strong>Vision/Audio Receptors:</strong> 카메라, 마이크 입력을 지속적으로 스트리밍하여 환경 신호(Environment Signal)로 변환 후 방출(Emit).</span>
+          </li>
+          <li class="task-item">
+            <i data-lucide="check-square" class="task-bullet" width="18" height="18"></i>
+            <span class="task-text"><strong>Motor/Actuator Cells:</strong> 코어 런타임에서 결정된 판단 신호(Decision Signal)를 수신하여 TTS 음성 출력 또는 하드웨어 모터 제어 수행.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <i data-lucide="activity" class="phase-icon" width="32" height="32"></i>
+          <h2 class="phase-title">Phase 3: Visualizer (React)</h2>
+        </div>
+        <div class="phase-meta">
+          <div class="meta-item"><i data-lucide="code" width="16" height="16"></i> React / WebSockets</div>
+          <div class="meta-item"><i data-lucide="eye" width="16" height="16"></i> Live Monitoring</div>
+        </div>
+        <p class="phase-body">
+          시스템 내에서 세포들이 신호를 주고받는 과정을 실시간으로 관찰할 수 있는 '생체 현미경' 대시보드를 구축합니다. 디버깅과 아키텍처 이해도를 비약적으로 상승시킵니다.
+        </p>
+        <ul class="task-list">
+          <li class="task-item">
+            <i data-lucide="check-square" class="task-bullet" width="18" height="18"></i>
+            <span class="task-text"><strong>Real-time Node Graph:</strong> React Flow 등을 활용하여 현재 살아있는 세포들과 그 사이를 흐르는 신호를 동적 그래프로 렌더링.</span>
+          </li>
+          <li class="task-item">
+            <i data-lucide="check-square" class="task-bullet" width="18" height="18"></i>
+            <span class="task-text"><strong>Signal Tracer:</strong> 특정 신호가 어떤 세포들을 거쳐 변이되고 흡수되는지 추적하는 타임라인 뷰 제공.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-header">
+          <i data-lucide="braces" class="phase-icon" width="32" height="32"></i>
+          <h2 class="phase-title">Phase 4: AST Transpiler (Future)</h2>
+        </div>
+        <div class="phase-meta">
+          <div class="meta-item"><i data-lucide="code" width="16" height="16"></i> TypeScript (AST)</div>
+          <div class="meta-item"><i data-lucide="rocket" width="16" height="16"></i> Native Language</div>
+        </div>
+        <p class="phase-body">
+          런타임 라이브러리와 뷰어가 안정화되면, 최종적으로 <code>.cell</code> 확장자를 가진 순수 세포코딩 문법을 파싱하여 TS/Python 코드로 자동 변환하는 독자적인 트랜스파일러를 구현합니다.
+        </p>
+        <ul class="task-list">
+          <li class="task-item">
+            <i data-lucide="check-square" class="task-bullet" width="18" height="18"></i>
+            <span class="task-text"><strong>Parser & Lexer:</strong> EBNF 문법을 기반으로 추상 구문 트리(AST)를 생성하는 구문 분석기 개발.</span>
+          </li>
+          <li class="task-item">
+            <i data-lucide="check-square" class="task-bullet" width="18" height="18"></i>
+            <span class="task-text"><strong>Multi-target Generator:</strong> 작성된 단일 <code>.cell</code> 스펙을 대상 환경에 따라 TypeScript 또는 Python 코드로 생성.</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cell Coding - Phase 1 PoC</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      /* 미니멀 로보틱 테마 (그라데이션 배제, 플랫 디자인) */
+      --bg-base: #000000;
+      --bg-surface: #0a0a0a;
+      --border-color: #222222;
+      --text-main: #e5e5e5;
+      --text-muted: #888888;
+      --accent: #2dff8f;
+      --accent-muted: rgba(45, 255, 143, 0.1);
+      --font-sans: 'Noto Sans KR', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 4rem 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* 헤더 영역 */
+    header {
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--bg-base);
+      background-color: var(--accent);
+      padding: 0.4rem 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    /* 섹션 공통 */
+    section {
+      margin-bottom: 4rem;
+    }
+
+    h2 {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 4px solid var(--accent);
+      padding-left: 12px;
+    }
+
+    /* 요약 카드 */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1px;
+      background-color: var(--border-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .summary-card {
+      background-color: var(--bg-surface);
+      padding: 2rem;
+    }
+
+    .summary-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .summary-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* 코드 블록 */
+    .code-container {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    pre {
+      padding: 1.5rem;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: #cccccc;
+      line-height: 1.5;
+    }
+
+    .keyword { color: #ff7b72; }
+    .type { color: #79c0ff; }
+    .string { color: #a5d6ff; }
+    .comment { color: #8b949e; }
+    .decorator { color: var(--accent); }
+
+    /* 실행 결과 터미널 */
+    .terminal {
+      background-color: #050505;
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .terminal-success { color: var(--accent); }
+    .terminal-highlight { color: #e5e5e5; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge">
+        <i data-lucide="cpu" width="16" height="16"></i>
+        Proof of Concept
+      </div>
+      <h1>Cell Coding: Phase 1</h1>
+      <p class="subtitle">TypeScript 및 RxJS를 활용한 독립 세포 간 비동기 신호 처리 시뮬레이션</p>
+    </header>
+
+    <section>
+      <h2>01_ARCHITECTURE_SUMMARY</h2>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h3><i data-lucide="radio" width="20" height="20"></i> Signal (신호)</h3>
+          <p>세포 간의 유일한 매개체입니다. 읽기 전용(Immutable) 상태로 신경계에 방출되며, 수신 대상을 특정하지 않습니다.</p>
+        </div>
+        <div class="summary-card">
+          <h3><i data-lucide="network" width="20" height="20"></i> Nervous System (신경계)</h3>
+          <p>RxJS Subject를 기반으로 구축된 중앙 이벤트 버스입니다. 세포가 방출한 신호를 가로채어 적절한 세포의 막으로 라우팅합니다.</p>
+        </div>
+        <div class="summary-card">
+          <h3><i data-lucide="box" width="20" height="20"></i> Membrane (막)</h3>
+          <p>TS Decorator로 구현됩니다. 세포가 어떤 신호를 받아들일지(accepts) 선언적으로 정의하며, 필터링을 수행합니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>02_CORE_IMPLEMENTATION (index.ts)</h2>
+      <div class="code-container">
+        <div class="code-header">
+          <span>TypeScript</span>
+          <span>src/index.ts</span>
+        </div>
+        <pre>
+<span class="keyword">import</span> { Subject } <span class="keyword">from</span> <span class="string">'rxjs'</span>;
+<span class="keyword">import</span> { filter } <span class="keyword">from</span> <span class="string">'rxjs/operators'</span>;
+
+<span class="comment">// ── 1. 신호 (Signal) ────────────────────────────────────────</span>
+<span class="keyword">interface</span> <span class="type">Signal</span> {
+  type: <span class="type">string</span>;
+  payload: <span class="type">any</span>;
+  timestamp: <span class="type">number</span>;
+}
+
+<span class="keyword">const</span> createSignal = (type: <span class="type">string</span>, payload: <span class="type">any</span> = {}): <span class="type">Signal</span> => ({
+  type, payload, timestamp: Date.now(),
+});
+
+<span class="comment">// ── 2. 신경계 (Nervous System) ──────────────────────────────────</span>
+<span class="keyword">class</span> <span class="type">NervousSystem</span> {
+  <span class="keyword">private</span> bus = <span class="keyword">new</span> Subject&lt;<span class="type">Signal</span>&gt;();
+
+  emit(signal: <span class="type">Signal</span>) {
+    <span class="keyword">this</span>.bus.next(signal);
+  }
+
+  observe(signalType: <span class="type">string</span>) {
+    <span class="keyword">return</span> <span class="keyword">this</span>.bus.pipe(filter((signal) => signal.type === signalType));
+  }
+}
+<span class="keyword">const</span> appNervousSystem = <span class="keyword">new</span> NervousSystem();
+
+<span class="comment">// ── 3. 세포 기반 클래스 및 막(Membrane) ─────────────────────────</span>
+<span class="keyword">abstract class</span> <span class="type">BaseCell</span> {
+  <span class="keyword">protected</span> emit(signal: <span class="type">Signal</span>) {
+    appNervousSystem.emit(signal);
+  }
+}
+
+<span class="keyword">function</span> <span class="decorator">membrane</span>(accepts: <span class="type">string</span>) {
+  <span class="keyword">return function</span> (target: <span class="type">any</span>, propertyKey: <span class="type">string</span>, descriptor: <span class="type">PropertyDescriptor</span>) {
+    <span class="keyword">const</span> originalMethod = descriptor.value;
+    setTimeout(() => {
+      appNervousSystem.observe(accepts).subscribe((signal) => {
+        originalMethod.apply(target, [signal]);
+      });
+    }, 0);
+  };
+}
+
+<span class="comment">// ── 4. 구체 세포 (카메라 & 알람) ────────────────────────────────</span>
+<span class="keyword">class</span> <span class="type">CameraCell</span> <span class="keyword">extends</span> <span class="type">BaseCell</span> {
+  role = <span class="string">"외부 환경의 움직임을 감지하여 신호 발생"</span>;
+
+  detectMotion(x: <span class="type">number</span>, y: <span class="type">number</span>) {
+    <span class="keyword">this</span>.emit(createSignal(<span class="string">'MotionDetected'</span>, { x, y, confidence: 0.98 }));
+  }
+}
+
+<span class="keyword">class</span> <span class="type">AlarmCell</span> <span class="keyword">extends</span> <span class="type">BaseCell</span> {
+  role = <span class="string">"움직임 감지 신호를 받아 사이렌 작동 신호 발생"</span>;
+
+  <span class="decorator">@membrane</span>(<span class="string">'MotionDetected'</span>)
+  onMotion(signal: <span class="type">Signal</span>) {
+    <span class="keyword">if</span> (signal.payload.confidence > 0.9) {
+      <span class="keyword">this</span>.emit(createSignal(<span class="string">'SirenActivated'</span>, { volume: 100, pattern: <span class="string">'beep-beep'</span> }));
+    }
+  }
+}
+
+<span class="comment">// ── 5. 시뮬레이션 ─────────────────────────────────────────────</span>
+<span class="keyword">const</span> camera = <span class="keyword">new</span> CameraCell();
+<span class="keyword">const</span> alarm = <span class="keyword">new</span> AlarmCell();
+
+setTimeout(() => {
+  camera.detectMotion(150, 220);
+}, 2000);
+</pre>
+      </div>
+    </section>
+
+    <section>
+      <h2>03_EXECUTION_LOG</h2>
+      <div class="terminal">
+        <span class="terminal-highlight">=== 세포코딩 유기체 부팅 완료 ===</span><br><br>
+        [👁️ 카메라 세포] 좌표(150, 220)에서 움직임 감지!<br>
+        [📡 신경계] 신호 전파 중: <span class="terminal-success">[MotionDetected]</span> { x: 150, y: 220, confidence: 0.98 }<br>
+        [🚨 알람 세포] 'MotionDetected' 신호 수신. 신호 분석 중...<br>
+        [🚨 알람 세포] 신뢰도 높음. 사이렌 작동 결정.<br>
+        [📡 신경계] 신호 전파 중: <span class="terminal-success">[SirenActivated]</span> { volume: 100, pattern: 'beep-beep' }<br>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

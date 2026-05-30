@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>세포코딩 — Cell Coding Paradigm</title>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=DM+Mono:wght@300;400;500&family=Pretendard:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f0d;
+    --bg2: #0f1a14;
+    --bg3: #142019;
+    --cell-green: #2dff8f;
+    --cell-green-dim: rgba(45,255,143,0.12);
+    --cell-green-glow: rgba(45,255,143,0.25);
+    --cell-amber: #ffd166;
+    --cell-coral: #ff6b6b;
+    --cell-blue: #74c0fc;
+    --text: #e8f5ee;
+    --text-dim: rgba(232,245,238,0.5);
+    --border: rgba(45,255,143,0.18);
+    --border-dim: rgba(45,255,143,0.08);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ── Noise texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.6;
+  }
+
+  /* ── Animated background grid ── */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border-dim) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-dim) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    animation: gridPulse 8s ease-in-out infinite;
+  }
+
+  @keyframes gridPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+
+  /* ── Floating orbs ── */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: orbFloat linear infinite;
+  }
+  .orb1 { width:400px; height:400px; background:rgba(45,255,143,0.06); top:-100px; left:-100px; animation-duration:20s; }
+  .orb2 { width:300px; height:300px; background:rgba(116,192,252,0.05); bottom:10%; right:-80px; animation-duration:25s; animation-delay:-8s; }
+  .orb3 { width:200px; height:200px; background:rgba(255,107,107,0.04); top:50%; left:40%; animation-duration:18s; animation-delay:-12s; }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    33% { transform: translateY(-30px) scale(1.05); }
+    66% { transform: translateY(20px) scale(0.95); }
+  }
+
+  /* ── Layout ── */
+  main { position: relative; z-index: 1; }
+
+  section { padding: 80px 0; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 48px; }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 0 80px;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--cell-green);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin-bottom: 40px;
+    width: fit-content;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--cell-green);
+    animation: blink 2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .hero-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(52px, 8vw, 110px);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .hero-title .ko { color: var(--text); }
+  .hero-title .en {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(45,255,143,0.5);
+    font-size: clamp(40px, 6vw, 80px);
+    margin-top: 8px;
+  }
+
+  .hero-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 48px;
+    border-left: 2px solid var(--border);
+    padding-left: 16px;
+    line-height: 1.8;
+  }
+
+  .hero-desc {
+    max-width: 560px;
+    font-size: 17px;
+    line-height: 1.85;
+    color: rgba(232,245,238,0.8);
+    font-weight: 300;
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    left: 48px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-scroll::after {
+    content: '';
+    width: 40px; height: 1px;
+    background: var(--border);
+    display: block;
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollLine {
+    0% { width:20px; opacity:0.3; }
+    50% { width:60px; opacity:1; }
+    100% { width:20px; opacity:0.3; }
+  }
+
+  /* ── Section headings ── */
+  .sec-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cell-green);
+    margin-bottom: 20px;
+    opacity: 0.7;
+  }
+
+  .sec-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 24px;
+  }
+
+  .sec-body {
+    font-size: 16px;
+    line-height: 1.9;
+    color: rgba(232,245,238,0.7);
+    max-width: 640px;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border-dim);
+    margin: 0;
+  }
+
+  /* ── Cell Principles ── */
+  .principles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 56px;
+  }
+
+  .principle-card {
+    background: var(--bg2);
+    border: 1px solid var(--border-dim);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, background 0.3s;
+    cursor: default;
+  }
+
+  .principle-card:hover {
+    border-color: var(--border);
+    background: var(--bg3);
+  }
+
+  .principle-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--cell-green);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .principle-card:hover::before { transform: scaleX(1); }
+
+  .principle-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--cell-green);
+    opacity: 0.6;
+    margin-bottom: 20px;
+  }
+
+  .principle-icon {
+    width: 48px; height: 48px;
+    margin-bottom: 20px;
+  }
+
+  .principle-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .principle-body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-dim);
+  }
+
+  /* ── Hierarchy ── */
+  .hierarchy-section { background: var(--bg2); }
+
+  .hierarchy-wrapper {
+    margin-top: 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .level {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 0;
+    border: 1px solid var(--border-dim);
+    overflow: hidden;
+    transition: border-color 0.3s;
+    cursor: default;
+  }
+
+  .level:hover { border-color: var(--border); }
+
+  .level-meta {
+    background: var(--bg3);
+    padding: 28px 24px;
+    border-right: 1px solid var(--border-dim);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .level-name {
+    font-family: 'Gowun Batang', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .level-en {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+  }
+
+  .level-cells {
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .cell-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    transition: transform 0.2s;
+  }
+
+  .cell-chip:hover { transform: translateY(-2px); }
+
+  .chip-green { background: var(--cell-green-dim); color: var(--cell-green); border: 1px solid rgba(45,255,143,0.25); }
+  .chip-amber { background: rgba(255,209,102,0.1); color: var(--cell-amber); border: 1px solid rgba(255,209,102,0.25); }
+  .chip-coral { background: rgba(255,107,107,0.1); color: var(--cell-coral); border: 1px solid rgba(255,107,107,0.25); }
+  .chip-blue  { background: rgba(116,192,252,0.1); color: var(--cell-blue);  border: 1px solid rgba(116,192,252,0.25); }
+
+  .level-arrow {
+    margin-left: auto;
+    font-size: 20px;
+    opacity: 0.2;
+    padding-right: 8px;
+  }
+
+  /* ── Comparison ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 56px;
+  }
+
+  .compare-col {
+    background: var(--bg2);
+    border: 1px solid var(--border-dim);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .compare-head {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border-dim);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .compare-col.oop .compare-head { color: var(--text-dim); }
+  .compare-col.cell .compare-head { color: var(--cell-green); }
+
+  .compare-rows { padding: 12px 0; }
+
+  .compare-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 0;
+    padding: 12px 32px;
+    border-bottom: 1px solid var(--border-dim);
+    font-size: 13px;
+  }
+
+  .compare-row:last-child { border-bottom: none; }
+
+  .compare-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    padding-top: 2px;
+  }
+
+  .compare-val { line-height: 1.6; color: rgba(232,245,238,0.85); }
+  .compare-col.cell .compare-val { color: var(--cell-green); }
+
+  /* ── Code Example ── */
+  .code-section { background: var(--bg); }
+
+  .code-block-wrapper {
+    margin-top: 56px;
+    border: 1px solid var(--border-dim);
+    overflow: hidden;
+  }
+
+  .code-bar {
+    background: var(--bg2);
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .code-dot { width:10px; height:10px; border-radius:50%; }
+  .code-dot:nth-child(1) { background: #ff5f57; }
+  .code-dot:nth-child(2) { background: #febc2e; }
+  .code-dot:nth-child(3) { background: #28c840; }
+
+  .code-filename {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-left: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  .code-body {
+    background: #080d0a;
+    padding: 36px 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 2;
+    overflow-x: auto;
+  }
+
+  .code-body pre { margin: 0; }
+
+  .c-comment { color: rgba(45,255,143,0.35); }
+  .c-keyword  { color: #ff7eb3; }
+  .c-class    { color: var(--cell-amber); }
+  .c-string   { color: var(--cell-green); }
+  .c-attr     { color: var(--cell-blue); }
+  .c-val      { color: rgba(232,245,238,0.9); }
+  .c-fn       { color: #c9a0ff; }
+  .c-paren    { color: var(--text-dim); }
+
+  /* ── Three pillars ── */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 56px;
+  }
+
+  .pillar {
+    padding: 40px 32px;
+    border: 1px solid var(--border-dim);
+    position: relative;
+    background: var(--bg2);
+    transition: border-color 0.3s;
+  }
+
+  .pillar:hover { border-color: var(--border); }
+
+  .pillar-icon-wrap {
+    width: 56px; height: 56px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .pillar-glyph {
+    font-size: 36px;
+    line-height: 56px;
+  }
+
+  .pillar-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .pillar-en {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+  }
+
+  .pillar-body {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--text-dim);
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    text-align: center;
+    padding: 120px 0;
+    position: relative;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(45,255,143,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-title {
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  .cta-title span { color: var(--cell-green); }
+
+  .cta-body {
+    font-size: 16px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    margin-bottom: 48px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-version {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    margin-top: 32px;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border-dim);
+    padding: 32px 0;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── Canvas cell animation ── */
+  #cell-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+  }
+
+  /* ── Animations on scroll ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .container { padding: 0 24px; }
+    .principles-grid { grid-template-columns: 1fr; }
+    .pillars-grid { grid-template-columns: 1fr; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .level { grid-template-columns: 1fr; }
+    .level-meta { border-right: none; border-bottom: 1px solid var(--border-dim); }
+    .hero-title { font-size: 48px; }
+    .hero-title .en { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="cell-canvas"></canvas>
+<div class="grid-bg"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<main>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">New Paradigm · v0.1 · 2025</div>
+      <h1 class="hero-title">
+        <span class="ko">세포코딩</span>
+        <span class="en">Cell Coding</span>
+      </h1>
+      <p class="hero-sub">
+        biological architecture · organic computation<br>
+        role-driven · signal-based · self-organizing
+      </p>
+      <p class="hero-desc">
+        인간의 세포처럼, 코드의 모든 단위는 고유한 역할을 가진다.
+        독립적이면서도 유기적으로 연결된 세포들이
+        모여 살아 숨쉬는 시스템을 만드는 새로운 코딩 철학.
+      </p>
+    </div>
+    <div class="hero-scroll">Scroll to explore</div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── PRINCIPLES ─── -->
+  <section>
+    <div class="container">
+      <p class="sec-label fade-in">Core Principles</p>
+      <h2 class="sec-title fade-in">세포의 3대 법칙</h2>
+      <p class="sec-body fade-in">생물의 세포가 수십억 년에 걸쳐 최적화한 원리를 코드에 적용한다. 단순하지만 강력한 세 가지 법칙이 모든 것을 결정한다.</p>
+
+      <div class="principles-grid">
+        <div class="principle-card fade-in">
+          <div class="principle-num">01 ——</div>
+          <svg class="principle-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="20" stroke="rgba(45,255,143,0.4)" stroke-width="1"/>
+            <circle cx="24" cy="24" r="12" stroke="rgba(45,255,143,0.6)" stroke-width="1" stroke-dasharray="3 3"/>
+            <circle cx="24" cy="24" r="4" fill="rgba(45,255,143,0.8)"/>
+          </svg>
+          <div class="principle-title">역할 (Role)</div>
+          <div class="principle-body">모든 세포는 단 하나의 명확한 역할을 가진다. 심장세포는 펌핑만 한다. 신경세포는 신호만 전달한다. 코드도 마찬가지다. 하나의 세포, 하나의 책임.</div>
+        </div>
+
+        <div class="principle-card fade-in" style="transition-delay:0.1s">
+          <div class="principle-num">02 ——</div>
+          <svg class="principle-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="6" width="36" height="36" rx="4" stroke="rgba(255,209,102,0.4)" stroke-width="1"/>
+            <line x1="14" y1="14" x2="34" y2="14" stroke="rgba(255,209,102,0.6)" stroke-width="1"/>
+            <line x1="14" y1="24" x2="34" y2="24" stroke="rgba(255,209,102,0.3)" stroke-width="1"/>
+            <line x1="14" y1="34" x2="24" y2="34" stroke="rgba(255,209,102,0.3)" stroke-width="1"/>
+          </svg>
+          <div class="principle-title">막 (Membrane)</div>
+          <div class="principle-body">세포막은 무엇이 들어오고 나갈지를 결정한다. 코드에서 막은 인터페이스이자 계약이다. 선택적 투과성 — 필요한 신호만 통과시킨다.</div>
+        </div>
+
+        <div class="principle-card fade-in" style="transition-delay:0.2s">
+          <div class="principle-num">03 ——</div>
+          <svg class="principle-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="24" r="6" stroke="rgba(116,192,252,0.5)" stroke-width="1"/>
+            <circle cx="36" cy="12" r="6" stroke="rgba(116,192,252,0.5)" stroke-width="1"/>
+            <circle cx="36" cy="36" r="6" stroke="rgba(116,192,252,0.5)" stroke-width="1"/>
+            <path d="M18 21 L30 15" stroke="rgba(116,192,252,0.4)" stroke-width="1" marker-end="url(#arr)"/>
+            <path d="M18 27 L30 33" stroke="rgba(116,192,252,0.4)" stroke-width="1"/>
+            <defs><marker id="arr" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><circle cx="2" cy="2" r="1.5" fill="rgba(116,192,252,0.6)"/></marker></defs>
+          </svg>
+          <div class="principle-title">신호 (Signal)</div>
+          <div class="principle-body">세포는 메서드를 직접 호출하지 않는다. 신호를 보내고, 반응한다. 이 간접성이 시스템을 유연하고 확장 가능하게 만드는 핵심이다.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── HIERARCHY ─── -->
+  <section class="hierarchy-section">
+    <div class="container">
+      <p class="sec-label fade-in">Complexity Scale</p>
+      <h2 class="sec-title fade-in">단세포에서 유기체로</h2>
+      <p class="sec-body fade-in">세포의 수와 조직화 수준에 따라 시스템의 복잡도가 결정된다. 작은 스크립트는 단세포이고, 대규모 플랫폼은 인간이다.</p>
+
+      <div class="hierarchy-wrapper">
+
+        <div class="level fade-in">
+          <div class="level-meta">
+            <div class="level-name">단세포</div>
+            <div class="level-en">UNICELLULAR</div>
+          </div>
+          <div class="level-cells">
+            <span class="cell-chip chip-green">순수 함수</span>
+            <span class="cell-chip chip-green">단일 변환</span>
+            <span class="cell-chip chip-green">유틸리티</span>
+            <span class="level-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="level fade-in" style="transition-delay:0.08s">
+          <div class="level-meta">
+            <div class="level-name">미생물</div>
+            <div class="level-en">MICROBE</div>
+          </div>
+          <div class="level-cells">
+            <span class="cell-chip chip-green">입력 세포</span>
+            <span class="cell-chip chip-green">처리 세포</span>
+            <span class="cell-chip chip-green">출력 세포</span>
+            <span class="cell-chip chip-amber">3~5개 세포</span>
+            <span class="level-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="level fade-in" style="transition-delay:0.12s">
+          <div class="level-meta">
+            <div class="level-name">플랑크톤</div>
+            <div class="level-en">PLANKTON</div>
+          </div>
+          <div class="level-cells">
+            <span class="cell-chip chip-green">감지 세포</span>
+            <span class="cell-chip chip-green">판단 세포</span>
+            <span class="cell-chip chip-green">실행 세포</span>
+            <span class="cell-chip chip-amber">원시 조직화</span>
+            <span class="level-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="level fade-in" style="transition-delay:0.16s">
+          <div class="level-meta">
+            <div class="level-name">곤충</div>
+            <div class="level-en">INSECT</div>
+          </div>
+          <div class="level-cells">
+            <span class="cell-chip chip-amber">감각 기관</span>
+            <span class="cell-chip chip-amber">처리 기관</span>
+            <span class="cell-chip chip-amber">출력 기관</span>
+            <span class="cell-chip chip-blue">기관 클러스터</span>
+            <span class="level-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="level fade-in" style="transition-delay:0.20s">
+          <div class="level-meta">
+            <div class="level-name">척추동물</div>
+            <div class="level-en">VERTEBRATE</div>
+          </div>
+          <div class="level-cells">
+            <span class="cell-chip chip-amber">API 계층</span>
+            <span class="cell-chip chip-amber">비즈니스 기관</span>
+            <span class="cell-chip chip-amber">데이터 기관</span>
+            <span class="cell-chip chip-blue">신경계 이벤트</span>
+            <span class="level-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="level fade-in" style="transition-delay:0.24s">
+          <div class="level-meta" style="background:rgba(45,255,143,0.06); border-right-color: var(--border);">
+            <div class="level-name" style="color:var(--cell-green)">인간</div>
+            <div class="level-en">HUMAN</div>
+          </div>
+          <div class="level-cells">
+            <span class="cell-chip chip-coral">마이크로서비스</span>
+            <span class="cell-chip chip-coral">분산 처리</span>
+            <span class="cell-chip chip-coral">자가 복구</span>
+            <span class="cell-chip chip-coral">진화 가능</span>
+            <span class="cell-chip chip-blue">수천 개 세포</span>
+            <span class="level-arrow">→</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── COMPARISON ─── -->
+  <section>
+    <div class="container">
+      <p class="sec-label fade-in">Paradigm Comparison</p>
+      <h2 class="sec-title fade-in">OOP와 무엇이 다른가</h2>
+      <p class="sec-body fade-in">얼핏 객체지향처럼 보이지만, 철학의 출발점이 다르다. OOP는 데이터를 캡슐화하고, 세포코딩은 생존과 반응을 설계한다.</p>
+
+      <div class="compare-grid fade-in">
+        <div class="compare-col oop">
+          <div class="compare-head">OOP — Object Oriented</div>
+          <div class="compare-rows">
+            <div class="compare-row"><div class="compare-key">단위</div><div class="compare-val">객체 (상태 + 행동)</div></div>
+            <div class="compare-row"><div class="compare-key">통신</div><div class="compare-val">메서드 직접 호출</div></div>
+            <div class="compare-row"><div class="compare-key">의존성</div><div class="compare-val">강결합 가능</div></div>
+            <div class="compare-row"><div class="compare-key">확장</div><div class="compare-val">상속 / 컴포지션</div></div>
+            <div class="compare-row"><div class="compare-key">구조화</div><div class="compare-val">클래스 계층</div></div>
+            <div class="compare-row"><div class="compare-key">생존</div><div class="compare-val">프로그램에 종속</div></div>
+            <div class="compare-row"><div class="compare-key">복잡도</div><div class="compare-val">클래스 / 패키지</div></div>
+          </div>
+        </div>
+        <div class="compare-col cell">
+          <div class="compare-head">세포코딩 — Cell Coding</div>
+          <div class="compare-rows">
+            <div class="compare-row"><div class="compare-key">단위</div><div class="compare-val">세포 (역할 + 막 + 신호)</div></div>
+            <div class="compare-row"><div class="compare-key">통신</div><div class="compare-val">신호 방출 / 수신</div></div>
+            <div class="compare-row"><div class="compare-key">의존성</div><div class="compare-val">원칙적 독립</div></div>
+            <div class="compare-row"><div class="compare-key">확장</div><div class="compare-val">세포 분열 / 분화</div></div>
+            <div class="compare-row"><div class="compare-key">구조화</div><div class="compare-val">조직 → 기관 → 유기체</div></div>
+            <div class="compare-row"><div class="compare-key">생존</div><div class="compare-val">각 세포 독립 수명</div></div>
+            <div class="compare-row"><div class="compare-key">복잡도</div><div class="compare-val">세포 수 / 조직화 수준</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── CODE EXAMPLE ─── -->
+  <section class="code-section">
+    <div class="container">
+      <p class="sec-label fade-in">Pseudocode Example</p>
+      <h2 class="sec-title fade-in">세포코딩이 생긴 모습</h2>
+      <p class="sec-body fade-in">아직 언어 스펙은 확정되지 않았다. 하지만 이런 모습이 될 것이다. 각 세포는 선언적이고, 역할이 명확하며, 서로를 모른다.</p>
+
+      <div class="code-block-wrapper fade-in">
+        <div class="code-bar">
+          <div class="code-dot"></div>
+          <div class="code-dot"></div>
+          <div class="code-dot"></div>
+          <span class="code-filename">organism.cell</span>
+        </div>
+        <div class="code-body">
+<pre><span class="c-comment">// ── 단세포: 단일 순수 기능 ──────────────────────────────</span>
+<span class="c-keyword">cell</span> <span class="c-class">Validator</span> <span class="c-paren">{</span>
+  <span class="c-attr">role</span>    <span class="c-val">: "입력값 유효성 검사"</span>
+  <span class="c-attr">membrane</span><span class="c-val">: accepts(RawInput), emits(ValidSignal | ErrorSignal)</span>
+
+  <span class="c-fn">on</span><span class="c-paren">(</span><span class="c-class">RawInput</span><span class="c-paren">)</span> <span class="c-paren">{</span>
+    <span class="c-keyword">if</span> valid<span class="c-paren">(</span>input<span class="c-paren">)</span> <span class="c-keyword">emit</span><span class="c-paren">(</span><span class="c-class">ValidSignal</span><span class="c-paren">)</span>
+    <span class="c-keyword">else</span>        <span class="c-keyword">emit</span><span class="c-paren">(</span><span class="c-class">ErrorSignal</span><span class="c-paren">(</span><span class="c-string">"검증 실패"</span><span class="c-paren">))</span>
+  <span class="c-paren">}</span>
+<span class="c-paren">}</span>
+
+<span class="c-comment">// ── 조직: 관련 세포의 클러스터 ──────────────────────────</span>
+<span class="c-keyword">tissue</span> <span class="c-class">AuthTissue</span> <span class="c-paren">{</span>
+  <span class="c-attr">cells</span>: <span class="c-paren">[</span><span class="c-class">TokenParser</span>, <span class="c-class">Authenticator</span>, <span class="c-class">SessionManager</span><span class="c-paren">]</span>
+  <span class="c-attr">flow</span> <span class="c-val">: TokenParser → Authenticator → SessionManager</span>
+<span class="c-paren">}</span>
+
+<span class="c-comment">// ── 기관: 조직들의 협력 ──────────────────────────────────</span>
+<span class="c-keyword">organ</span> <span class="c-class">UserOrgan</span> <span class="c-paren">{</span>
+  <span class="c-attr">tissues</span>: <span class="c-paren">[</span><span class="c-class">AuthTissue</span>, <span class="c-class">ProfileTissue</span>, <span class="c-class">ActivityTissue</span><span class="c-paren">]</span>
+  <span class="c-attr">signals</span>: <span class="c-paren">[</span><span class="c-class">UserCreated</span>, <span class="c-class">UserBanned</span>, <span class="c-class">SessionExpired</span><span class="c-paren">]</span>
+<span class="c-paren">}</span>
+
+<span class="c-comment">// ── 유기체: 전체 시스템 ──────────────────────────────────</span>
+<span class="c-keyword">organism</span> <span class="c-class">AppOrganism</span> <span class="c-paren">{</span>
+  <span class="c-attr">organs</span>  : <span class="c-paren">[</span><span class="c-class">UserOrgan</span>, <span class="c-class">PaymentOrgan</span>, <span class="c-class">NotifyOrgan</span><span class="c-paren">]</span>
+  <span class="c-attr">nervous </span>: <span class="c-class">EventBus</span>   <span class="c-comment">// 신경계 — 기관 간 신호 중계</span>
+  <span class="c-attr">immune  </span>: <span class="c-class">ErrorHandler</span> <span class="c-comment">// 면역계 — 오류 격리 및 복구</span>
+<span class="c-paren">}</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── THREE PILLARS ─── -->
+  <section>
+    <div class="container">
+      <p class="sec-label fade-in">Platform Vision</p>
+      <h2 class="sec-title fade-in">플랫폼이 제공할 세 가지</h2>
+      <p class="sec-body fade-in">세포코딩을 현실로 만드는 플랫폼은 세 가지 핵심 도구를 제공해야 한다.</p>
+
+      <div class="pillars-grid">
+        <div class="pillar fade-in">
+          <div class="pillar-icon-wrap">
+            <div class="pillar-glyph">🧬</div>
+          </div>
+          <div class="pillar-title">Cell DSL</div>
+          <div class="pillar-en">LANGUAGE LAYER</div>
+          <div class="pillar-body">Python / TypeScript 위에 @cell, @tissue, @organ 데코레이터로 동작하는 경량 언어 확장. 기존 코드베이스에 점진적으로 도입 가능하다.</div>
+        </div>
+
+        <div class="pillar fade-in" style="transition-delay:0.1s">
+          <div class="pillar-icon-wrap">
+            <div class="pillar-glyph">🔬</div>
+          </div>
+          <div class="pillar-title">Cell Viewer</div>
+          <div class="pillar-en">VISUAL LAYER</div>
+          <div class="pillar-body">실시간으로 세포의 신호 흐름을 시각화하는 IDE 플러그인. 어느 세포가 어떤 신호를 주고받는지 생체 현미경처럼 관찰할 수 있다.</div>
+        </div>
+
+        <div class="pillar fade-in" style="transition-delay:0.2s">
+          <div class="pillar-icon-wrap">
+            <div class="pillar-glyph">🧪</div>
+          </div>
+          <div class="pillar-title">Cell Lab</div>
+          <div class="pillar-en">TEST LAYER</div>
+          <div class="pillar-body">각 세포를 격리된 환경에서 테스트하는 실험실. 세포의 독립성이 보장되므로 테스트가 극적으로 단순해진다. 세포 단위 TDD.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─── CTA ─── -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="cta-title fade-in">모든 코드는<br><span>살아있다</span></h2>
+      <p class="cta-body fade-in">세포코딩은 단순한 방법론이 아니다. 프로그램을 바라보는 새로운 철학이다. 코드가 자라고, 분화하고, 적응하는 것을 상상해보라.</p>
+      <p class="cta-version fade-in">세포코딩 (Cell Coding) — Concept Paper v0.1</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <span>세포코딩 · Cell Coding Paradigm</span>
+      <span>v0.1 · 2025 · All concepts reserved</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Floating cell particles ── */
+const canvas = document.getElementById('cell-canvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const cells = Array.from({length: 28}, () => ({
+  x: Math.random() * window.innerWidth,
+  y: Math.random() * window.innerHeight,
+  r: 3 + Math.random() * 8,
+  vx: (Math.random() - 0.5) * 0.4,
+  vy: (Math.random() - 0.5) * 0.4,
+  pulse: Math.random() * Math.PI * 2,
+  speed: 0.01 + Math.random() * 0.02,
+  color: ['rgba(45,255,143', 'rgba(116,192,252', 'rgba(255,209,102'][Math.floor(Math.random()*3)]
+}));
+
+function drawCell(c) {
+  const alpha = 0.15 + 0.15 * Math.sin(c.pulse);
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+  ctx.strokeStyle = `${c.color},${alpha + 0.2})`;
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(c.x, c.y, c.r * 0.35, 0, Math.PI * 2);
+  ctx.fillStyle = `${c.color},${alpha * 1.5})`;
+  ctx.fill();
+}
+
+function drawConnections() {
+  for (let i = 0; i < cells.length; i++) {
+    for (let j = i+1; j < cells.length; j++) {
+      const dx = cells[i].x - cells[j].x;
+      const dy = cells[i].y - cells[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 160) {
+        ctx.beginPath();
+        ctx.moveTo(cells[i].x, cells[i].y);
+        ctx.lineTo(cells[j].x, cells[j].y);
+        ctx.strokeStyle = `rgba(45,255,143,${0.04 * (1 - dist/160)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawConnections();
+  cells.forEach(c => {
+    c.x += c.vx;
+    c.y += c.vy;
+    c.pulse += c.speed;
+    if (c.x < -20) c.x = canvas.width + 20;
+    if (c.x > canvas.width + 20) c.x = -20;
+    if (c.y < -20) c.y = canvas.height + 20;
+    if (c.y > canvas.height + 20) c.y = -20;
+    drawCell(c);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ── Scroll fade-in ── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
