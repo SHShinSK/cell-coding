@@ -645,6 +645,34 @@
     <div class="hero-scroll">Scroll to explore</div>
   </section>
 
+  <!-- ─── WHY CELL CODING ─── -->
+  <section>
+    <div class="container">
+      <p class="sec-label fade-in">Why Cell Coding</p>
+      <h2 class="sec-title fade-in">왜 이 개념이 필요한가</h2>
+      <p class="sec-body fade-in">Classical software assumed a narrower input-process-output frame. Physical AI now requires many sensing channels and many action channels at once, so we need a model of cooperating functional cells rather than a single monolithic pipeline.</p>
+      <p class="sec-body fade-in">고전 소프트웨어는 비교적 좁은 입력-처리-출력 프레임을 전제로 했다. Physical AI는 다중 감각 채널과 다중 행동 채널을 동시에 요구하므로, 단일 거대 파이프라인이 아니라 기능 세포의 협업 모델이 필요하다.</p>
+
+      <div class="principles-grid">
+        <div class="principle-card fade-in">
+          <div class="principle-num">Origin ——</div>
+          <div class="principle-title">From I/O to Functional Cells</div>
+          <div class="principle-body">Keyboard/mouse era software can model interaction as discrete I/O events. Embodied AI must process continuous multimodal sensing and produce layered physical actions.<br>키보드/마우스 중심 시대의 소프트웨어는 이산적인 I/O 이벤트로 상호작용을 모델링할 수 있었지만, 구현형 AI는 연속적인 다중 모달 감지와 계층적 물리 행동을 처리해야 한다.</div>
+        </div>
+        <div class="principle-card fade-in" style="transition-delay:0.1s">
+          <div class="principle-num">Example ——</div>
+          <div class="principle-title">Spider Robot Scenario</div>
+          <div class="principle-body">A spider robot may ingest vision, hearing, tactile, and chemical context simultaneously, then output locomotion patterns, web-generation behavior, and chemical actions.<br>거미 로봇은 시각·청각·촉각·화학적 맥락을 동시에 받아들이고, 보행 패턴·거미줄 생성 행동·화학적 작동 같은 결과를 함께 만들어낼 수 있다.</div>
+        </div>
+        <div class="principle-card fade-in" style="transition-delay:0.2s">
+          <div class="principle-num">Definition ——</div>
+          <div class="principle-title">Cell Coding Definition</div>
+          <div class="principle-body">Cell Coding models software as role-defined cells, membrane contracts, and signal-mediated cooperation across tissue-organ-organism layers.<br>Cell Coding은 역할 기반 세포, 막 계약, 신호 기반 협업을 통해 조직-기관-유기체 계층의 소프트웨어를 모델링한다.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <hr class="divider">
 
   <!-- ─── PRINCIPLES ─── -->
@@ -814,6 +842,7 @@
             <div class="compare-row"><div class="compare-key">구조화</div><div class="compare-val">클래스 계층</div></div>
             <div class="compare-row"><div class="compare-key">생존</div><div class="compare-val">프로그램에 종속</div></div>
             <div class="compare-row"><div class="compare-key">복잡도</div><div class="compare-val">클래스 / 패키지</div></div>
+            <div class="compare-row"><div class="compare-key">Physical AI 적합성</div><div class="compare-val">다중 감각·다중 행동 표현이 불편</div></div>
           </div>
         </div>
         <div class="compare-col cell">
@@ -826,6 +855,7 @@
             <div class="compare-row"><div class="compare-key">구조화</div><div class="compare-val">조직 → 기관 → 유기체</div></div>
             <div class="compare-row"><div class="compare-key">생존</div><div class="compare-val">각 세포 독립 수명</div></div>
             <div class="compare-row"><div class="compare-key">복잡도</div><div class="compare-val">세포 수 / 조직화 수준</div></div>
+            <div class="compare-row"><div class="compare-key">Physical AI 적합성</div><div class="compare-val">다중 감각·다중 행동을 기능 세포로 매핑</div></div>
           </div>
         </div>
       </div>
@@ -840,6 +870,8 @@
       <p class="sec-label fade-in">Pseudocode Example</p>
       <h2 class="sec-title fade-in">세포코딩이 생긴 모습</h2>
       <p class="sec-body fade-in">아직 언어 스펙은 확정되지 않았다. 하지만 이런 모습이 될 것이다. 각 세포는 선언적이고, 역할이 명확하며, 서로를 모른다.</p>
+      <p class="sec-body fade-in">Spider robot style systems can be expressed as sensing cells, decision cells, and action cells, where each layer communicates only via signals and membrane contracts.</p>
+      <p class="sec-body fade-in">거미 로봇 같은 시스템은 감각 세포·판단 세포·행동 세포로 표현할 수 있고, 각 계층은 신호와 막 계약을 통해서만 통신한다.</p>
 
       <div class="code-block-wrapper fade-in">
         <div class="code-bar">

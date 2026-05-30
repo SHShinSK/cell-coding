@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Cell Coding — Physical AI를 위한 이벤트 기반 생물학적 프로그래밍 패러다임">
+  <meta name="description" content="Cell Coding — A biological programming paradigm for Physical AI. Functional cells instead of narrow input-process-output pipelines.">
   <title>Cell Coding — Open Source</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Pretendard:wght@300;500;700&display=swap" rel="stylesheet">
   <style>
@@ -11,7 +11,7 @@
       --bg: #0a0f0d;
       --green: #2dff8f;
       --text: #e8f5ee;
-      --dim: rgba(232,245,238,0.55);
+      --dim: rgba(232,245,238,0.62);
       --border: rgba(45,255,143,0.2);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,59 +20,66 @@
       background: var(--bg);
       color: var(--text);
       font-family: 'Pretendard', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 24px;
+      padding: 48px 24px 56px;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
     }
     .badge {
+      width: fit-content;
       font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 0.15em;
       color: var(--green);
       border: 1px solid var(--border);
       padding: 6px 12px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
     h1 {
-      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-size: clamp(2rem, 6vw, 3.4rem);
       font-weight: 700;
-      text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
-    .sub {
-      text-align: center;
+    .lead {
       color: var(--dim);
-      max-width: 560px;
       line-height: 1.8;
-      margin-bottom: 8px;
-    }
-    .sub-en {
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      color: var(--dim);
-      text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 4px;
     }
     .lang {
+      margin-top: 18px;
       display: flex;
-      gap: 12px;
-      margin-bottom: 32px;
+      gap: 10px;
       font-size: 13px;
+      color: var(--dim);
+      margin-bottom: 30px;
     }
     .lang a { color: var(--green); text-decoration: none; }
+    .panel {
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .panel h2 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: var(--green);
+    }
+    .panel p {
+      line-height: 1.8;
+      color: var(--dim);
+      margin-bottom: 6px;
+    }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      max-width: 900px;
-      width: 100%;
-      margin-bottom: 32px;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+      margin-bottom: 30px;
     }
     .card {
       border: 1px solid var(--border);
-      padding: 24px;
+      padding: 20px;
       text-decoration: none;
       color: inherit;
       transition: border-color 0.2s, transform 0.2s;
@@ -82,30 +89,28 @@
       transform: translateY(-2px);
     }
     .card-title { font-weight: 600; margin-bottom: 8px; color: var(--green); }
-    .card-desc { font-size: 14px; color: var(--dim); line-height: 1.6; }
+    .card-desc { font-size: 14px; color: var(--dim); line-height: 1.65; }
+    .card-desc .sub { display: block; margin-top: 6px; opacity: 0.85; }
     .cta {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      justify-content: center;
+      gap: 10px;
     }
     .btn {
       font-family: 'DM Mono', monospace;
       font-size: 12px;
-      padding: 12px 20px;
+      padding: 11px 16px;
       border: 1px solid var(--border);
       color: var(--text);
       text-decoration: none;
-      transition: background 0.2s;
     }
     .btn-primary {
-      background: rgba(45,255,143,0.12);
       border-color: var(--green);
       color: var(--green);
+      background: rgba(45,255,143,0.1);
     }
-    .btn:hover { background: rgba(45,255,143,0.08); }
     footer {
-      margin-top: 48px;
+      margin-top: 34px;
       font-size: 12px;
       color: var(--dim);
       font-family: 'DM Mono', monospace;
@@ -113,43 +118,75 @@
   </style>
 </head>
 <body>
-  <div class="badge">OPEN SOURCE · v0.1</div>
-  <h1>세포코딩 · Cell Coding</h1>
-  <p class="sub">Physical AI를 위한 이벤트 기반 생물학적 프로그래밍 패러다임</p>
-  <p class="sub-en">A biological programming paradigm for Physical AI, built on event-driven architecture.</p>
+  <div class="wrap">
+    <div class="badge">OPEN SOURCE · v0.1</div>
+    <h1>Cell Coding · 세포코딩</h1>
+    <p class="lead">A biological programming paradigm for Physical AI, built on event-driven architecture.</p>
+    <p class="lead">Physical AI를 위한 이벤트 기반 생물학적 프로그래밍 패러다임.</p>
 
-  <div class="lang">
-    <span>한국어</span>
-    <span>|</span>
-    <a href="README.en.md">English docs</a>
+    <div class="lang">
+      <a href="README.en.md">English docs</a>
+      <span>|</span>
+      <a href="README.md">한국어</a>
+    </div>
+
+    <section class="panel">
+      <h2>Why Cell Coding exists | 왜 Cell Coding이 필요한가</h2>
+      <p>Classical computing centered around a narrow input-process-output frame, where interfaces and outputs were comparatively constrained.</p>
+      <p>고전 컴퓨팅은 비교적 제약된 인터페이스와 출력을 가진 입력-처리-출력 프레임을 중심으로 발전했습니다.</p>
+      <p>Inputs expanded from keyboard and mouse to camera, microphone, and location — but outputs often stayed screen- and printer-centric.</p>
+      <p>입력은 키보드·마우스에서 카메라·마이크·위치정보로 확장됐지만, 출력은 여전히 화면·프린터 중심에 머무는 경우가 많았습니다.</p>
+      <p>Physical AI introduces many sensing channels and many real-world action channels at the same time. Cell Coding reframes software as a network of functional cells instead of a single I/O pipeline.</p>
+      <p>Physical AI는 다중 감각 채널과 다중 현실 행동 채널을 동시에 요구합니다. Cell Coding은 소프트웨어를 단일 I/O 파이프라인이 아닌 기능 세포 네트워크로 재정의합니다.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Spider robot scenario | 거미 로봇 시나리오</h2>
+      <p>A spider robot may ingest vision, hearing, tactile, and chemical context simultaneously — not as plain "inputs" but as specialized sensory functions.</p>
+      <p>거미 로봇은 시각·청각·촉각·화학적 맥락을 단순 "입력"이 아니라 특화된 감각 기능으로 동시에 받아들입니다.</p>
+      <p>Outputs include locomotion patterns, web generation, and chemical actions — better modeled as cooperating cells with roles, membranes, and signals across tissue-organ-organism levels.</p>
+      <p>출력은 보행 패턴·거미줄 생성·화학적 작동까지 확장되며, 역할·막·신호를 가진 세포가 조직-기관-유기체 계층에서 협업하는 모델로 표현하는 편이 더 적합합니다.</p>
+    </section>
+
+    <div class="grid">
+      <a class="card" href="cell-coding.html">
+        <div class="card-title">Paradigm | 개념 소개</div>
+        <div class="card-desc">
+          Role · Membrane · Signal — the three laws of cells and layered model.
+          <span class="sub">Role · Membrane · Signal — 세포의 3대 법칙과 계층 모델</span>
+        </div>
+      </a>
+      <a class="card" href="개발명세서.html">
+        <div class="card-title">Spec v0.1 | 언어 명세</div>
+        <div class="card-desc">
+          Keywords, grammar, type system, and EBNF direction for the DSL.
+          <span class="sub">키워드, 문법, 타입 시스템, EBNF</span>
+        </div>
+      </a>
+      <a class="card" href="roadmap.html">
+        <div class="card-title">Roadmap | 구현 로드맵</div>
+        <div class="card-desc">
+          Phase-based implementation checkpoints from compiler to ecosystem.
+          <span class="sub">4단계 구현 가이드와 체크포인트</span>
+        </div>
+      </a>
+      <a class="card" href="Cell%20Coding%20Blueprint.html">
+        <div class="card-title">Physical AI Blueprint</div>
+        <div class="card-desc">
+          TypeScript + Python + React hybrid architecture for embodied runtime.
+          <span class="sub">TypeScript + Python + React 하이브리드 아키텍처</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/SHShinSK/cell-coding">GitHub</a>
+      <a class="btn" href="https://github.com/SHShinSK/cell-coding/issues">Issues</a>
+      <a class="btn" href="https://github.com/SHShinSK/cell-coding/discussions">Discussions</a>
+      <a class="btn" href="https://github.com/SHShinSK/cell-coding/blob/main/CONTRIBUTING.md">Contributing · 기여하기</a>
+    </div>
+
+    <footer>Apache-2.0 · SHShinSK/cell-coding</footer>
   </div>
-
-  <div class="grid">
-    <a class="card" href="cell-coding.html">
-      <div class="card-title">개념 소개 / Paradigm</div>
-      <div class="card-desc">Role · Membrane · Signal — 세포의 3대 법칙과 계층 모델</div>
-    </a>
-    <a class="card" href="개발명세서.html">
-      <div class="card-title">언어 명세 / Spec v0.1</div>
-      <div class="card-desc">키워드, 문법, 타입 시스템, EBNF</div>
-    </a>
-    <a class="card" href="roadmap.html">
-      <div class="card-title">구현 로드맵 / Roadmap</div>
-      <div class="card-desc">4단계 구현 가이드와 체크포인트</div>
-    </a>
-    <a class="card" href="Cell%20Coding%20Blueprint.html">
-      <div class="card-title">Physical AI Blueprint</div>
-      <div class="card-desc">TypeScript + Python + React 하이브리드 아키텍처</div>
-    </a>
-  </div>
-
-  <div class="cta">
-    <a class="btn btn-primary" href="https://github.com/SHShinSK/cell-coding">GitHub 저장소</a>
-    <a class="btn" href="https://github.com/SHShinSK/cell-coding/issues">Issues</a>
-    <a class="btn" href="https://github.com/SHShinSK/cell-coding/discussions">Discussions</a>
-    <a class="btn" href="https://github.com/SHShinSK/cell-coding/blob/main/CONTRIBUTING.md">기여하기</a>
-  </div>
-
-  <footer>Apache-2.0 · SHShinSK/cell-coding</footer>
 </body>
 </html>
