@@ -1,0 +1,42 @@
+// divide-scale fixture · cell divide + HPA PoC
+
+signal Task {
+  id: String;
+}
+
+signal Done {
+  id: String;
+}
+
+cell WorkerCell {
+  role: "Queue worker · 큐 워커";
+
+  membrane {
+    accepts: Task;
+    emits: Done;
+  }
+
+  divide when (queue.depth > 10) {
+    max: 4
+    strategy: round-robin
+  }
+
+  on(Task t) {
+    emit Done(id: t.id);
+  }
+}
+
+tissue WorkerTissue {
+  flow linear {
+    WorkerCell
+  }
+}
+
+organ WorkerOrgan {
+  tissues { WorkerTissue }
+  exports { Done }
+}
+
+organism WorkerOrganism {
+  organs { WorkerOrgan }
+}

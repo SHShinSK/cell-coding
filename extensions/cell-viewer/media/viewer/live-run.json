@@ -1,0 +1,994 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-30T13:01:58.632Z",
+  "live": true,
+  "result": {
+    "ok": true,
+    "file": "D:\\Claude\\examples\\porifera-filter\\sponge-organism.cell",
+    "errors": [],
+    "trace": [
+      {
+        "from": "external",
+        "signal": {
+          "type": "WaterSample",
+          "data": {
+            "turbidity": 0.95,
+            "flowRate": 10
+          }
+        }
+      },
+      {
+        "from": "InflowSenseCell",
+        "signal": {
+          "type": "SensorFault",
+          "data": {}
+        }
+      },
+      {
+        "from": "immune:SensorPolicy#retry:1",
+        "signal": {
+          "type": "WaterSample",
+          "data": {
+            "turbidity": 0.95,
+            "flowRate": 10
+          }
+        }
+      },
+      {
+        "from": "InflowSenseCell",
+        "signal": {
+          "type": "SensorFault",
+          "data": {}
+        }
+      },
+      {
+        "from": "immune:SensorPolicy#retry:2",
+        "signal": {
+          "type": "WaterSample",
+          "data": {
+            "turbidity": 0.95,
+            "flowRate": 10
+          }
+        }
+      },
+      {
+        "from": "InflowSenseCell",
+        "signal": {
+          "type": "SensorFault",
+          "data": {}
+        }
+      },
+      {
+        "from": "immune:SensorPolicy#retry:3",
+        "signal": {
+          "type": "WaterSample",
+          "data": {
+            "turbidity": 0.95,
+            "flowRate": 10
+          }
+        }
+      },
+      {
+        "from": "InflowSenseCell",
+        "signal": {
+          "type": "SensorFault",
+          "data": {}
+        }
+      }
+    ],
+    "lifecycle": {
+      "states": {
+        "InflowSenseCell": "dormant",
+        "FilterDecideCell": "dormant",
+        "OutflowActCell": "dormant"
+      },
+      "transitions": [
+        {
+          "cell": "InflowSenseCell",
+          "from": "genesis",
+          "to": "dormant",
+          "reason": "bootstrap complete · 초기화 완료",
+          "step": 1
+        },
+        {
+          "cell": "FilterDecideCell",
+          "from": "genesis",
+          "to": "dormant",
+          "reason": "bootstrap complete · 초기화 완료",
+          "step": 2
+        },
+        {
+          "cell": "OutflowActCell",
+          "from": "genesis",
+          "to": "dormant",
+          "reason": "bootstrap complete · 초기화 완료",
+          "step": 3
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "dormant",
+          "to": "active",
+          "reason": "processing signal · 신호 처리",
+          "step": 4
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "active",
+          "to": "emitting",
+          "reason": "emitting signal · 신호 방출",
+          "step": 5
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "emitting",
+          "to": "active",
+          "reason": "resume handler · 핸들러 재개",
+          "step": 6
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "active",
+          "to": "dormant",
+          "reason": "handler complete · 핸들러 완료",
+          "step": 7
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "dormant",
+          "to": "active",
+          "reason": "processing signal · 신호 처리",
+          "step": 8
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "active",
+          "to": "emitting",
+          "reason": "emitting signal · 신호 방출",
+          "step": 9
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "emitting",
+          "to": "active",
+          "reason": "resume handler · 핸들러 재개",
+          "step": 10
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "active",
+          "to": "dormant",
+          "reason": "handler complete · 핸들러 완료",
+          "step": 11
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "dormant",
+          "to": "active",
+          "reason": "processing signal · 신호 처리",
+          "step": 12
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "active",
+          "to": "emitting",
+          "reason": "emitting signal · 신호 방출",
+          "step": 13
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "emitting",
+          "to": "active",
+          "reason": "resume handler · 핸들러 재개",
+          "step": 14
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "active",
+          "to": "dormant",
+          "reason": "handler complete · 핸들러 완료",
+          "step": 15
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "dormant",
+          "to": "active",
+          "reason": "processing signal · 신호 처리",
+          "step": 16
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "active",
+          "to": "emitting",
+          "reason": "emitting signal · 신호 방출",
+          "step": 17
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "emitting",
+          "to": "active",
+          "reason": "resume handler · 핸들러 재개",
+          "step": 18
+        },
+        {
+          "cell": "InflowSenseCell",
+          "from": "active",
+          "to": "dormant",
+          "reason": "handler complete · 핸들러 완료",
+          "step": 19
+        }
+      ]
+    },
+    "bundle": {
+      "id": "sponge-organism",
+      "title": "sponge-organism.cell",
+      "titleKo": "sponge-organism.cell",
+      "file": "examples/porifera-filter/sponge-organism.cell",
+      "input": {
+        "type": "WaterSample",
+        "data": {
+          "turbidity": 0.95,
+          "flowRate": 10
+        }
+      },
+      "graph": {
+        "cells": [
+          {
+            "name": "InflowSenseCell",
+            "role": "Water inflow sensing · 물 유입 감지",
+            "accepts": [
+              "WaterSample"
+            ],
+            "emits": [
+              "ParticleLoad",
+              "SensorFault"
+            ],
+            "handlers": [
+              "WaterSample"
+            ]
+          },
+          {
+            "name": "FilterDecideCell",
+            "role": "Filter routing · 여과 경로 판단",
+            "accepts": [
+              "ParticleLoad"
+            ],
+            "emits": [
+              "FilterCommand"
+            ],
+            "handlers": [
+              "ParticleLoad"
+            ]
+          },
+          {
+            "name": "OutflowActCell",
+            "role": "Filtered outflow · 여과수 배출",
+            "accepts": [
+              "FilterCommand"
+            ],
+            "emits": [
+              "ExhalePulse"
+            ],
+            "handlers": [
+              "FilterCommand"
+            ]
+          }
+        ],
+        "tissueFlow": [
+          [
+            "InflowSenseCell",
+            "FilterDecideCell",
+            "OutflowActCell"
+          ]
+        ],
+        "immune": [
+          {
+            "name": "SensorPolicy",
+            "errorType": "SensorFault",
+            "strategy": "retry"
+          }
+        ]
+      },
+      "trace": [
+        {
+          "from": "external",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          }
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          }
+        },
+        {
+          "from": "immune:SensorPolicy#retry:1",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          }
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          }
+        },
+        {
+          "from": "immune:SensorPolicy#retry:2",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          }
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          }
+        },
+        {
+          "from": "immune:SensorPolicy#retry:3",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          }
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          }
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "from": "external",
+          "fromKind": "external",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ]
+        },
+        {
+          "index": 1,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": []
+        },
+        {
+          "index": 2,
+          "from": "immune:SensorPolicy#retry:1",
+          "fromKind": "immune",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ]
+        },
+        {
+          "index": 3,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": []
+        },
+        {
+          "index": 4,
+          "from": "immune:SensorPolicy#retry:2",
+          "fromKind": "immune",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ]
+        },
+        {
+          "index": 5,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": []
+        },
+        {
+          "index": 6,
+          "from": "immune:SensorPolicy#retry:3",
+          "fromKind": "immune",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ]
+        },
+        {
+          "index": 7,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": []
+        }
+      ],
+      "lifecycle": {
+        "states": {
+          "InflowSenseCell": "dormant",
+          "FilterDecideCell": "dormant",
+          "OutflowActCell": "dormant"
+        },
+        "transitions": [
+          {
+            "cell": "InflowSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 1
+          },
+          {
+            "cell": "FilterDecideCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 2
+          },
+          {
+            "cell": "OutflowActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 3
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 4
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 5
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 6
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 7
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 8
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 9
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 10
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 11
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 12
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 13
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 14
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 15
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 16
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 17
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 18
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 19
+          }
+        ]
+      }
+    }
+  },
+  "scenarios": [
+    {
+      "id": "sponge-organism",
+      "title": "sponge-organism.cell",
+      "titleKo": "sponge-organism.cell",
+      "file": "examples/porifera-filter/sponge-organism.cell",
+      "input": {
+        "type": "WaterSample",
+        "data": {
+          "turbidity": 0.95,
+          "flowRate": 10
+        }
+      },
+      "graph": {
+        "cells": [
+          {
+            "name": "InflowSenseCell",
+            "role": "Water inflow sensing · 물 유입 감지",
+            "accepts": [
+              "WaterSample"
+            ],
+            "emits": [
+              "ParticleLoad",
+              "SensorFault"
+            ],
+            "handlers": [
+              "WaterSample"
+            ]
+          },
+          {
+            "name": "FilterDecideCell",
+            "role": "Filter routing · 여과 경로 판단",
+            "accepts": [
+              "ParticleLoad"
+            ],
+            "emits": [
+              "FilterCommand"
+            ],
+            "handlers": [
+              "ParticleLoad"
+            ]
+          },
+          {
+            "name": "OutflowActCell",
+            "role": "Filtered outflow · 여과수 배출",
+            "accepts": [
+              "FilterCommand"
+            ],
+            "emits": [
+              "ExhalePulse"
+            ],
+            "handlers": [
+              "FilterCommand"
+            ]
+          }
+        ],
+        "tissueFlow": [
+          [
+            "InflowSenseCell",
+            "FilterDecideCell",
+            "OutflowActCell"
+          ]
+        ],
+        "immune": [
+          {
+            "name": "SensorPolicy",
+            "errorType": "SensorFault",
+            "strategy": "retry"
+          }
+        ]
+      },
+      "trace": [
+        {
+          "from": "external",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          }
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          }
+        },
+        {
+          "from": "immune:SensorPolicy#retry:1",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          }
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          }
+        },
+        {
+          "from": "immune:SensorPolicy#retry:2",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          }
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          }
+        },
+        {
+          "from": "immune:SensorPolicy#retry:3",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          }
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          }
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "from": "external",
+          "fromKind": "external",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ]
+        },
+        {
+          "index": 1,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": []
+        },
+        {
+          "index": 2,
+          "from": "immune:SensorPolicy#retry:1",
+          "fromKind": "immune",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ]
+        },
+        {
+          "index": 3,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": []
+        },
+        {
+          "index": 4,
+          "from": "immune:SensorPolicy#retry:2",
+          "fromKind": "immune",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ]
+        },
+        {
+          "index": 5,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": []
+        },
+        {
+          "index": 6,
+          "from": "immune:SensorPolicy#retry:3",
+          "fromKind": "immune",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ]
+        },
+        {
+          "index": 7,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": []
+        }
+      ],
+      "lifecycle": {
+        "states": {
+          "InflowSenseCell": "dormant",
+          "FilterDecideCell": "dormant",
+          "OutflowActCell": "dormant"
+        },
+        "transitions": [
+          {
+            "cell": "InflowSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 1
+          },
+          {
+            "cell": "FilterDecideCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 2
+          },
+          {
+            "cell": "OutflowActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 3
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 4
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 5
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 6
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 7
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 8
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 9
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 10
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 11
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 12
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 13
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 14
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 15
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 16
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 17
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 18
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 19
+          }
+        ]
+      }
+    }
+  ]
+}

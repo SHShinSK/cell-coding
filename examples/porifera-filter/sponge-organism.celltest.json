@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "suites": [
+    {
+      "name": "InflowSenseCell isolation · 유입 감지 격리",
+      "target": "InflowSenseCell",
+      "cases": [
+        {
+          "name": "clean sample emits ParticleLoad",
+          "inject": { "type": "WaterSample", "data": { "turbidity": 0.2, "flowRate": 10 } },
+          "expect": [
+            { "kind": "trace", "from": "InflowSenseCell", "signal": "ParticleLoad" },
+            { "kind": "none", "signal": "SensorFault" }
+          ]
+        },
+        {
+          "name": "high turbidity emits SensorFault",
+          "inject": { "type": "WaterSample", "data": { "turbidity": 0.95, "flowRate": 10 } },
+          "expect": [
+            { "kind": "trace", "from": "InflowSenseCell", "signal": "SensorFault" },
+            { "kind": "none", "signal": "ParticleLoad" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FilterDecideCell isolation · 여과 판단 격리",
+      "target": "FilterDecideCell",
+      "cases": [
+        {
+          "name": "low density pass",
+          "inject": { "type": "ParticleLoad", "data": { "density": 0.1, "maxSize": 1 } },
+          "expect": [
+            { "kind": "trace", "from": "FilterDecideCell", "signal": "FilterCommand", "data": { "action": "pass" } }
+          ]
+        },
+        {
+          "name": "high density absorb",
+          "inject": { "type": "ParticleLoad", "data": { "density": 0.9, "maxSize": 1 } },
+          "expect": [
+            { "kind": "trace", "from": "FilterDecideCell", "signal": "FilterCommand", "data": { "action": "absorb" } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FilterTissue integration · 조직 연쇄",
+      "target": "FilterTissue",
+      "cases": [
+        {
+          "name": "clean water to ExhalePulse",
+          "inject": { "type": "WaterSample", "data": { "turbidity": 0.2, "flowRate": 10 } },
+          "expect": [
+            { "kind": "trace", "signal": "ExhalePulse" },
+            { "kind": "count", "signal": "ExhalePulse", "count": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SpongeBody circuit breaker · 회로 차단",
+      "target": "SpongeBody",
+      "immune": true,
+      "cases": [
+        {
+          "name": "fault storm trips circuit and limits retries",
+          "inject": { "type": "WaterSample", "data": { "turbidity": 0.95, "flowRate": 10 } },
+          "expect": [
+            { "kind": "trace", "from": "immune:CircuitBreaker#trip", "signal": "SensorFault" },
+            { "kind": "trace", "from": "immune:CircuitBreaker#reject", "signal": "SensorFault" },
+            { "kind": "count", "from": "immune:SensorPolicy#retry:", "signal": "WaterSample", "count": 2 },
+            { "kind": "trace", "from": "immune:SensorPolicy#escalate", "signal": "ImmuneEscalation" }
+          ]
+        }
+      ]
+    }
+  ]
+}

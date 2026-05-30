@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "suites": [
+    {
+      "name": "AlarmActCell isolation · 알람 세포 격리",
+      "target": "AlarmActCell",
+      "cases": [
+        {
+          "name": "high confidence triggers alarm",
+          "inject": { "type": "MotionDetected", "data": { "x": 120, "y": 80, "confidence": 0.95 } },
+          "expect": [
+            { "kind": "trace", "from": "AlarmActCell", "signal": "AlarmPulse", "data": { "level": "triggered" } }
+          ]
+        },
+        {
+          "name": "low confidence no alarm",
+          "inject": { "type": "MotionDetected", "data": { "x": 10, "y": 10, "confidence": 0.3 } },
+          "expect": [
+            { "kind": "none", "signal": "AlarmPulse" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AlarmTissue integration · 조직 연쇄",
+      "target": "AlarmTissue",
+      "cases": [
+        {
+          "name": "motion cascade to AlarmPulse",
+          "inject": { "type": "MotionDetected", "data": { "x": 150, "y": 220, "confidence": 0.98 } },
+          "expect": [
+            { "kind": "trace", "signal": "AlarmPulse", "data": { "level": "triggered" } },
+            { "kind": "count", "signal": "AlarmPulse", "count": 1 }
+          ]
+        },
+        {
+          "name": "weak motion blocked by gate",
+          "inject": { "type": "MotionDetected", "data": { "x": 1, "y": 1, "confidence": 0.2 } },
+          "expect": [
+            { "kind": "none", "signal": "AlarmPulse" }
+          ]
+        }
+      ]
+    }
+  ]
+}

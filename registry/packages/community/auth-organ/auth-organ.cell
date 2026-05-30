@@ -1,0 +1,43 @@
+// @community/auth-organ v0.1.0 — community auth organ · 커뮤니티 인증 기관
+// Install · 설치: cell install @community/auth-organ
+
+signal AuthRequest {
+  token: String;
+}
+
+signal AuthGranted {
+  userId: String;
+  scope: String;
+}
+
+signal AuthDenied {
+  reason: String;
+}
+
+cell TokenValidateCell {
+  role: "Bearer token validation · Bearer 토큰 검증";
+
+  membrane {
+    accepts: AuthRequest;
+    emits: AuthGranted | AuthDenied;
+  }
+
+  on(AuthRequest req) {
+    if (req.token == "valid-token") {
+      emit AuthGranted(userId: "user-42", scope: "read");
+    } else {
+      emit AuthDenied(reason: "invalid token · 유효하지 않은 토큰");
+    }
+  }
+}
+
+tissue AuthTissue {
+  flow linear {
+    TokenValidateCell
+  }
+}
+
+organ AuthOrgan {
+  tissues { AuthTissue }
+  exports { AuthGranted, AuthDenied }
+}

@@ -1,0 +1,36 @@
+signal SensorFault {
+  message: String;
+}
+
+cell SinkCell {
+  role: "Fault sink · fault 흡수";
+
+  membrane {
+    accepts: SensorFault;
+  }
+
+  on(SensorFault f) {
+    absorb;
+  }
+}
+
+tissue FaultTissue {
+  flow linear {
+    SinkCell
+  }
+}
+
+organ FaultOrgan {
+  tissues { FaultTissue }
+}
+
+organism EscalateOrganism {
+  organs { FaultOrgan }
+
+  immune DeadLetterPolicy {
+    on SensorFault {
+      strategy: deadLetter;
+      escalate: true;
+    }
+  }
+}

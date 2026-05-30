@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-adapter-rules
+  namespace: monitoring
+data:
+  config.yaml: |
+    rules:
+      - seriesQuery: 'cell_signal_queue_depth{organ!=""}'
+        resources:
+          overrides:
+            organ: { resource: "namespace" }
+        name:
+          matches: "cell_signal_queue_depth"
+          as: "cell_signal_queue_depth"
+        metricsQuery: 'avg(<<.Series>>{<<.LabelMatchers>>}) by (organ)'
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus-adapter
+  namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus-adapter-cell-e2e
+rules:
+  - apiGroups: [""]
+    resources: [namespaces, pods, services]
+    verbs: [get, list, watch]
+  - apiGroups: [custom.metrics.k8s.io]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-adapter-cell-e2e
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus-adapter-cell-e2e
+subjects:
+  - kind: ServiceAccount
+    name: prometheus-adapter
+    namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prometheus-adapter-auth-reader
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: extension-apiserver-authentication-reader
+subjects:
+  - kind: ServiceAccount
+    name: prometheus-adapter
+    namespace: monitoring
+---
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1beta1.custom.metrics.k8s.io
+spec:
+  service:
+    name: prometheus-adapter
+    namespace: monitoring
+  group: custom.metrics.k8s.io
+  version: v1beta1
+  insecureSkipTLSVerify: true
+  groupPriorityMinimum: 100
+  versionPriorityMinimum: 100
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-adapter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-adapter
+  template:
+    metadata:
+      labels:
+        app: prometheus-adapter
+    spec:
+      serviceAccountName: prometheus-adapter
+      containers:
+        - name: adapter
+          image: registry.k8s.io/prometheus-adapter/prometheus-adapter:v0.12.0
+          args:
+            - --secure-port=6443
+            - --cert-dir=/tmp/cert
+            - --prometheus-url=http://prometheus.monitoring.svc.cluster.local:9090/
+            - --metrics-relist-interval=15s
+            - --config=/etc/adapter/config.yaml
+          ports:
+            - containerPort: 6443
+          volumeMounts:
+            - name: config
+              mountPath: /etc/adapter
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-adapter-rules
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-adapter
+  namespace: monitoring
+spec:
+  selector:
+    app: prometheus-adapter
+  ports:
+    - port: 443
+      targetPort: 6443

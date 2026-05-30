@@ -299,7 +299,7 @@ export class Parser {
         max = parseInt(this.expect(TokenType.NUMBER).value, 10);
       } else if (t.value === 'strategy') {
         this.advance(); this.expect(TokenType.COLON);
-        strategy = this.advance().value as AST.DivideDecl['strategy'];
+        strategy = this.parseDivideStrategy();
       } else {
         this.advance();
       }
@@ -308,6 +308,17 @@ export class Parser {
 
     this.expect(TokenType.RBRACE);
     return { kind: 'DivideDecl', pos, condition, max, strategy };
+  }
+
+  private parseDivideStrategy(): AST.DivideDecl['strategy'] {
+    const tok = this.advance();
+    const allowed: AST.DivideDecl['strategy'][] = ['round-robin', 'least-loaded', 'random'];
+    if (allowed.includes(tok.value as AST.DivideDecl['strategy'])) {
+      return tok.value as AST.DivideDecl['strategy'];
+    }
+    throw new Error(
+      `Unknown divide strategy '${tok.value}' · divide strategy는 round-robin | least-loaded | random`,
+    );
   }
 
   // ── Mutate ────────────────────────────────────────────────
@@ -497,30 +508,83 @@ export class Parser {
 
     const routes: AST.RouteDecl[] = [];
     while (!this.check(TokenType.RBRACE) && !this.check(TokenType.EOF)) {
-      const rpos = this.pos2();
-      if (this.peek().type === TokenType.IDENTIFIER) {
-        const source = this.advance().value +
-          (this.match(TokenType.DOT) ? '.' + this.advance().value : '');
-        this.match(TokenType.ARROW); this.match(TokenType.ARROW_ASCII);
-        const targets: string[] = [];
-        if (this.check(TokenType.LBRACKET)) {
-          this.advance();
-          while (!this.check(TokenType.RBRACKET) && !this.check(TokenType.EOF)) {
-            if (this.peek().type === TokenType.IDENTIFIER) targets.push(this.advance().value);
-            this.match(TokenType.COMMA);
-          }
-          this.expect(TokenType.RBRACKET);
-        } else if (this.peek().type === TokenType.IDENTIFIER) {
-          targets.push(this.advance().value);
-        }
-        routes.push({ kind: 'RouteDecl', pos: rpos, source, targets });
-      } else {
-        this.advance();
-      }
+      routes.push(this.parseRouteDecl());
     }
 
     this.expect(TokenType.RBRACE);
     return { kind: 'NervousDecl', pos, name, routes };
+  }
+
+  private parseRouteDecl(): AST.RouteDecl {
+    const rpos = this.pos2();
+    const source = this.expect(TokenType.IDENTIFIER).value +
+      (this.match(TokenType.DOT) ? '.' + this.advance().value : '');
+    this.match(TokenType.ARROW);
+    this.match(TokenType.ARROW_ASCII);
+
+    if (this.check(TokenType.WHEN)) {
+      this.advance();
+      this.expect(TokenType.LPAREN);
+      const condition = this.parseExpr();
+      this.expect(TokenType.RPAREN);
+      this.match(TokenType.ARROW);
+      this.match(TokenType.ARROW_ASCII);
+      const targets = this.parseRouteTargets();
+      return { kind: 'RouteDecl', pos: rpos, source, targets, branchKind: 'when', condition };
+    }
+
+    if (this.check(TokenType.ALWAYS)) {
+      this.advance();
+      this.match(TokenType.ARROW);
+      this.match(TokenType.ARROW_ASCII);
+      const targets = this.parseRouteTargets();
+      return { kind: 'RouteDecl', pos: rpos, source, targets, branchKind: 'always' };
+    }
+
+    if (this.check(TokenType.TRANSFORM)) {
+      this.advance();
+      this.expect(TokenType.LPAREN);
+      const paramName = this.expect(TokenType.IDENTIFIER).value;
+      this.expect(TokenType.RPAREN);
+      this.expect(TokenType.LBRACE);
+      const signalType = this.expect(TokenType.IDENTIFIER).value;
+      let args: AST.ArgList | undefined;
+      if (this.check(TokenType.LPAREN)) {
+        this.advance();
+        args = this.parseArgList();
+        this.expect(TokenType.RPAREN);
+      }
+      this.expect(TokenType.RBRACE);
+      const transform: AST.RouteTransform = {
+        kind: 'RouteTransform',
+        pos: rpos,
+        paramName,
+        signalType,
+        args,
+      };
+      this.match(TokenType.ARROW);
+      this.match(TokenType.ARROW_ASCII);
+      const targets = this.parseRouteTargets();
+      return { kind: 'RouteDecl', pos: rpos, source, targets, branchKind: 'plain', transform };
+    }
+
+    const targets = this.parseRouteTargets();
+    return { kind: 'RouteDecl', pos: rpos, source, targets, branchKind: 'plain' };
+  }
+
+  private parseRouteTargets(): string[] {
+    const targets: string[] = [];
+    if (this.check(TokenType.LBRACKET)) {
+      this.advance();
+      while (!this.check(TokenType.RBRACKET) && !this.check(TokenType.EOF)) {
+        if (this.peek().type === TokenType.IDENTIFIER) targets.push(this.advance().value);
+        this.match(TokenType.COMMA);
+      }
+      this.expect(TokenType.RBRACKET);
+    } else if (this.peek().type === TokenType.IDENTIFIER) {
+      targets.push(this.advance().value);
+    }
+    return targets;
   }
 
   private parseImmuneDecl(): AST.ImmuneDecl {
@@ -541,6 +605,9 @@ export class Parser {
         this.expect(TokenType.LBRACE);
         let strategy: AST.ImmunePolicyDecl['strategy'] = 'retry';
         let retries = 3;
+        let backoff: AST.ImmunePolicyDecl['backoff'];
+        let fallback: string | undefined;
+        let escalate: boolean | undefined;
         while (!this.check(TokenType.RBRACE) && !this.check(TokenType.EOF)) {
           const pt = this.peek();
           if (pt.value === 'strategy') {
@@ -549,11 +616,20 @@ export class Parser {
           } else if (pt.value === 'retries' || pt.value === 'attempts') {
             this.advance(); this.expect(TokenType.COLON);
             retries = parseInt(this.advance().value, 10);
+          } else if (pt.value === 'backoff') {
+            this.advance(); this.expect(TokenType.COLON);
+            backoff = this.advance().value as AST.ImmunePolicyDecl['backoff'];
+          } else if (pt.value === 'fallback') {
+            this.advance(); this.expect(TokenType.COLON);
+            fallback = this.advance().value;
+          } else if (pt.value === 'escalate') {
+            this.advance(); this.expect(TokenType.COLON);
+            escalate = this.advance().value === 'true';
           } else { this.advance(); }
           this.match(TokenType.SEMICOLON);
         }
         this.expect(TokenType.RBRACE);
-        policies.push({ kind: 'ImmunePolicyDecl', pos: ppos, errorType, strategy, retries });
+        policies.push({ kind: 'ImmunePolicyDecl', pos: ppos, errorType, strategy, retries, backoff, fallback, escalate });
       } else if (t.value === 'circuit') {
         circuit = this.parseCircuitBreaker();
       } else {
@@ -574,6 +650,7 @@ export class Parser {
     while (!this.check(TokenType.RBRACE) && !this.check(TokenType.EOF)) {
       const t = this.peek();
       if (t.value === 'threshold')  { this.advance(); this.expect(TokenType.COLON); threshold  = parseInt(this.advance().value); }
+      else if (t.value === 'window') { this.advance(); this.expect(TokenType.COLON); windowSecs = parseInt(this.advance().value); }
       else if (t.value === 'open')  { this.advance(); this.expect(TokenType.COLON); openSecs   = parseInt(this.advance().value); }
       else if (t.value === 'halfOpen') { this.advance(); this.expect(TokenType.COLON); probes = parseInt(this.advance().value); }
       else { this.advance(); }
@@ -662,28 +739,23 @@ export class Parser {
     }
 
     this.advance();
-    const first = this.parseTypeExpr();
-
-    if (this.match(TokenType.COMMA)) {
-      const second = this.parseTypeExpr();
-      this.expect(TokenType.RANGLE);
-      if (name === 'Map') {
-        return { kind: 'MapType', pos, key: first, value: second };
-      }
-      if (name === 'Result') {
-        return { kind: 'ResultType', pos, ok: first, err: second };
-      }
-      return { kind: 'GenericType', pos, name, params: [first, second] };
-    }
-
+    const params: AST.TypeExpr[] = [this.parseTypeExpr()];
+    while (this.match(TokenType.COMMA)) params.push(this.parseTypeExpr());
     this.expect(TokenType.RANGLE);
-    if (name === 'List') {
-      return { kind: 'ListType', pos, item: first };
+
+    if (name === 'List' && params.length === 1) {
+      return { kind: 'ListType', pos, item: params[0] };
     }
-    if (name === 'Option') {
-      return { kind: 'OptionType', pos, inner: first };
+    if (name === 'Option' && params.length === 1) {
+      return { kind: 'OptionType', pos, inner: params[0] };
     }
-    return { kind: 'GenericType', pos, name, params: [first] };
+    if (name === 'Map' && params.length === 2) {
+      return { kind: 'MapType', pos, key: params[0], value: params[1] };
+    }
+    if (name === 'Result' && params.length === 2) {
+      return { kind: 'ResultType', pos, ok: params[0], err: params[1] };
+    }
+    return { kind: 'GenericType', pos, name, params };
   }
 
   private parseStmtList(): AST.Stmt[] {

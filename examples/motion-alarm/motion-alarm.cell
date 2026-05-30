@@ -1,0 +1,57 @@
+// Motion Alarm — Physical AI PoC (MotionDetected → AlarmPulse)
+// Physical AI PoC · 모션 감지 → 알람
+
+signal MotionDetected {
+  x: Number;
+  y: Number;
+  confidence: Number;
+}
+
+signal AlarmPulse {
+  level: String;
+}
+
+cell MotionGateCell {
+  role: "Motion confidence gate · 모션 신뢰도 게이트";
+
+  membrane {
+    accepts: MotionDetected;
+    emits: MotionDetected;
+  }
+
+  on(MotionDetected motion) {
+    if (motion.confidence >= 0.5) {
+      emit MotionDetected;
+    }
+  }
+}
+
+cell AlarmActCell {
+  role: "Alarm actuator · 알람 액추에이터";
+
+  membrane {
+    accepts: MotionDetected;
+    emits: AlarmPulse;
+  }
+
+  on(MotionDetected motion) {
+    if (motion.confidence >= 0.7) {
+      emit AlarmPulse(level: "triggered");
+    }
+  }
+}
+
+tissue AlarmTissue {
+  flow linear {
+    MotionGateCell -> AlarmActCell
+  }
+}
+
+organ AlarmOrgan {
+  tissues { AlarmTissue }
+  exports { AlarmPulse }
+}
+
+organism MotionAlarmOrganism {
+  organs { AlarmOrgan }
+}

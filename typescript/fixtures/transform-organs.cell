@@ -1,0 +1,74 @@
+signal Start {
+  tag: string;
+}
+
+signal SharedPing {
+  payload: string;
+}
+
+signal RoutedPing {
+  payload: string;
+}
+
+signal DoneB {
+  ok: bool;
+}
+
+cell PingCellA {
+  role: "Organ A emitter · A기관 송신";
+
+  membrane {
+    accepts: Start;
+    emits: SharedPing;
+  }
+
+  on(Start s) {
+    emit SharedPing(payload: s.tag);
+  }
+}
+
+cell PingCellB {
+  role: "Organ B listener · B기관 수신";
+
+  membrane {
+    accepts: RoutedPing;
+    emits: DoneB;
+  }
+
+  on(RoutedPing p) {
+    emit DoneB;
+  }
+}
+
+tissue TissueA {
+  flow linear {
+    PingCellA
+  }
+}
+
+tissue TissueB {
+  flow linear {
+    PingCellB
+  }
+}
+
+organ OrganA {
+  tissues { TissueA }
+  exports { SharedPing }
+}
+
+organ OrganB {
+  tissues { TissueB }
+  exports { DoneB }
+}
+
+organism TransformOrganism {
+  organs {
+    OrganA
+    OrganB
+  }
+
+  nervous TestBus {
+    OrganA.SharedPing -> transform (p) { RoutedPing(payload: p.payload) } -> OrganB
+  }
+}

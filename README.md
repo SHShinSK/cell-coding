@@ -42,20 +42,29 @@ Cell Coding은 그 단위를 `role`, `membrane`, `signal` 계약을 가진 `Cell
 Cell Coding maps embodied systems into functional cell networks, not one monolithic controller.  
 Cell Coding은 구현체 시스템을 단일 거대 컨트롤러가 아니라 기능 세포 네트워크로 매핑합니다.
 
+**시작점:** [A1](examples/porifera-filter/SCENARIO.md) → [A2](examples/spiderling/SCENARIO.md) → [A3](examples/spider-robot/SCENARIO.md) → [A4 PET](examples/pet-robot/SCENARIO.md) → [A5 Humanoid](examples/humanoid-robot/SCENARIO.md).  
+**Start here:** [A1](examples/porifera-filter/SCENARIO.md) → [A2](examples/spiderling/SCENARIO.md) → [A3](examples/spider-robot/SCENARIO.md) → [A4 PET](examples/pet-robot/SCENARIO.md) → [A5 Humanoid](examples/humanoid-robot/SCENARIO.md).
+
 ### Spider robot | 거미 로봇
 
 A spider robot ingests vision, hearing, tactile, and chemical context simultaneously, then produces locomotion patterns, web generation, and chemical actions — sensing and acting cells adapt to terrain rather than following a fixed pipeline.  
 거미 로봇은 시각·청각·촉각·화학적 맥락을 동시에 받아들이고, 보행 패턴·거미줄 생성·화학적 작동을 만들어냅니다. 감각·행동 세포가 고정 파이프라인이 아니라 지형에 적응합니다.
 
+**레퍼런스:** [`examples/spider-robot/`](examples/spider-robot/) — 10세포, 3기관, `nervous EventBus` ([SCENARIO.md](examples/spider-robot/SCENARIO.md)).
+
 ### Humanoid robot | 휴머노이드
 
-A humanoid ingests vision, proprioception, balance, hand tactile, and speech context at once. Its actions span bipedal locomotion, grasping, gestures, facial expression, and speech — better modeled as cooperating organs (balance, manipulation, interaction) than one controller pipeline.  
-휴머노이드는 시각·고유수용감각·균형·손 촉각·음성 맥락을 동시에 처리합니다. 이족 보행, 파지, 제스처, 표정, 발화는 단일 컨트롤러가 아니라 균형·조작·상호작용 기관의 협업으로 표현하는 편이 적합합니다.
+A humanoid ingests vision, proprioception, balance, hand tactile, and speech context at once.  
+휴머노이드는 시각·고유수용감각·균형·손 촉각·음성 맥락을 동시에 처리합니다.
+
+**레퍼런스:** [`examples/humanoid-robot/`](examples/humanoid-robot/) — 14세포, 4기관, `nervous MotorBus` ([SCENARIO.md](examples/humanoid-robot/SCENARIO.md)).
 
 ### PET robot | 반려(PET) 로봇
 
-A companion PET robot reads owner presence, touch, voice tone, and ambient home context continuously. Its behaviors include following, responsive vocalization, tail/LED expression, and comfort actions — modeled as affect and safety cells, not discrete I/O events.  
-반려(PET) 로봇은 주인 존재, 터치, 음성 톤, 가정 환경 맥락을 연속적으로 읽습니다. 따라가기, 반응형 발성, 꼬리/LED 표현, 위로 행동은 이산 I/O가 아니라 정서·안전 세포 네트워크로 모델링합니다.
+A companion PET robot reads owner presence, touch, voice tone, and ambient home context continuously.  
+반려(PET) 로봇은 주인 존재, 터치, 음성 톤, 가정 환경 맥락을 연속적으로 읽습니다.
+
+**레퍼런스:** [`examples/pet-robot/`](examples/pet-robot/) — 11세포, 정서·안전·상호작용 ([SCENARIO.md](examples/pet-robot/SCENARIO.md)).
 
 ## One-liner | 한 줄 정의
 
@@ -97,9 +106,40 @@ Decompose by **role**, declare boundaries with **membrane**, and connect systems
 
 ## Quick start | 빠른 시작
 
-1. Check milestones in [ROADMAP.md](ROADMAP.md)
-2. Read [OPEN_SOURCE_CHARTER.md](OPEN_SOURCE_CHARTER.md)
-3. Start with `good first issue` tasks in [issue drafts](.github/issue-drafts/README.md)
+**Node.js 20+** 필요.
+
+### npm (권장 · 공개 런칭)
+
+```bash
+# Physical AI PoC — MotionDetected → AlarmPulse
+npx @cell-coding/cli run ./motion-alarm.cell MotionDetected '{"x":150,"y":220,"confidence":0.98}'
+
+# transpiled TS handler + validator callFn sidecar
+npx @cell-coding/cli run --transpiled ./validator.cell RawInput '{"payload":"hello"}'
+
+# JSON → Viewer / CI
+npx @cell-coding/cli run --json --jaeger http://127.0.0.1:16686 ./motion-alarm.cell MotionDetected '{"x":1,"y":2,"confidence":0.9}'
+```
+
+전역 설치: `npm install -g @cell-coding/cli` 후 `cell run ...`
+
+### 저장소에서 개발
+
+```bash
+git clone https://github.com/SHShinSK/cell-coding.git
+cd cell-coding/typescript && npm install && npm test
+npm run cell:run -- ../examples/motion-alarm/motion-alarm.cell MotionDetected '{"x":1,"y":2,"confidence":0.9}'
+```
+
+Viewer: [`viewer-react/README.md`](viewer-react/README.md) · Physical AI: [`examples/physical-ai-motion-alarm.md`](examples/physical-ai-motion-alarm.md)
+
+**Release · 배포:** [`.github/RELEASE.md`](.github/RELEASE.md) — tag `v*` → npm · PyPI · VS Code Marketplace
+
+### Contributing · 기여 시작
+
+1. [ROADMAP.md](ROADMAP.md) 마일스톤 확인
+2. [OPEN_SOURCE_CHARTER.md](OPEN_SOURCE_CHARTER.md) 읽기
+3. [`good first issue`](https://github.com/SHShinSK/cell-coding/issues?q=is%3Aissue+label%3A%22good+first+issue%22) 로 첫 PR
 
 ## Grow together | 함께 발전시키기
 

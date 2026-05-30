@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "packages": {
+    "@community/auth-organ": {
+      "version": "0.1.0",
+      "path": "packages/community/auth-organ",
+      "organ": "AuthOrgan",
+      "exports": ["AuthGranted", "AuthDenied"],
+      "description": "Token validation organ · 토큰 검증 기관"
+    }
+  }
+}

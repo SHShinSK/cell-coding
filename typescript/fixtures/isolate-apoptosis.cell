@@ -1,0 +1,18 @@
+signal Ping { n: Number; }
+signal Pong { ok: Boolean; }
+signal Fault { msg: String; }
+
+cell FaultyCell {
+  role: "fault emitter · fault 방출";
+  membrane { accepts: Ping; emits: Fault | Pong; }
+  on(Ping p) {
+    if (p.n < 0) { emit Fault; } else { emit Pong; }
+  }
+  apoptosis { emit Pong(ok: false); }
+}
+
+organism IsoOrg {
+  immune IsoPolicy {
+    on Fault { strategy: isolate; }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "name": "cell-coding-viewer",
+  "displayName": "Cell Coding Viewer",
+  "description": "Signal flow and lifecycle viewer for .cell programs · .cell 신호 흐름·생존주기 뷰어",
+  "version": "0.1.0",
+  "publisher": "cell-coding",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SHShinSK/cell-coding.git",
+    "directory": "extensions/cell-viewer"
+  },
+  "homepage": "https://github.com/SHShinSK/cell-coding#readme",
+  "bugs": {
+    "url": "https://github.com/SHShinSK/cell-coding/issues"
+  },
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onCommand:cellCoding.openViewer",
+    "onCommand:cellCoding.refreshTraces",
+    "onCommand:cellCoding.runActiveCell",
+    "onCommand:cellCoding.testActiveCell",
+    "onCommand:cellCoding.inspectActiveCell"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cellCoding.runActiveCell",
+        "title": "Cell Coding: Run Active Cell",
+        "category": "Cell Coding"
+      },
+      {
+        "command": "cellCoding.testActiveCell",
+        "title": "Cell Coding: Test Active Cell (Cell Lab)",
+        "category": "Cell Coding"
+      },
+      {
+        "command": "cellCoding.inspectActiveCell",
+        "title": "Cell Coding: Inspect Active Cell",
+        "category": "Cell Coding"
+      },
+      {
+        "command": "cellCoding.openViewer",
+        "title": "Cell Coding: Open Signal Viewer",
+        "category": "Cell Coding"
+      },
+      {
+        "command": "cellCoding.refreshTraces",
+        "title": "Cell Coding: Refresh Viewer Traces",
+        "category": "Cell Coding"
+      }
+    ],
+    "configuration": {
+      "title": "Cell Coding Viewer",
+      "properties": {
+        "cellCoding.jaegerUiUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Jaeger UI base URL for trace links in viewer · e.g. http://127.0.0.1:16686 (also reads JAEGER_UI_URL)"
+        },
+        "cellCoding.runTranspiled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use transpiled TS handlers when running active cell · cell run --transpiled"
+        },
+        "cellCoding.functionsPath": {
+          "type": "string",
+          "default": "",
+          "description": "Optional callFn functions sidecar path · empty = auto-detect {stem}.functions.json next to .cell"
+        },
+        "cellCoding.cliPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to `cell` CLI binary · empty = monorepo typescript/ or PATH `cell` (@cell-coding/cli)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -watch -p .",
+    "build:viewer": "npm run build --prefix ../../viewer-react && node scripts/copy-viewer.mjs",
+    "vscode:prepublish": "npm run build:viewer && npm run compile",
+    "package": "vsce package",
+    "publish:marketplace": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.1",
+    "typescript": "^5.7.3"
+  }
+}

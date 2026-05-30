@@ -1,0 +1,12 @@
+{
+  "name": "@community/auth-organ",
+  "version": "0.1.0",
+  "organ": "AuthOrgan",
+  "exports": ["AuthGranted", "AuthDenied"],
+  "requires": [],
+  "files": ["auth-organ.cell"],
+  "membrane": {
+    "accepts": ["AuthRequest"],
+    "emits": ["AuthGranted", "AuthDenied"]
+  }
+}

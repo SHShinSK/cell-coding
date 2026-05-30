@@ -1,17 +1,71 @@
 {
-  "name": "@cell-coding/compiler",
+  "name": "@cell-coding/cli",
   "version": "0.1.0",
-  "private": true,
+  "description": "Cell Coding CLI — .cell DSL compiler, signal runtime, and Physical AI tools · Cell Coding CLI",
   "type": "module",
-  "description": "Cell Coding DSL compiler draft (lexer, parser, checker) · 세포코딩 DSL 컴파일러 초안",
+  "license": "Apache-2.0",
+  "author": "Cell Coding Contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SHShinSK/cell-coding.git",
+    "directory": "typescript"
+  },
+  "homepage": "https://shshinsk.github.io/cell-coding/",
+  "bugs": {
+    "url": "https://github.com/SHShinSK/cell-coding/issues"
+  },
+  "keywords": [
+    "cell-coding",
+    "physical-ai",
+    "dsl",
+    "runtime",
+    "robotics",
+    "event-driven"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "cell": "./bin/cell.mjs"
+  },
+  "files": [
+    "bin",
+    "*.ts",
+    "fixtures",
+    "registry",
+    "scripts/bundle-registry.mjs",
+    "!**/*.test.ts",
+    "!redis-streams.integration.test.ts"
+  ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsc",
-    "test": "node --import tsx --test compile.test.ts"
+    "build": "tsc --noEmit",
+    "prepublishOnly": "node scripts/bundle-registry.mjs && npm test",
+    "cell:deploy": "node --import tsx deploy.ts",
+    "cell:install": "node --import tsx install.ts",
+    "cell:compose": "node --import tsx compose.ts",
+    "test": "node --import tsx --test compile.test.ts runtime.test.ts nervous-routing.test.ts circuit-breaker.test.ts signal-graph.test.ts lifecycle.test.ts run-cell.test.ts run-watch.test.ts backoff.test.ts cell-lab.test.ts signal-bus.test.ts phase3.test.ts transpile-handler.test.ts transpiled-runtime.test.ts transpiled-parity.test.ts cell-functions.test.ts viewer-inspect.test.ts phase4.test.ts phase4-cloud.test.ts phase4-divide.test.ts phase4-divide-scale.test.ts phase4-metrics.test.ts phase4-nervous-distributed.test.ts phase4-k8s-hpa.test.ts",
+    "test:integration": "node --import tsx --test redis-streams.integration.test.ts",
+    "cell:serve": "node --import tsx serve.ts",
+    "demo": "node --import tsx demo.ts",
+    "cell:init": "node --import tsx init.ts",
+    "cell:build": "node --import tsx build.ts",
+    "cell:run": "node --import tsx run.ts",
+    "cell:inspect": "node --import tsx inspect.ts",
+    "cell:test": "node --import tsx test.ts",
+    "viewer:traces": "node --import tsx viewer-traces.ts",
+    "pack:smoke": "npm pack --dry-run"
+  },
+  "dependencies": {
+    "ioredis": "^5.6.1",
+    "tsx": "^4.19.4"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
-    "tsx": "^4.19.4",
+    "testcontainers": "^10.28.0",
     "typescript": "^5.7.3"
   }
 }

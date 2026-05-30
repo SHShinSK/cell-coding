@@ -1,0 +1,3211 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-30T13:39:46.894Z",
+  "scenarios": [
+    {
+      "id": "porifera-clean",
+      "title": "Porifera — clean filter path",
+      "titleKo": "Porifera — 정상 여과 경로",
+      "file": "examples/porifera-filter/sponge-organism.cell",
+      "input": {
+        "type": "WaterSample",
+        "data": {
+          "turbidity": 0.2,
+          "flowRate": 10
+        }
+      },
+      "graph": {
+        "cells": [
+          {
+            "name": "InflowSenseCell",
+            "role": "Water inflow sensing · 물 유입 감지",
+            "accepts": [
+              "WaterSample"
+            ],
+            "emits": [
+              "ParticleLoad",
+              "SensorFault"
+            ],
+            "handlers": [
+              "WaterSample"
+            ]
+          },
+          {
+            "name": "FilterDecideCell",
+            "role": "Filter routing · 여과 경로 판단",
+            "accepts": [
+              "ParticleLoad"
+            ],
+            "emits": [
+              "FilterCommand"
+            ],
+            "handlers": [
+              "ParticleLoad"
+            ]
+          },
+          {
+            "name": "OutflowActCell",
+            "role": "Filtered outflow · 여과수 배출",
+            "accepts": [
+              "FilterCommand"
+            ],
+            "emits": [
+              "ExhalePulse"
+            ],
+            "handlers": [
+              "FilterCommand"
+            ]
+          }
+        ],
+        "tissueFlow": [
+          [
+            "InflowSenseCell",
+            "FilterDecideCell",
+            "OutflowActCell"
+          ]
+        ],
+        "immune": [
+          {
+            "name": "SensorPolicy",
+            "errorType": "SensorFault",
+            "strategy": "retry"
+          }
+        ]
+      },
+      "trace": [
+        {
+          "from": "external",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.2,
+              "flowRate": 10
+            }
+          },
+          "atMs": 0
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "ParticleLoad",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "FilterDecideCell",
+          "signal": {
+            "type": "FilterCommand",
+            "data": {
+              "action": "absorb"
+            }
+          },
+          "atMs": 0
+        },
+        {
+          "from": "OutflowActCell",
+          "signal": {
+            "type": "ExhalePulse",
+            "data": {}
+          },
+          "atMs": 0
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "from": "external",
+          "fromKind": "external",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.2,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 1,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "ParticleLoad",
+            "data": {}
+          },
+          "consumers": [
+            "FilterDecideCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 2,
+          "from": "FilterDecideCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "FilterCommand",
+            "data": {
+              "action": "absorb"
+            }
+          },
+          "consumers": [
+            "OutflowActCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 3,
+          "from": "OutflowActCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "ExhalePulse",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 0
+        }
+      ],
+      "lifecycle": {
+        "states": {
+          "InflowSenseCell": "dormant",
+          "FilterDecideCell": "dormant",
+          "OutflowActCell": "dormant"
+        },
+        "transitions": [
+          {
+            "cell": "InflowSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 1
+          },
+          {
+            "cell": "FilterDecideCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 2
+          },
+          {
+            "cell": "OutflowActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 3
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 4
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 5
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 6
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 7
+          },
+          {
+            "cell": "FilterDecideCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 8
+          },
+          {
+            "cell": "FilterDecideCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 9
+          },
+          {
+            "cell": "FilterDecideCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 10
+          },
+          {
+            "cell": "FilterDecideCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 11
+          },
+          {
+            "cell": "OutflowActCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 12
+          },
+          {
+            "cell": "OutflowActCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 13
+          },
+          {
+            "cell": "OutflowActCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 14
+          },
+          {
+            "cell": "OutflowActCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 15
+          }
+        ]
+      },
+      "inspect": {
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "signalCount": 5,
+          "cellCount": 3,
+          "tissueCount": 1,
+          "organCount": 1
+        },
+        "organism": {
+          "name": "SpongeOrganism",
+          "organs": [
+            "SpongeBody"
+          ]
+        },
+        "hierarchy": [
+          {
+            "name": "SpongeBody",
+            "tissues": [
+              "FilterTissue"
+            ],
+            "exports": [
+              "ExhalePulse"
+            ],
+            "cells": [
+              {
+                "name": "InflowSenseCell",
+                "role": "Water inflow sensing · 물 유입 감지",
+                "tissue": "FilterTissue",
+                "organ": "SpongeBody"
+              },
+              {
+                "name": "FilterDecideCell",
+                "role": "Filter routing · 여과 경로 판단",
+                "tissue": "FilterTissue",
+                "organ": "SpongeBody"
+              },
+              {
+                "name": "OutflowActCell",
+                "role": "Filtered outflow · 여과수 배출",
+                "tissue": "FilterTissue",
+                "organ": "SpongeBody"
+              }
+            ]
+          }
+        ],
+        "nervousRoutes": [],
+        "immunePolicies": [
+          {
+            "block": "SensorPolicy",
+            "errorType": "SensorFault",
+            "strategy": "retry",
+            "escalate": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "porifera-fault",
+      "title": "Porifera — sensor fault + immune retry",
+      "titleKo": "Porifera — 센서 fault + immune retry",
+      "file": "examples/porifera-filter/sponge-organism.cell",
+      "input": {
+        "type": "WaterSample",
+        "data": {
+          "turbidity": 0.95,
+          "flowRate": 10
+        }
+      },
+      "graph": {
+        "cells": [
+          {
+            "name": "InflowSenseCell",
+            "role": "Water inflow sensing · 물 유입 감지",
+            "accepts": [
+              "WaterSample"
+            ],
+            "emits": [
+              "ParticleLoad",
+              "SensorFault"
+            ],
+            "handlers": [
+              "WaterSample"
+            ]
+          },
+          {
+            "name": "FilterDecideCell",
+            "role": "Filter routing · 여과 경로 판단",
+            "accepts": [
+              "ParticleLoad"
+            ],
+            "emits": [
+              "FilterCommand"
+            ],
+            "handlers": [
+              "ParticleLoad"
+            ]
+          },
+          {
+            "name": "OutflowActCell",
+            "role": "Filtered outflow · 여과수 배출",
+            "accepts": [
+              "FilterCommand"
+            ],
+            "emits": [
+              "ExhalePulse"
+            ],
+            "handlers": [
+              "FilterCommand"
+            ]
+          }
+        ],
+        "tissueFlow": [
+          [
+            "InflowSenseCell",
+            "FilterDecideCell",
+            "OutflowActCell"
+          ]
+        ],
+        "immune": [
+          {
+            "name": "SensorPolicy",
+            "errorType": "SensorFault",
+            "strategy": "retry"
+          }
+        ]
+      },
+      "trace": [
+        {
+          "from": "external",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "atMs": 0
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "immune:SensorPolicy#backoff:1",
+          "signal": {
+            "type": "SensorFault",
+            "data": {
+              "waitMs": 100
+            }
+          },
+          "atMs": 0,
+          "backoffMs": 100
+        },
+        {
+          "from": "immune:SensorPolicy#retry:1",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "atMs": 100
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "atMs": 100
+        },
+        {
+          "from": "immune:SensorPolicy#backoff:2",
+          "signal": {
+            "type": "SensorFault",
+            "data": {
+              "waitMs": 200
+            }
+          },
+          "atMs": 100,
+          "backoffMs": 200
+        },
+        {
+          "from": "immune:SensorPolicy#retry:2",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "atMs": 300
+        },
+        {
+          "from": "InflowSenseCell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "atMs": 300
+        },
+        {
+          "from": "immune:CircuitBreaker#trip",
+          "signal": {
+            "type": "SensorFault",
+            "data": {
+              "faults": "open",
+              "atMs": 300
+            }
+          },
+          "atMs": 300
+        },
+        {
+          "from": "immune:CircuitBreaker#reject",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "atMs": 300
+        },
+        {
+          "from": "immune:SensorPolicy#escalate",
+          "signal": {
+            "type": "ImmuneEscalation",
+            "data": {
+              "policyName": "SensorPolicy",
+              "errorType": "SensorFault",
+              "reason": "circuit open · 회로 개방",
+              "faultCell": "InflowSenseCell"
+            }
+          },
+          "atMs": 300
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "from": "external",
+          "fromKind": "external",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 1,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 0
+        },
+        {
+          "index": 2,
+          "from": "immune:SensorPolicy#backoff:1",
+          "fromKind": "immune",
+          "signal": {
+            "type": "SensorFault",
+            "data": {
+              "waitMs": 100
+            }
+          },
+          "consumers": [],
+          "atMs": 0,
+          "backoffMs": 100
+        },
+        {
+          "index": 3,
+          "from": "immune:SensorPolicy#retry:1",
+          "fromKind": "immune",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ],
+          "atMs": 100
+        },
+        {
+          "index": 4,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 100
+        },
+        {
+          "index": 5,
+          "from": "immune:SensorPolicy#backoff:2",
+          "fromKind": "immune",
+          "signal": {
+            "type": "SensorFault",
+            "data": {
+              "waitMs": 200
+            }
+          },
+          "consumers": [],
+          "atMs": 100,
+          "backoffMs": 200
+        },
+        {
+          "index": 6,
+          "from": "immune:SensorPolicy#retry:2",
+          "fromKind": "immune",
+          "signal": {
+            "type": "WaterSample",
+            "data": {
+              "turbidity": 0.95,
+              "flowRate": 10
+            }
+          },
+          "consumers": [
+            "InflowSenseCell"
+          ],
+          "atMs": 300
+        },
+        {
+          "index": 7,
+          "from": "InflowSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 300
+        },
+        {
+          "index": 8,
+          "from": "immune:CircuitBreaker#trip",
+          "fromKind": "immune",
+          "signal": {
+            "type": "SensorFault",
+            "data": {
+              "faults": "open",
+              "atMs": 300
+            }
+          },
+          "consumers": [],
+          "atMs": 300
+        },
+        {
+          "index": 9,
+          "from": "immune:CircuitBreaker#reject",
+          "fromKind": "immune",
+          "signal": {
+            "type": "SensorFault",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 300
+        },
+        {
+          "index": 10,
+          "from": "immune:SensorPolicy#escalate",
+          "fromKind": "immune",
+          "signal": {
+            "type": "ImmuneEscalation",
+            "data": {
+              "policyName": "SensorPolicy",
+              "errorType": "SensorFault",
+              "reason": "circuit open · 회로 개방",
+              "faultCell": "InflowSenseCell"
+            }
+          },
+          "consumers": [],
+          "atMs": 300
+        }
+      ],
+      "lifecycle": {
+        "states": {
+          "InflowSenseCell": "dormant",
+          "FilterDecideCell": "dormant",
+          "OutflowActCell": "dormant"
+        },
+        "transitions": [
+          {
+            "cell": "InflowSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 1
+          },
+          {
+            "cell": "FilterDecideCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 2
+          },
+          {
+            "cell": "OutflowActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 3
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 4
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 5
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 6
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 7
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 8
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 9
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 10
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 11
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 12
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 13
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 14
+          },
+          {
+            "cell": "InflowSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 15
+          }
+        ]
+      },
+      "inspect": {
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "signalCount": 5,
+          "cellCount": 3,
+          "tissueCount": 1,
+          "organCount": 1
+        },
+        "organism": {
+          "name": "SpongeOrganism",
+          "organs": [
+            "SpongeBody"
+          ]
+        },
+        "hierarchy": [
+          {
+            "name": "SpongeBody",
+            "tissues": [
+              "FilterTissue"
+            ],
+            "exports": [
+              "ExhalePulse"
+            ],
+            "cells": [
+              {
+                "name": "InflowSenseCell",
+                "role": "Water inflow sensing · 물 유입 감지",
+                "tissue": "FilterTissue",
+                "organ": "SpongeBody"
+              },
+              {
+                "name": "FilterDecideCell",
+                "role": "Filter routing · 여과 경로 판단",
+                "tissue": "FilterTissue",
+                "organ": "SpongeBody"
+              },
+              {
+                "name": "OutflowActCell",
+                "role": "Filtered outflow · 여과수 배출",
+                "tissue": "FilterTissue",
+                "organ": "SpongeBody"
+              }
+            ]
+          }
+        ],
+        "nervousRoutes": [],
+        "immunePolicies": [
+          {
+            "block": "SensorPolicy",
+            "errorType": "SensorFault",
+            "strategy": "retry",
+            "escalate": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "pet-comfort",
+      "title": "PET — distress + immune fallback",
+      "titleKo": "PET — distress + immune fallback",
+      "file": "examples/pet-robot/pet-organism.cell",
+      "input": {
+        "type": "OwnerPing",
+        "data": {
+          "rssi": 0.01
+        }
+      },
+      "graph": {
+        "cells": [
+          {
+            "name": "PresenceSenseCell",
+            "role": "Owner presence detection · 주인 존재 감지",
+            "accepts": [
+              "OwnerPing"
+            ],
+            "emits": [
+              "OwnerPresence",
+              "DistressSignal"
+            ],
+            "handlers": [
+              "OwnerPing"
+            ]
+          },
+          {
+            "name": "TouchSenseCell",
+            "role": "Touch and petting sensing · 터치·쓰다듬기 감지",
+            "accepts": [
+              "OwnerPresence"
+            ],
+            "emits": [
+              "TouchSignal"
+            ],
+            "handlers": [
+              "OwnerPresence"
+            ]
+          },
+          {
+            "name": "VoiceSenseCell",
+            "role": "Voice tone sensing · 음성 톤 감지",
+            "accepts": [
+              "TouchSignal"
+            ],
+            "emits": [
+              "VoiceTone"
+            ],
+            "handlers": [
+              "TouchSignal"
+            ]
+          },
+          {
+            "name": "HomeContextCell",
+            "role": "Home ambient context · 가정 환경 맥락",
+            "accepts": [
+              "VoiceTone"
+            ],
+            "emits": [
+              "HomeContext"
+            ],
+            "handlers": [
+              "VoiceTone"
+            ]
+          },
+          {
+            "name": "AffectFusionCell",
+            "role": "Affect state fusion · 정서 상태 융합",
+            "accepts": [
+              "HomeContext"
+            ],
+            "emits": [
+              "AffectState"
+            ],
+            "handlers": [
+              "HomeContext"
+            ]
+          },
+          {
+            "name": "MoodDecideCell",
+            "role": "Social intent from affect · 정서 기반 상호작용 의도",
+            "accepts": [
+              "AffectState"
+            ],
+            "emits": [
+              "SocialIntent"
+            ],
+            "handlers": [
+              "AffectState"
+            ]
+          },
+          {
+            "name": "SafetyGuardCell",
+            "role": "Home safety guard · 가정 안전 가드",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "SafetyClear",
+              "DistressSignal"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          },
+          {
+            "name": "FollowActCell",
+            "role": "Owner following locomotion · 주인 따라가기 보행",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "FollowPulse"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          },
+          {
+            "name": "VocalizeActCell",
+            "role": "Responsive vocalization · 반응형 발성",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "VocalCue"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          },
+          {
+            "name": "ExpressionActCell",
+            "role": "Tail and LED expression · 꼬리·LED 표현",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "ExpressionPulse"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          },
+          {
+            "name": "ComfortActCell",
+            "role": "Comfort and soothing behavior · 위로·안정 행동",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "ComfortAction"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          }
+        ],
+        "tissueFlow": [
+          [
+            "PresenceSenseCell",
+            "TouchSenseCell",
+            "VoiceSenseCell",
+            "HomeContextCell",
+            "AffectFusionCell"
+          ],
+          [
+            "MoodDecideCell",
+            "SafetyGuardCell"
+          ],
+          [
+            "FollowActCell",
+            "VocalizeActCell",
+            "ExpressionActCell",
+            "ComfortActCell"
+          ]
+        ],
+        "immune": [
+          {
+            "name": "SafetyPolicy",
+            "errorType": "DistressSignal",
+            "strategy": "fallback"
+          }
+        ]
+      },
+      "trace": [
+        {
+          "from": "external",
+          "signal": {
+            "type": "OwnerPing",
+            "data": {
+              "rssi": 0.01
+            }
+          },
+          "atMs": 0
+        },
+        {
+          "from": "PresenceSenseCell",
+          "signal": {
+            "type": "DistressSignal",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "immune:SafetyPolicy#fallback",
+          "signal": {
+            "type": "ComfortAction",
+            "data": {}
+          },
+          "atMs": 0
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "from": "external",
+          "fromKind": "external",
+          "signal": {
+            "type": "OwnerPing",
+            "data": {
+              "rssi": 0.01
+            }
+          },
+          "consumers": [
+            "PresenceSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 1,
+          "from": "PresenceSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "DistressSignal",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 0
+        },
+        {
+          "index": 2,
+          "from": "immune:SafetyPolicy#fallback",
+          "fromKind": "immune",
+          "signal": {
+            "type": "ComfortAction",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 0
+        }
+      ],
+      "lifecycle": {
+        "states": {
+          "PresenceSenseCell": "dormant",
+          "TouchSenseCell": "dormant",
+          "VoiceSenseCell": "dormant",
+          "HomeContextCell": "dormant",
+          "AffectFusionCell": "dormant",
+          "MoodDecideCell": "dormant",
+          "SafetyGuardCell": "dormant",
+          "FollowActCell": "dormant",
+          "VocalizeActCell": "dormant",
+          "ExpressionActCell": "dormant",
+          "ComfortActCell": "dormant"
+        },
+        "transitions": [
+          {
+            "cell": "PresenceSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 1
+          },
+          {
+            "cell": "TouchSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 2
+          },
+          {
+            "cell": "VoiceSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 3
+          },
+          {
+            "cell": "HomeContextCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 4
+          },
+          {
+            "cell": "AffectFusionCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 5
+          },
+          {
+            "cell": "MoodDecideCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 6
+          },
+          {
+            "cell": "SafetyGuardCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 7
+          },
+          {
+            "cell": "FollowActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 8
+          },
+          {
+            "cell": "VocalizeActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 9
+          },
+          {
+            "cell": "ExpressionActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 10
+          },
+          {
+            "cell": "ComfortActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 11
+          },
+          {
+            "cell": "PresenceSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 12
+          },
+          {
+            "cell": "PresenceSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 13
+          },
+          {
+            "cell": "PresenceSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 14
+          },
+          {
+            "cell": "PresenceSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 15
+          }
+        ]
+      },
+      "inspect": {
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "signalCount": 13,
+          "cellCount": 11,
+          "tissueCount": 3,
+          "organCount": 3
+        },
+        "organism": {
+          "name": "PetOrganism",
+          "organs": [
+            "PerceptionOrgan",
+            "AffectOrgan",
+            "InteractionOrgan"
+          ]
+        },
+        "hierarchy": [
+          {
+            "name": "PerceptionOrgan",
+            "tissues": [
+              "PerceptionTissue"
+            ],
+            "exports": [
+              "AffectState"
+            ],
+            "cells": [
+              {
+                "name": "PresenceSenseCell",
+                "role": "Owner presence detection · 주인 존재 감지",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              },
+              {
+                "name": "TouchSenseCell",
+                "role": "Touch and petting sensing · 터치·쓰다듬기 감지",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              },
+              {
+                "name": "VoiceSenseCell",
+                "role": "Voice tone sensing · 음성 톤 감지",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              },
+              {
+                "name": "HomeContextCell",
+                "role": "Home ambient context · 가정 환경 맥락",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              },
+              {
+                "name": "AffectFusionCell",
+                "role": "Affect state fusion · 정서 상태 융합",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              }
+            ]
+          },
+          {
+            "name": "AffectOrgan",
+            "tissues": [
+              "AffectTissue"
+            ],
+            "exports": [
+              "SocialIntent",
+              "SafetyClear"
+            ],
+            "cells": [
+              {
+                "name": "MoodDecideCell",
+                "role": "Social intent from affect · 정서 기반 상호작용 의도",
+                "tissue": "AffectTissue",
+                "organ": "AffectOrgan"
+              },
+              {
+                "name": "SafetyGuardCell",
+                "role": "Home safety guard · 가정 안전 가드",
+                "tissue": "AffectTissue",
+                "organ": "AffectOrgan"
+              }
+            ]
+          },
+          {
+            "name": "InteractionOrgan",
+            "tissues": [
+              "InteractionTissue"
+            ],
+            "exports": [
+              "FollowPulse",
+              "VocalCue",
+              "ExpressionPulse",
+              "ComfortAction"
+            ],
+            "cells": [
+              {
+                "name": "FollowActCell",
+                "role": "Owner following locomotion · 주인 따라가기 보행",
+                "tissue": "InteractionTissue",
+                "organ": "InteractionOrgan"
+              },
+              {
+                "name": "VocalizeActCell",
+                "role": "Responsive vocalization · 반응형 발성",
+                "tissue": "InteractionTissue",
+                "organ": "InteractionOrgan"
+              },
+              {
+                "name": "ExpressionActCell",
+                "role": "Tail and LED expression · 꼬리·LED 표현",
+                "tissue": "InteractionTissue",
+                "organ": "InteractionOrgan"
+              },
+              {
+                "name": "ComfortActCell",
+                "role": "Comfort and soothing behavior · 위로·안정 행동",
+                "tissue": "InteractionTissue",
+                "organ": "InteractionOrgan"
+              }
+            ]
+          }
+        ],
+        "nervousRoutes": [
+          {
+            "source": "PerceptionOrgan.AffectState",
+            "targets": [
+              "AffectOrgan"
+            ],
+            "branchKind": "plain",
+            "hasTransform": false
+          },
+          {
+            "source": "AffectOrgan.SocialIntent",
+            "targets": [
+              "InteractionOrgan"
+            ],
+            "branchKind": "plain",
+            "hasTransform": false
+          },
+          {
+            "source": "AffectOrgan.SafetyClear",
+            "targets": [
+              "InteractionOrgan"
+            ],
+            "branchKind": "plain",
+            "hasTransform": false
+          }
+        ],
+        "immunePolicies": [
+          {
+            "block": "SafetyPolicy",
+            "errorType": "DistressSignal",
+            "strategy": "fallback"
+          }
+        ]
+      }
+    },
+    {
+      "id": "pet-presence",
+      "title": "PET — owner presence (no immune)",
+      "titleKo": "PET — 주인 감지 (immune 없음)",
+      "file": "examples/pet-robot/pet-organism.cell",
+      "input": {
+        "type": "OwnerPing",
+        "data": {
+          "rssi": 0.8
+        }
+      },
+      "graph": {
+        "cells": [
+          {
+            "name": "PresenceSenseCell",
+            "role": "Owner presence detection · 주인 존재 감지",
+            "accepts": [
+              "OwnerPing"
+            ],
+            "emits": [
+              "OwnerPresence",
+              "DistressSignal"
+            ],
+            "handlers": [
+              "OwnerPing"
+            ]
+          },
+          {
+            "name": "TouchSenseCell",
+            "role": "Touch and petting sensing · 터치·쓰다듬기 감지",
+            "accepts": [
+              "OwnerPresence"
+            ],
+            "emits": [
+              "TouchSignal"
+            ],
+            "handlers": [
+              "OwnerPresence"
+            ]
+          },
+          {
+            "name": "VoiceSenseCell",
+            "role": "Voice tone sensing · 음성 톤 감지",
+            "accepts": [
+              "TouchSignal"
+            ],
+            "emits": [
+              "VoiceTone"
+            ],
+            "handlers": [
+              "TouchSignal"
+            ]
+          },
+          {
+            "name": "HomeContextCell",
+            "role": "Home ambient context · 가정 환경 맥락",
+            "accepts": [
+              "VoiceTone"
+            ],
+            "emits": [
+              "HomeContext"
+            ],
+            "handlers": [
+              "VoiceTone"
+            ]
+          },
+          {
+            "name": "AffectFusionCell",
+            "role": "Affect state fusion · 정서 상태 융합",
+            "accepts": [
+              "HomeContext"
+            ],
+            "emits": [
+              "AffectState"
+            ],
+            "handlers": [
+              "HomeContext"
+            ]
+          },
+          {
+            "name": "MoodDecideCell",
+            "role": "Social intent from affect · 정서 기반 상호작용 의도",
+            "accepts": [
+              "AffectState"
+            ],
+            "emits": [
+              "SocialIntent"
+            ],
+            "handlers": [
+              "AffectState"
+            ]
+          },
+          {
+            "name": "SafetyGuardCell",
+            "role": "Home safety guard · 가정 안전 가드",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "SafetyClear",
+              "DistressSignal"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          },
+          {
+            "name": "FollowActCell",
+            "role": "Owner following locomotion · 주인 따라가기 보행",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "FollowPulse"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          },
+          {
+            "name": "VocalizeActCell",
+            "role": "Responsive vocalization · 반응형 발성",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "VocalCue"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          },
+          {
+            "name": "ExpressionActCell",
+            "role": "Tail and LED expression · 꼬리·LED 표현",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "ExpressionPulse"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          },
+          {
+            "name": "ComfortActCell",
+            "role": "Comfort and soothing behavior · 위로·안정 행동",
+            "accepts": [
+              "SocialIntent"
+            ],
+            "emits": [
+              "ComfortAction"
+            ],
+            "handlers": [
+              "SocialIntent"
+            ]
+          }
+        ],
+        "tissueFlow": [
+          [
+            "PresenceSenseCell",
+            "TouchSenseCell",
+            "VoiceSenseCell",
+            "HomeContextCell",
+            "AffectFusionCell"
+          ],
+          [
+            "MoodDecideCell",
+            "SafetyGuardCell"
+          ],
+          [
+            "FollowActCell",
+            "VocalizeActCell",
+            "ExpressionActCell",
+            "ComfortActCell"
+          ]
+        ],
+        "immune": [
+          {
+            "name": "SafetyPolicy",
+            "errorType": "DistressSignal",
+            "strategy": "fallback"
+          }
+        ]
+      },
+      "trace": [
+        {
+          "from": "external",
+          "signal": {
+            "type": "OwnerPing",
+            "data": {
+              "rssi": 0.8
+            }
+          },
+          "atMs": 0
+        },
+        {
+          "from": "PresenceSenseCell",
+          "signal": {
+            "type": "OwnerPresence",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "TouchSenseCell",
+          "signal": {
+            "type": "TouchSignal",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "VoiceSenseCell",
+          "signal": {
+            "type": "VoiceTone",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "HomeContextCell",
+          "signal": {
+            "type": "HomeContext",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "AffectFusionCell",
+          "signal": {
+            "type": "AffectState",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "MoodDecideCell",
+          "signal": {
+            "type": "SocialIntent",
+            "data": {
+              "mode": "follow"
+            }
+          },
+          "atMs": 0
+        },
+        {
+          "from": "SafetyGuardCell",
+          "signal": {
+            "type": "SafetyClear",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "FollowActCell",
+          "signal": {
+            "type": "FollowPulse",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "VocalizeActCell",
+          "signal": {
+            "type": "VocalCue",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "ExpressionActCell",
+          "signal": {
+            "type": "ExpressionPulse",
+            "data": {}
+          },
+          "atMs": 0
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "from": "external",
+          "fromKind": "external",
+          "signal": {
+            "type": "OwnerPing",
+            "data": {
+              "rssi": 0.8
+            }
+          },
+          "consumers": [
+            "PresenceSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 1,
+          "from": "PresenceSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "OwnerPresence",
+            "data": {}
+          },
+          "consumers": [
+            "TouchSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 2,
+          "from": "TouchSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "TouchSignal",
+            "data": {}
+          },
+          "consumers": [
+            "VoiceSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 3,
+          "from": "VoiceSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "VoiceTone",
+            "data": {}
+          },
+          "consumers": [
+            "HomeContextCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 4,
+          "from": "HomeContextCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "HomeContext",
+            "data": {}
+          },
+          "consumers": [
+            "AffectFusionCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 5,
+          "from": "AffectFusionCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "AffectState",
+            "data": {}
+          },
+          "consumers": [
+            "MoodDecideCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 6,
+          "from": "MoodDecideCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SocialIntent",
+            "data": {
+              "mode": "follow"
+            }
+          },
+          "consumers": [
+            "SafetyGuardCell",
+            "FollowActCell",
+            "VocalizeActCell",
+            "ExpressionActCell",
+            "ComfortActCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 7,
+          "from": "SafetyGuardCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "SafetyClear",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 0
+        },
+        {
+          "index": 8,
+          "from": "FollowActCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "FollowPulse",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 0
+        },
+        {
+          "index": 9,
+          "from": "VocalizeActCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "VocalCue",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 0
+        },
+        {
+          "index": 10,
+          "from": "ExpressionActCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "ExpressionPulse",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 0
+        }
+      ],
+      "lifecycle": {
+        "states": {
+          "PresenceSenseCell": "dormant",
+          "TouchSenseCell": "dormant",
+          "VoiceSenseCell": "dormant",
+          "HomeContextCell": "dormant",
+          "AffectFusionCell": "dormant",
+          "MoodDecideCell": "dormant",
+          "SafetyGuardCell": "dormant",
+          "FollowActCell": "dormant",
+          "VocalizeActCell": "dormant",
+          "ExpressionActCell": "dormant",
+          "ComfortActCell": "dormant"
+        },
+        "transitions": [
+          {
+            "cell": "PresenceSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 1
+          },
+          {
+            "cell": "TouchSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 2
+          },
+          {
+            "cell": "VoiceSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 3
+          },
+          {
+            "cell": "HomeContextCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 4
+          },
+          {
+            "cell": "AffectFusionCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 5
+          },
+          {
+            "cell": "MoodDecideCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 6
+          },
+          {
+            "cell": "SafetyGuardCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 7
+          },
+          {
+            "cell": "FollowActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 8
+          },
+          {
+            "cell": "VocalizeActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 9
+          },
+          {
+            "cell": "ExpressionActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 10
+          },
+          {
+            "cell": "ComfortActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 11
+          },
+          {
+            "cell": "PresenceSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 12
+          },
+          {
+            "cell": "PresenceSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 13
+          },
+          {
+            "cell": "PresenceSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 14
+          },
+          {
+            "cell": "PresenceSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 15
+          },
+          {
+            "cell": "TouchSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 16
+          },
+          {
+            "cell": "TouchSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 17
+          },
+          {
+            "cell": "TouchSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 18
+          },
+          {
+            "cell": "TouchSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 19
+          },
+          {
+            "cell": "VoiceSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 20
+          },
+          {
+            "cell": "VoiceSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 21
+          },
+          {
+            "cell": "VoiceSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 22
+          },
+          {
+            "cell": "VoiceSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 23
+          },
+          {
+            "cell": "HomeContextCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 24
+          },
+          {
+            "cell": "HomeContextCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 25
+          },
+          {
+            "cell": "HomeContextCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 26
+          },
+          {
+            "cell": "HomeContextCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 27
+          },
+          {
+            "cell": "AffectFusionCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 28
+          },
+          {
+            "cell": "AffectFusionCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 29
+          },
+          {
+            "cell": "AffectFusionCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 30
+          },
+          {
+            "cell": "AffectFusionCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 31
+          },
+          {
+            "cell": "MoodDecideCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 32
+          },
+          {
+            "cell": "MoodDecideCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 33
+          },
+          {
+            "cell": "MoodDecideCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 34
+          },
+          {
+            "cell": "MoodDecideCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 35
+          },
+          {
+            "cell": "SafetyGuardCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 36
+          },
+          {
+            "cell": "SafetyGuardCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 37
+          },
+          {
+            "cell": "SafetyGuardCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 38
+          },
+          {
+            "cell": "SafetyGuardCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 39
+          },
+          {
+            "cell": "FollowActCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 40
+          },
+          {
+            "cell": "FollowActCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 41
+          },
+          {
+            "cell": "FollowActCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 42
+          },
+          {
+            "cell": "FollowActCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 43
+          },
+          {
+            "cell": "VocalizeActCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 44
+          },
+          {
+            "cell": "VocalizeActCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 45
+          },
+          {
+            "cell": "VocalizeActCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 46
+          },
+          {
+            "cell": "VocalizeActCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 47
+          },
+          {
+            "cell": "ExpressionActCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 48
+          },
+          {
+            "cell": "ExpressionActCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 49
+          },
+          {
+            "cell": "ExpressionActCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 50
+          },
+          {
+            "cell": "ExpressionActCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 51
+          },
+          {
+            "cell": "ComfortActCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 52
+          },
+          {
+            "cell": "ComfortActCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 53
+          }
+        ]
+      },
+      "inspect": {
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "signalCount": 13,
+          "cellCount": 11,
+          "tissueCount": 3,
+          "organCount": 3
+        },
+        "organism": {
+          "name": "PetOrganism",
+          "organs": [
+            "PerceptionOrgan",
+            "AffectOrgan",
+            "InteractionOrgan"
+          ]
+        },
+        "hierarchy": [
+          {
+            "name": "PerceptionOrgan",
+            "tissues": [
+              "PerceptionTissue"
+            ],
+            "exports": [
+              "AffectState"
+            ],
+            "cells": [
+              {
+                "name": "PresenceSenseCell",
+                "role": "Owner presence detection · 주인 존재 감지",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              },
+              {
+                "name": "TouchSenseCell",
+                "role": "Touch and petting sensing · 터치·쓰다듬기 감지",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              },
+              {
+                "name": "VoiceSenseCell",
+                "role": "Voice tone sensing · 음성 톤 감지",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              },
+              {
+                "name": "HomeContextCell",
+                "role": "Home ambient context · 가정 환경 맥락",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              },
+              {
+                "name": "AffectFusionCell",
+                "role": "Affect state fusion · 정서 상태 융합",
+                "tissue": "PerceptionTissue",
+                "organ": "PerceptionOrgan"
+              }
+            ]
+          },
+          {
+            "name": "AffectOrgan",
+            "tissues": [
+              "AffectTissue"
+            ],
+            "exports": [
+              "SocialIntent",
+              "SafetyClear"
+            ],
+            "cells": [
+              {
+                "name": "MoodDecideCell",
+                "role": "Social intent from affect · 정서 기반 상호작용 의도",
+                "tissue": "AffectTissue",
+                "organ": "AffectOrgan"
+              },
+              {
+                "name": "SafetyGuardCell",
+                "role": "Home safety guard · 가정 안전 가드",
+                "tissue": "AffectTissue",
+                "organ": "AffectOrgan"
+              }
+            ]
+          },
+          {
+            "name": "InteractionOrgan",
+            "tissues": [
+              "InteractionTissue"
+            ],
+            "exports": [
+              "FollowPulse",
+              "VocalCue",
+              "ExpressionPulse",
+              "ComfortAction"
+            ],
+            "cells": [
+              {
+                "name": "FollowActCell",
+                "role": "Owner following locomotion · 주인 따라가기 보행",
+                "tissue": "InteractionTissue",
+                "organ": "InteractionOrgan"
+              },
+              {
+                "name": "VocalizeActCell",
+                "role": "Responsive vocalization · 반응형 발성",
+                "tissue": "InteractionTissue",
+                "organ": "InteractionOrgan"
+              },
+              {
+                "name": "ExpressionActCell",
+                "role": "Tail and LED expression · 꼬리·LED 표현",
+                "tissue": "InteractionTissue",
+                "organ": "InteractionOrgan"
+              },
+              {
+                "name": "ComfortActCell",
+                "role": "Comfort and soothing behavior · 위로·안정 행동",
+                "tissue": "InteractionTissue",
+                "organ": "InteractionOrgan"
+              }
+            ]
+          }
+        ],
+        "nervousRoutes": [
+          {
+            "source": "PerceptionOrgan.AffectState",
+            "targets": [
+              "AffectOrgan"
+            ],
+            "branchKind": "plain",
+            "hasTransform": false
+          },
+          {
+            "source": "AffectOrgan.SocialIntent",
+            "targets": [
+              "InteractionOrgan"
+            ],
+            "branchKind": "plain",
+            "hasTransform": false
+          },
+          {
+            "source": "AffectOrgan.SafetyClear",
+            "targets": [
+              "InteractionOrgan"
+            ],
+            "branchKind": "plain",
+            "hasTransform": false
+          }
+        ],
+        "immunePolicies": [
+          {
+            "block": "SafetyPolicy",
+            "errorType": "DistressSignal",
+            "strategy": "fallback"
+          }
+        ]
+      }
+    },
+    {
+      "id": "spider-stance",
+      "title": "Spider — vision to stance hold",
+      "titleKo": "Spider — 시각 → 자세 유지",
+      "file": "examples/spider-robot/spider-organism.cell",
+      "input": {
+        "type": "VisionFrame",
+        "data": {
+          "contrast": 0.6,
+          "motion": 0.3
+        }
+      },
+      "graph": {
+        "cells": [
+          {
+            "name": "VisionSenseCell",
+            "role": "Vision frame sensing · 시각 프레임 감지",
+            "accepts": [
+              "VisionFrame"
+            ],
+            "emits": [
+              "VisualCue",
+              "SensorFault"
+            ],
+            "handlers": [
+              "VisionFrame"
+            ]
+          },
+          {
+            "name": "TactileSenseCell",
+            "role": "Tactile contact sensing · 촉각 접촉 감지",
+            "accepts": [
+              "VisualCue"
+            ],
+            "emits": [
+              "TactilePing"
+            ],
+            "handlers": [
+              "VisualCue"
+            ]
+          },
+          {
+            "name": "HearingSenseCell",
+            "role": "Vibration and audio sensing · 진동·청각 감지",
+            "accepts": [
+              "TactilePing"
+            ],
+            "emits": [
+              "AudioCue"
+            ],
+            "handlers": [
+              "TactilePing"
+            ]
+          },
+          {
+            "name": "ChemicalSenseCell",
+            "role": "Chemical scent sensing · 화학 후각 감지",
+            "accepts": [
+              "AudioCue"
+            ],
+            "emits": [
+              "ChemicalCue"
+            ],
+            "handlers": [
+              "AudioCue"
+            ]
+          },
+          {
+            "name": "FuseDecideCell",
+            "role": "Multi-sense threat fusion · 다중 감각 위협 융합",
+            "accepts": [
+              "ChemicalCue"
+            ],
+            "emits": [
+              "ThreatAssessment"
+            ],
+            "handlers": [
+              "ChemicalCue"
+            ]
+          },
+          {
+            "name": "PathDecideCell",
+            "role": "Terrain-adaptive path routing · 지형 적응 경로 판단",
+            "accepts": [
+              "ThreatAssessment"
+            ],
+            "emits": [
+              "PathCommand"
+            ],
+            "handlers": [
+              "ThreatAssessment"
+            ]
+          },
+          {
+            "name": "GaitActCell",
+            "role": "Leg gait execution · 다리 보행 실행",
+            "accepts": [
+              "PathCommand"
+            ],
+            "emits": [
+              "GaitStep"
+            ],
+            "handlers": [
+              "PathCommand"
+            ]
+          },
+          {
+            "name": "StanceActCell",
+            "role": "Posture stabilization · 자세 안정화",
+            "accepts": [
+              "GaitStep"
+            ],
+            "emits": [
+              "StanceHold"
+            ],
+            "handlers": [
+              "GaitStep"
+            ]
+          },
+          {
+            "name": "WebActCell",
+            "role": "Web generation and anchoring · 거미줄 생성·고정",
+            "accepts": [
+              "ThreatAssessment"
+            ],
+            "emits": [
+              "WebSpan"
+            ],
+            "handlers": [
+              "ThreatAssessment"
+            ]
+          },
+          {
+            "name": "ChemicalActCell",
+            "role": "Chemical spray action · 화학 분사 행동",
+            "accepts": [
+              "ThreatAssessment"
+            ],
+            "emits": [
+              "ChemicalPulse"
+            ],
+            "handlers": [
+              "ThreatAssessment"
+            ]
+          }
+        ],
+        "tissueFlow": [
+          [
+            "VisionSenseCell",
+            "TactileSenseCell",
+            "HearingSenseCell",
+            "ChemicalSenseCell",
+            "FuseDecideCell"
+          ],
+          [
+            "PathDecideCell",
+            "GaitActCell",
+            "StanceActCell"
+          ],
+          [
+            "WebActCell",
+            "ChemicalActCell"
+          ]
+        ],
+        "immune": [
+          {
+            "name": "SensorPolicy",
+            "errorType": "SensorFault",
+            "strategy": "retry"
+          }
+        ]
+      },
+      "trace": [
+        {
+          "from": "external",
+          "signal": {
+            "type": "VisionFrame",
+            "data": {
+              "contrast": 0.6,
+              "motion": 0.3
+            }
+          },
+          "atMs": 0
+        },
+        {
+          "from": "VisionSenseCell",
+          "signal": {
+            "type": "VisualCue",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "TactileSenseCell",
+          "signal": {
+            "type": "TactilePing",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "HearingSenseCell",
+          "signal": {
+            "type": "AudioCue",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "ChemicalSenseCell",
+          "signal": {
+            "type": "ChemicalCue",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "FuseDecideCell",
+          "signal": {
+            "type": "ThreatAssessment",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "PathDecideCell",
+          "signal": {
+            "type": "PathCommand",
+            "data": {
+              "direction": "forward",
+              "speed": 0.7
+            }
+          },
+          "atMs": 0
+        },
+        {
+          "from": "GaitActCell",
+          "signal": {
+            "type": "GaitStep",
+            "data": {}
+          },
+          "atMs": 0
+        },
+        {
+          "from": "StanceActCell",
+          "signal": {
+            "type": "StanceHold",
+            "data": {}
+          },
+          "atMs": 0
+        }
+      ],
+      "steps": [
+        {
+          "index": 0,
+          "from": "external",
+          "fromKind": "external",
+          "signal": {
+            "type": "VisionFrame",
+            "data": {
+              "contrast": 0.6,
+              "motion": 0.3
+            }
+          },
+          "consumers": [
+            "VisionSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 1,
+          "from": "VisionSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "VisualCue",
+            "data": {}
+          },
+          "consumers": [
+            "TactileSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 2,
+          "from": "TactileSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "TactilePing",
+            "data": {}
+          },
+          "consumers": [
+            "HearingSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 3,
+          "from": "HearingSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "AudioCue",
+            "data": {}
+          },
+          "consumers": [
+            "ChemicalSenseCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 4,
+          "from": "ChemicalSenseCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "ChemicalCue",
+            "data": {}
+          },
+          "consumers": [
+            "FuseDecideCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 5,
+          "from": "FuseDecideCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "ThreatAssessment",
+            "data": {}
+          },
+          "consumers": [
+            "PathDecideCell",
+            "WebActCell",
+            "ChemicalActCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 6,
+          "from": "PathDecideCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "PathCommand",
+            "data": {
+              "direction": "forward",
+              "speed": 0.7
+            }
+          },
+          "consumers": [
+            "GaitActCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 7,
+          "from": "GaitActCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "GaitStep",
+            "data": {}
+          },
+          "consumers": [
+            "StanceActCell"
+          ],
+          "atMs": 0
+        },
+        {
+          "index": 8,
+          "from": "StanceActCell",
+          "fromKind": "cell",
+          "signal": {
+            "type": "StanceHold",
+            "data": {}
+          },
+          "consumers": [],
+          "atMs": 0
+        }
+      ],
+      "lifecycle": {
+        "states": {
+          "VisionSenseCell": "dormant",
+          "TactileSenseCell": "dormant",
+          "HearingSenseCell": "dormant",
+          "ChemicalSenseCell": "dormant",
+          "FuseDecideCell": "dormant",
+          "PathDecideCell": "dormant",
+          "GaitActCell": "dormant",
+          "StanceActCell": "dormant",
+          "WebActCell": "dormant",
+          "ChemicalActCell": "dormant"
+        },
+        "transitions": [
+          {
+            "cell": "VisionSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 1
+          },
+          {
+            "cell": "TactileSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 2
+          },
+          {
+            "cell": "HearingSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 3
+          },
+          {
+            "cell": "ChemicalSenseCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 4
+          },
+          {
+            "cell": "FuseDecideCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 5
+          },
+          {
+            "cell": "PathDecideCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 6
+          },
+          {
+            "cell": "GaitActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 7
+          },
+          {
+            "cell": "StanceActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 8
+          },
+          {
+            "cell": "WebActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 9
+          },
+          {
+            "cell": "ChemicalActCell",
+            "from": "genesis",
+            "to": "dormant",
+            "reason": "bootstrap complete · 초기화 완료",
+            "step": 10
+          },
+          {
+            "cell": "VisionSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 11
+          },
+          {
+            "cell": "VisionSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 12
+          },
+          {
+            "cell": "VisionSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 13
+          },
+          {
+            "cell": "VisionSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 14
+          },
+          {
+            "cell": "TactileSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 15
+          },
+          {
+            "cell": "TactileSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 16
+          },
+          {
+            "cell": "TactileSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 17
+          },
+          {
+            "cell": "TactileSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 18
+          },
+          {
+            "cell": "HearingSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 19
+          },
+          {
+            "cell": "HearingSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 20
+          },
+          {
+            "cell": "HearingSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 21
+          },
+          {
+            "cell": "HearingSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 22
+          },
+          {
+            "cell": "ChemicalSenseCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 23
+          },
+          {
+            "cell": "ChemicalSenseCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 24
+          },
+          {
+            "cell": "ChemicalSenseCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 25
+          },
+          {
+            "cell": "ChemicalSenseCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 26
+          },
+          {
+            "cell": "FuseDecideCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 27
+          },
+          {
+            "cell": "FuseDecideCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 28
+          },
+          {
+            "cell": "FuseDecideCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 29
+          },
+          {
+            "cell": "FuseDecideCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 30
+          },
+          {
+            "cell": "PathDecideCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 31
+          },
+          {
+            "cell": "PathDecideCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 32
+          },
+          {
+            "cell": "PathDecideCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 33
+          },
+          {
+            "cell": "PathDecideCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 34
+          },
+          {
+            "cell": "WebActCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 35
+          },
+          {
+            "cell": "WebActCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 36
+          },
+          {
+            "cell": "ChemicalActCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 37
+          },
+          {
+            "cell": "ChemicalActCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 38
+          },
+          {
+            "cell": "GaitActCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 39
+          },
+          {
+            "cell": "GaitActCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 40
+          },
+          {
+            "cell": "GaitActCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 41
+          },
+          {
+            "cell": "GaitActCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 42
+          },
+          {
+            "cell": "StanceActCell",
+            "from": "dormant",
+            "to": "active",
+            "reason": "processing signal · 신호 처리",
+            "step": 43
+          },
+          {
+            "cell": "StanceActCell",
+            "from": "active",
+            "to": "emitting",
+            "reason": "emitting signal · 신호 방출",
+            "step": 44
+          },
+          {
+            "cell": "StanceActCell",
+            "from": "emitting",
+            "to": "active",
+            "reason": "resume handler · 핸들러 재개",
+            "step": 45
+          },
+          {
+            "cell": "StanceActCell",
+            "from": "active",
+            "to": "dormant",
+            "reason": "handler complete · 핸들러 완료",
+            "step": 46
+          }
+        ]
+      },
+      "inspect": {
+        "ok": true,
+        "errors": [],
+        "warnings": [],
+        "stats": {
+          "signalCount": 15,
+          "cellCount": 10,
+          "tissueCount": 3,
+          "organCount": 3
+        },
+        "organism": {
+          "name": "SpiderOrganism",
+          "organs": [
+            "SensingOrgan",
+            "LocomotionOrgan",
+            "ActionOrgan"
+          ]
+        },
+        "hierarchy": [
+          {
+            "name": "SensingOrgan",
+            "tissues": [
+              "SensingTissue"
+            ],
+            "exports": [
+              "ThreatAssessment"
+            ],
+            "cells": [
+              {
+                "name": "VisionSenseCell",
+                "role": "Vision frame sensing · 시각 프레임 감지",
+                "tissue": "SensingTissue",
+                "organ": "SensingOrgan"
+              },
+              {
+                "name": "TactileSenseCell",
+                "role": "Tactile contact sensing · 촉각 접촉 감지",
+                "tissue": "SensingTissue",
+                "organ": "SensingOrgan"
+              },
+              {
+                "name": "HearingSenseCell",
+                "role": "Vibration and audio sensing · 진동·청각 감지",
+                "tissue": "SensingTissue",
+                "organ": "SensingOrgan"
+              },
+              {
+                "name": "ChemicalSenseCell",
+                "role": "Chemical scent sensing · 화학 후각 감지",
+                "tissue": "SensingTissue",
+                "organ": "SensingOrgan"
+              },
+              {
+                "name": "FuseDecideCell",
+                "role": "Multi-sense threat fusion · 다중 감각 위협 융합",
+                "tissue": "SensingTissue",
+                "organ": "SensingOrgan"
+              }
+            ]
+          },
+          {
+            "name": "LocomotionOrgan",
+            "tissues": [
+              "LocomotionTissue"
+            ],
+            "exports": [
+              "StanceHold"
+            ],
+            "cells": [
+              {
+                "name": "PathDecideCell",
+                "role": "Terrain-adaptive path routing · 지형 적응 경로 판단",
+                "tissue": "LocomotionTissue",
+                "organ": "LocomotionOrgan"
+              },
+              {
+                "name": "GaitActCell",
+                "role": "Leg gait execution · 다리 보행 실행",
+                "tissue": "LocomotionTissue",
+                "organ": "LocomotionOrgan"
+              },
+              {
+                "name": "StanceActCell",
+                "role": "Posture stabilization · 자세 안정화",
+                "tissue": "LocomotionTissue",
+                "organ": "LocomotionOrgan"
+              }
+            ]
+          },
+          {
+            "name": "ActionOrgan",
+            "tissues": [
+              "ActionTissue"
+            ],
+            "exports": [
+              "WebSpan",
+              "ChemicalPulse"
+            ],
+            "cells": [
+              {
+                "name": "WebActCell",
+                "role": "Web generation and anchoring · 거미줄 생성·고정",
+                "tissue": "ActionTissue",
+                "organ": "ActionOrgan"
+              },
+              {
+                "name": "ChemicalActCell",
+                "role": "Chemical spray action · 화학 분사 행동",
+                "tissue": "ActionTissue",
+                "organ": "ActionOrgan"
+              }
+            ]
+          }
+        ],
+        "nervousRoutes": [
+          {
+            "source": "SensingOrgan.ThreatAssessment",
+            "targets": [
+              "LocomotionOrgan"
+            ],
+            "branchKind": "plain",
+            "hasTransform": false
+          },
+          {
+            "source": "SensingOrgan.ThreatAssessment",
+            "targets": [
+              "ActionOrgan"
+            ],
+            "branchKind": "plain",
+            "hasTransform": false
+          }
+        ],
+        "immunePolicies": [
+          {
+            "block": "SensorPolicy",
+            "errorType": "SensorFault",
+            "strategy": "retry"
+          }
+        ]
+      }
+    }
+  ]
+}

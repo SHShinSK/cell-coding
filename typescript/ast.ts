@@ -196,12 +196,22 @@ export interface NervousDecl extends BaseNode {
   routes: RouteDecl[];
 }
 
+export type RouteBranchKind = 'plain' | 'when' | 'always';
+
+export interface RouteTransform extends BaseNode {
+  kind:       'RouteTransform';
+  paramName:  string;
+  signalType: string;
+  args?:      ArgList;
+}
+
 export interface RouteDecl extends BaseNode {
-  kind:      'RouteDecl';
-  source:    string;        // "OrganName.SignalName"
-  targets:   string[];
-  transform?: string;       // raw transform code · 변환 함수 코드 (raw)
-  condition?: Expr;
+  kind:        'RouteDecl';
+  source:      string;        // "OrganName.SignalName"
+  targets:     string[];
+  branchKind?: RouteBranchKind;
+  condition?:  Expr;
+  transform?:  RouteTransform;
 }
 
 export interface ImmuneDecl extends BaseNode {

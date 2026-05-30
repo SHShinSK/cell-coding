@@ -1,3 +1,7 @@
+# Python
+__pycache__/
+*.py[cod]
+
 # Dependencies
 node_modules/
 
@@ -23,3 +27,6 @@ Thumbs.db
 
 # Test coverage
 coverage/
+
+# cell run --transpiled standalone cache
+typescript/.cell-run-cache/

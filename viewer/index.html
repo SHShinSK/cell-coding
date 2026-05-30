@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cell Viewer — Signal Flow · 신호 흐름</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Pretendard:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f0d;
+    --bg2: #0f1a14;
+    --bg3: #142019;
+    --green: #2dff8f;
+    --green-dim: rgba(45,255,143,0.12);
+    --amber: #ffd166;
+    --coral: #ff6b6b;
+    --blue: #74c0fc;
+    --text: #e8f5ee;
+    --text-dim: rgba(232,245,238,0.55);
+    --border: rgba(45,255,143,0.18);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Pretendard', sans-serif;
+    min-height: 100vh;
+  }
+  .grid-bg {
+    position: fixed; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(45,255,143,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,255,143,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  header {
+    position: sticky; top: 0; z-index: 10;
+    backdrop-filter: blur(12px);
+    background: rgba(10,15,13,0.85);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; flex-direction: column; gap: 0.15rem; }
+  .brand h1 { font-size: 1.1rem; font-weight: 500; letter-spacing: 0.02em; }
+  .brand p { font-size: 0.78rem; color: var(--text-dim); }
+  .controls { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+  .obs-link {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: var(--amber); text-decoration: none;
+    border: 1px solid rgba(255,209,102,0.35); border-radius: 6px;
+    padding: 0.35rem 0.55rem;
+  }
+  .obs-link:hover { border-color: var(--amber); background: rgba(255,209,102,0.08); }
+  select, input, button {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    background: var(--bg2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.45rem 0.65rem;
+  }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--green); color: var(--green); }
+  button.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  main {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1rem;
+    padding: 1rem 1.5rem 2rem;
+    min-height: calc(100vh - 72px);
+  }
+  @media (max-width: 960px) {
+    main { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .graph-wrap { padding: 1rem; min-height: 420px; }
+  svg { width: 100%; height: auto; display: block; }
+  .node-cell { fill: var(--bg3); stroke: var(--green); stroke-width: 1.5; }
+  .node-external { fill: rgba(116,192,252,0.08); stroke: var(--blue); stroke-width: 1.5; }
+  .node-immune { fill: rgba(255,209,102,0.08); stroke: var(--amber); stroke-width: 1.5; }
+  .node-label { fill: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; }
+  .node-sub { fill: var(--text-dim); font-family: 'Pretendard', sans-serif; font-size: 9px; }
+  .edge-static { stroke: rgba(45,255,143,0.15); stroke-width: 1; stroke-dasharray: 4 4; fill: none; }
+  .edge-flow { stroke: rgba(45,255,143,0.45); stroke-width: 1.5; fill: none; marker-end: url(#arrow); }
+  .edge-flow.immune { stroke: var(--amber); }
+  .edge-flow.external { stroke: var(--blue); }
+  .edge-flow.active { stroke: var(--green); stroke-width: 2.5; filter: drop-shadow(0 0 6px rgba(45,255,143,0.5)); }
+  .edge-label { fill: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 9px; }
+  .timeline { max-height: calc(100vh - 140px); overflow-y: auto; }
+  .step {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(45,255,143,0.06);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .step:hover { background: rgba(45,255,143,0.04); }
+  .step.active { background: var(--green-dim); border-left: 3px solid var(--green); }
+  .step-num { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--text-dim); padding-top: 0.15rem; }
+  .step-from { font-family: 'DM Mono', monospace; font-size: 0.74rem; color: var(--green); }
+  .step-from.external { color: var(--blue); }
+  .step-from.immune { color: var(--amber); }
+  .step-signal { font-family: 'DM Mono', monospace; font-size: 0.82rem; margin-top: 0.2rem; }
+  .step-meta { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.25rem; }
+  .legend { display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--text-dim); }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 0.35rem; vertical-align: middle; }
+  .dot.cell { background: var(--green); }
+  .dot.external { background: var(--blue); }
+  .dot.immune { background: var(--amber); }
+  .status { padding: 2rem; text-align: center; color: var(--text-dim); }
+  .playback { display: flex; gap: 0.4rem; }
+  .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+  .lifecycle-list { max-height: 220px; overflow-y: auto; }
+  .lc-badge {
+    display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    padding: 0.15rem 0.45rem; border-radius: 4px; margin-left: 0.35rem;
+  }
+  .lc-genesis { background: rgba(136,136,136,0.2); color: #aaa; }
+  .lc-dormant { background: rgba(116,192,252,0.15); color: var(--blue); }
+  .lc-active { background: var(--green-dim); color: var(--green); }
+  .lc-emitting { background: rgba(255,209,102,0.15); color: var(--amber); }
+  .lc-apoptosis { background: rgba(255,107,107,0.15); color: var(--coral); }
+  .lc-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.45rem 1rem; border-bottom: 1px solid rgba(45,255,143,0.06);
+    font-size: 0.74rem;
+  }
+  .lc-trans {
+    padding: 0.35rem 1rem; font-size: 0.68rem; color: var(--text-dim);
+    border-bottom: 1px solid rgba(45,255,143,0.04);
+    font-family: 'DM Mono', monospace;
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<header>
+  <div class="brand">
+    <h1>Cell Viewer · 신호 흐름 뷰어</h1>
+    <p>Live signal cascade from <code>typescript/runtime.ts</code> · 런타임 trace 기반 시각화</p>
+  </div>
+  <div class="controls">
+    <select id="scenario" aria-label="Scenario"></select>
+    <input id="filter" type="search" placeholder="Filter cell / signal · 세포·신호 필터" />
+    <div class="playback">
+      <button id="prev" title="Previous step">◀</button>
+      <button id="play" title="Play">▶</button>
+      <button id="next" title="Next step">▶▶</button>
+    </div>
+    <a id="jaegerLink" class="obs-link" href="#" target="_blank" rel="noopener" hidden>Jaeger trace · Jaeger trace</a>
+  </div>
+</header>
+<main>
+  <section class="panel">
+    <div class="panel-head">
+      <span>Signal graph · 신호 그래프</span>
+      <span id="meta"></span>
+    </div>
+    <div class="graph-wrap" id="graph"><div class="status">Loading traces…</div></div>
+    <div class="legend">
+      <span><i class="dot external"></i>external · 외부 주입</span>
+      <span><i class="dot cell"></i>cell emit · 세포 방출</span>
+      <span><i class="dot immune"></i>immune · 면역</span>
+    </div>
+  </section>
+  <div class="sidebar">
+  <section class="panel">
+    <div class="panel-head">
+      <span>Timeline · 타임라인</span>
+      <span id="stepCount"></span>
+    </div>
+    <div class="timeline" id="timeline"></div>
+  </section>
+  <section class="panel">
+    <div class="panel-head">
+      <span>Lifecycle · 생존 주기</span>
+      <span id="lcCount"></span>
+    </div>
+    <div id="lifecycleStates"></div>
+    <div class="lifecycle-list" id="lifecycleLog"></div>
+  </section>
+  </div>
+</main>
+<script>
+/** @typedef {{ type: string, data: Record<string, unknown> }} SignalInstance */
+/** @typedef {{ from: string, signal: SignalInstance }} TraceEntry */
+/** @typedef {{ index: number, from: string, fromKind: string, signal: SignalInstance, consumers: string[] }} FlowStep */
+
+let payload = null;
+let current = null;
+let activeStep = 0;
+let playTimer = null;
+let livePollTimer = null;
+let lastGeneratedAt = null;
+
+const $ = (id) => document.getElementById(id);
+const DEFAULT_POLL_MS = 1000;
+
+async function fetchLivePayload(liveFile) {
+  const res = await fetch(`${liveFile}?t=${Date.now()}`, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`${liveFile} not found — run: cd typescript && npm run viewer:traces`);
+  return res.json();
+}
+
+function applyPayload(data, preserveScenarioId) {
+  payload = data;
+  lastGeneratedAt = payload.generatedAt;
+  const jaeger = $('jaegerLink');
+  if (payload.observability?.jaegerUrl) {
+    jaeger.href = payload.observability.jaegerUrl;
+    jaeger.hidden = false;
+    jaeger.textContent = `Jaeger · ${payload.observability.otelService ?? 'trace'}`;
+  } else {
+    jaeger.hidden = true;
+  }
+  const sel = $('scenario');
+  const prevId = preserveScenarioId ?? current?.id ?? payload.scenarios[0]?.id;
+  const nextId = payload.scenarios.some(s => s.id === prevId) ? prevId : payload.scenarios[0]?.id;
+  if (sel.options.length !== payload.scenarios.length) {
+    sel.innerHTML = '';
+    for (const s of payload.scenarios) {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = `${s.title} · ${s.titleKo}`;
+      sel.appendChild(opt);
+    }
+  }
+  selectScenario(nextId);
+}
+
+function startLivePoll(liveFile) {
+  if (livePollTimer) clearInterval(livePollTimer);
+  let pollMs = payload?.pollIntervalMs ?? DEFAULT_POLL_MS;
+  livePollTimer = setInterval(async () => {
+    try {
+      const data = await fetchLivePayload(liveFile);
+      pollMs = data.pollIntervalMs ?? pollMs;
+      if (data.generatedAt === lastGeneratedAt) return;
+      applyPayload(data, current?.id);
+    } catch {
+      /* ignore · 일시적 오류 무시 */
+    }
+  }, pollMs);
+}
+
+async function loadTraces() {
+  const params = new URLSearchParams(location.search);
+  const liveFile = params.get('live') || 'traces.json';
+  const sel = $('scenario');
+  sel.addEventListener('change', () => selectScenario(sel.value));
+  $('filter').addEventListener('input', render);
+  $('prev').addEventListener('click', () => setStep(activeStep - 1));
+  $('next').addEventListener('click', () => setStep(activeStep + 1));
+  $('play').addEventListener('click', togglePlay);
+  applyPayload(await fetchLivePayload(liveFile));
+  if (params.has('live')) startLivePoll(liveFile);
+}
+
+function selectScenario(id) {
+  current = payload.scenarios.find(s => s.id === id);
+  $('scenario').value = id;
+  activeStep = 0;
+  stopPlay();
+  render();
+}
+
+function filteredSteps() {
+  const q = $('filter').value.trim().toLowerCase();
+  if (!q) return current.steps.map((s, i) => ({ step: s, index: i }));
+  return current.steps
+    .map((s, i) => ({ step: s, index: i }))
+    .filter(({ step }) =>
+      step.from.toLowerCase().includes(q) ||
+      step.signal.type.toLowerCase().includes(q) ||
+      step.consumers.some(c => c.toLowerCase().includes(q))
+    );
+}
+
+function setStep(i) {
+  activeStep = Math.max(0, Math.min(current.steps.length - 1, i));
+  render();
+}
+
+function togglePlay() {
+  if (playTimer) { stopPlay(); return; }
+  $('play').classList.add('active');
+  $('play').textContent = '⏸';
+  playTimer = setInterval(() => {
+    if (activeStep >= current.steps.length - 1) { stopPlay(); return; }
+    setStep(activeStep + 1);
+  }, 700);
+}
+
+function stopPlay() {
+  if (playTimer) clearInterval(playTimer);
+  playTimer = null;
+  $('play').classList.remove('active');
+  $('play').textContent = '▶';
+}
+
+function nodeLayout(scenario) {
+  const flow = scenario.graph.tissueFlow[0] || scenario.graph.cells.map(c => c.name);
+  const cellW = 130, cellH = 52, gap = 48, pad = 40;
+  const positions = new Map();
+  flow.forEach((name, i) => {
+    positions.set(name, { x: pad + i * (cellW + gap), y: 80, w: cellW, h: cellH, kind: 'cell' });
+  });
+  positions.set('external', { x: pad - 60, y: 80, w: 90, h: 44, kind: 'external' });
+  scenario.graph.immune.forEach((pol, i) => {
+    positions.set(`immune:${pol.name}`, {
+      x: pad + (flow.length - 1) * (cellW + gap) / 2 + i * 20,
+      y: 180, w: 120, h: 40, kind: 'immune', label: pol.name
+    });
+  });
+  const width = pad * 2 + flow.length * cellW + (flow.length - 1) * gap;
+  return { positions, width, height: 250 };
+}
+
+function phaseClass(phase) {
+  return `lc-${phase}`;
+}
+
+function renderGraph() {
+  const { positions, width, height } = nodeLayout(current);
+  const steps = current.steps;
+  const flow = current.graph.tissueFlow[0] || [];
+
+  let svg = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+  svg += `<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="rgba(45,255,143,0.6)"/></marker></defs>`;
+
+  for (let i = 0; i < flow.length - 1; i++) {
+    const a = positions.get(flow[i]);
+    const b = positions.get(flow[i + 1]);
+    if (!a || !b) continue;
+    svg += `<line class="edge-static" x1="${a.x + a.w}" y1="${a.y + a.h/2}" x2="${b.x}" y2="${b.y + b.h/2}"/>`;
+  }
+
+  for (let i = 0; i <= activeStep; i++) {
+    const step = steps[i];
+    if (!step) continue;
+    const fromKind = step.fromKind;
+    let fromPos = positions.get(step.from);
+    if (fromKind === 'external') fromPos = positions.get('external');
+    if (fromKind === 'immune') {
+      const pol = current.graph.immune.find(p => step.from.includes(p.name));
+      if (pol) fromPos = positions.get(`immune:${pol.name}`);
+    }
+    if (!fromPos) continue;
+    const targets = step.consumers.length ? step.consumers : [];
+    if (targets.length === 0 && fromKind === 'cell') continue;
+    for (const target of targets.length ? targets : ['']) {
+      const toPos = target ? positions.get(target) : null;
+      if (!toPos) continue;
+      const cls = ['edge-flow', fromKind, i === activeStep ? 'active' : ''].filter(Boolean).join(' ');
+      const x1 = fromPos.x + fromPos.w;
+      const y1 = fromPos.y + fromPos.h / 2;
+      const x2 = toPos.x;
+      const y2 = toPos.y + toPos.h / 2;
+      const mx = (x1 + x2) / 2;
+      const my = Math.min(y1, y2) - 20 - i * 2;
+      svg += `<path class="${cls}" d="M${x1},${y1} Q${mx},${my} ${x2},${y2}"/>`;
+      if (i === activeStep) {
+        svg += `<text class="edge-label" x="${mx}" y="${my - 4}" text-anchor="middle">${step.signal.type}</text>`;
+      }
+    }
+  }
+
+  for (const [name, pos] of positions) {
+    const cls = pos.kind === 'external' ? 'node-external' : pos.kind === 'immune' ? 'node-immune' : 'node-cell';
+    const label = pos.label || (name === 'external' ? 'external' : name.replace(/^immune:/, ''));
+    svg += `<g transform="translate(${pos.x},${pos.y})">`;
+    if (pos.kind === 'cell') {
+      const phase = current.lifecycle?.states[name] || 'dormant';
+      const stroke = phase === 'apoptosis' ? '#ff6b6b' : phase === 'emitting' ? '#ffd166' : phase === 'active' ? '#2dff8f' : '#74c0fc';
+      svg += `<rect class="${cls}" width="${pos.w}" height="${pos.h}" rx="8" stroke="${stroke}"/>`;
+      svg += `<text class="node-sub" x="${pos.w/2}" y="${pos.h/2 + 12}" text-anchor="middle">${phase}</text>`;
+    } else {
+      svg += `<rect class="${cls}" width="${pos.w}" height="${pos.h}" rx="8"/>`;
+    }
+    svg += `<text class="node-label" x="${pos.w/2}" y="${pos.h/2 - 2}" text-anchor="middle">${label.length > 14 ? label.slice(0,12)+'…' : label}</text>`;
+    svg += `</g>`;
+  }
+  svg += '</svg>';
+  $('graph').innerHTML = svg;
+}
+
+function renderLifecycle() {
+  const lc = current.lifecycle;
+  if (!lc) {
+    $('lifecycleStates').innerHTML = '<div class="status">No lifecycle data</div>';
+    $('lifecycleLog').innerHTML = '';
+    return;
+  }
+  $('lcCount').textContent = `${Object.keys(lc.states).length} cells · ${Object.keys(lc.states).length}세포`;
+  $('lifecycleStates').innerHTML = Object.entries(lc.states).map(([cell, phase]) =>
+    `<div class="lc-row"><span>${cell}</span><span class="lc-badge ${phaseClass(phase)}">${phase}</span></div>`
+  ).join('');
+  $('lifecycleLog').innerHTML = lc.transitions.slice(-12).map(t =>
+    `<div class="lc-trans">${t.step}. ${t.cell}: ${t.from} → ${t.to}</div>`
+  ).join('');
+}
+
+function renderTimeline() {
+  const items = filteredSteps();
+  $('stepCount').textContent = `${current.steps.length} steps · ${current.steps.length}단계`;
+  $('meta').textContent = current.file.split('/').slice(-2).join('/');
+  const html = items.map(({ step, index }) => {
+    const data = Object.keys(step.signal.data).length ? ' ' + JSON.stringify(step.signal.data) : '';
+    const consumers = step.consumers.length ? `→ ${step.consumers.join(', ')}` : '';
+    const timing = step.backoffMs != null
+      ? `⏱ backoff ${step.backoffMs}ms · t=${step.atMs ?? 0}ms`
+      : step.atMs != null && step.atMs > 0
+        ? `⏱ t=${step.atMs}ms`
+        : '';
+    const meta = [consumers || '(no consumer · 소비 세포 없음)', timing].filter(Boolean).join(' · ');
+    return `<article class="step${index === activeStep ? ' active' : ''}" data-idx="${index}">
+      <div class="step-num">${index + 1}</div>
+      <div>
+        <div class="step-from ${step.fromKind}">${step.from}</div>
+        <div class="step-signal">${step.signal.type}${data}</div>
+        <div class="step-meta">${meta}</div>
+      </div>
+    </article>`;
+  }).join('');
+  $('timeline').innerHTML = html || '<div class="status">No matching steps · 일치하는 단계 없음</div>';
+  $('timeline').querySelectorAll('.step').forEach(el => {
+    el.addEventListener('click', () => setStep(Number(el.dataset.idx)));
+  });
+}
+
+function render() {
+  if (!current) return;
+  renderGraph();
+  renderTimeline();
+  renderLifecycle();
+}
+
+loadTraces().catch(err => {
+  $('graph').innerHTML = `<div class="status">${err.message}</div>`;
+  $('timeline').innerHTML = `<div class="status">cd typescript && npm run viewer:traces</div>`;
+});
+</script>
+</body>
+</html>

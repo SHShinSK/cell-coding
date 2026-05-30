@@ -1,0 +1,32 @@
+[project]
+name = "cell-coding-bridge"
+version = "0.1.0"
+description = "Cell Coding Python bridge — sensor inject and actuator readback via cell CLI · Physical AI bridge"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [{ name = "Cell Coding Contributors" }]
+keywords = ["cell-coding", "physical-ai", "robotics", "bridge"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://shshinsk.github.io/cell-coding/"
+Repository = "https://github.com/SHShinSK/cell-coding"
+Documentation = "https://github.com/SHShinSK/cell-coding/tree/main/examples/physical-ai-motion-alarm.md"
+
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cell_bridge"]

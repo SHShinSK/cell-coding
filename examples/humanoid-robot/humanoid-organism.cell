@@ -1,0 +1,332 @@
+// Humanoid Robot — A5 reference (14 cells, 4 organs, multi-organ coordination)
+// 휴머노이드 로봇 — A5 레퍼런스 (14세포, 4기관, 다기관 협업)
+
+signal WorldFrame {
+  timestamp: Number;
+}
+
+signal VisualCue {
+  obstacle: Boolean;
+  range: Number;
+}
+
+signal ProprioSignal {
+  jointAngle: Number;
+  velocity: Number;
+}
+
+signal BalanceReading {
+  tilt: Number;
+  stable: Boolean;
+}
+
+signal HandTouch {
+  pressure: Number;
+  contact: Boolean;
+}
+
+signal SpeechInput {
+  text: String;
+  intent: String;
+}
+
+signal BodyState {
+  posture: String;
+  load: Number;
+}
+
+signal BalanceCommand {
+  mode: String;
+  speed: Number;
+}
+
+signal WalkStep {
+  phase: String;
+  stable: Boolean;
+}
+
+signal GraspCommand {
+  target: String;
+  force: Number;
+}
+
+signal GraspPulse {
+  gripped: Boolean;
+}
+
+signal GesturePulse {
+  gesture: String;
+}
+
+signal FaceExpression {
+  emotion: String;
+}
+
+signal Utterance {
+  phrase: String;
+  volume: Number;
+}
+
+signal StabilityFault {
+  reason: String;
+}
+
+cell VisionSenseCell {
+  role: "Vision and scene sensing · 시각·장면 감지";
+
+  membrane {
+    accepts: WorldFrame;
+    emits: VisualCue | StabilityFault;
+  }
+
+  on(WorldFrame frame) {
+    emit VisualCue;
+  }
+}
+
+cell ProprioSenseCell {
+  role: "Proprioception sensing · 고유수용감각 감지";
+
+  membrane {
+    accepts: VisualCue;
+    emits: ProprioSignal;
+  }
+
+  on(VisualCue cue) {
+    emit ProprioSignal;
+  }
+}
+
+cell BalanceSenseCell {
+  role: "Balance and tilt sensing · 균형·기울기 감지";
+
+  membrane {
+    accepts: ProprioSignal;
+    emits: BalanceReading;
+  }
+
+  on(ProprioSignal proprio) {
+    emit BalanceReading;
+  }
+}
+
+cell HandTactileCell {
+  role: "Hand tactile sensing · 손 촉각 감지";
+
+  membrane {
+    accepts: BalanceReading;
+    emits: HandTouch;
+  }
+
+  on(BalanceReading balance) {
+    emit HandTouch;
+  }
+}
+
+cell SpeechContextCell {
+  role: "Speech context sensing · 음성 맥락 감지";
+
+  membrane {
+    accepts: HandTouch;
+    emits: SpeechInput;
+  }
+
+  on(HandTouch touch) {
+    emit SpeechInput;
+  }
+}
+
+cell BodyFusionCell {
+  role: "Unified body state fusion · 통합 신체 상태 융합";
+
+  membrane {
+    accepts: SpeechInput;
+    emits: BodyState;
+  }
+
+  on(SpeechInput speech) {
+    emit BodyState;
+  }
+}
+
+cell BalanceDecideCell {
+  role: "Bipedal balance decision · 이족 균형 판단";
+
+  membrane {
+    accepts: BodyState;
+    emits: BalanceCommand;
+  }
+
+  on(BodyState body) {
+    if (body.load > 0.7) {
+      emit BalanceCommand(mode: "slow", speed: 0.3);
+    } else {
+      emit BalanceCommand(mode: "walk", speed: 0.6);
+    }
+  }
+}
+
+cell GaitActCell {
+  role: "Bipedal gait execution · 이족 보행 실행";
+
+  membrane {
+    accepts: BalanceCommand;
+    emits: WalkStep;
+  }
+
+  on(BalanceCommand cmd) {
+    emit WalkStep;
+  }
+}
+
+cell StabilizeActCell {
+  role: "Posture stabilization · 자세 안정화";
+
+  membrane {
+    accepts: WalkStep;
+    emits: WalkStep | StabilityFault;
+  }
+
+  on(WalkStep step) {
+    if (!step.stable) {
+      emit StabilityFault;
+    } else {
+      emit WalkStep;
+    }
+  }
+}
+
+cell GraspDecideCell {
+  role: "Manipulation grasp planning · 조작 파지 계획";
+
+  membrane {
+    accepts: BodyState;
+    emits: GraspCommand;
+  }
+
+  on(BodyState body) {
+    emit GraspCommand(target: "object", force: 0.5);
+  }
+}
+
+cell GraspActCell {
+  role: "Hand grasp execution · 손 파지 실행";
+
+  membrane {
+    accepts: GraspCommand;
+    emits: GraspPulse;
+  }
+
+  on(GraspCommand cmd) {
+    emit GraspPulse;
+  }
+}
+
+cell GestureActCell {
+  role: "Arm gesture execution · 팔 제스처 실행";
+
+  membrane {
+    accepts: BodyState;
+    emits: GesturePulse;
+  }
+
+  on(BodyState body) {
+    emit GesturePulse;
+  }
+}
+
+cell ExpressionActCell {
+  role: "Facial expression · 표정";
+
+  membrane {
+    accepts: BodyState;
+    emits: FaceExpression;
+  }
+
+  on(BodyState body) {
+    emit FaceExpression;
+  }
+}
+
+cell SpeechActCell {
+  role: "Speech output · 발화";
+
+  membrane {
+    accepts: BodyState;
+    emits: Utterance;
+  }
+
+  on(BodyState body) {
+    emit Utterance;
+  }
+}
+
+tissue PerceptionTissue {
+  flow linear {
+    VisionSenseCell -> ProprioSenseCell -> BalanceSenseCell -> HandTactileCell -> SpeechContextCell -> BodyFusionCell
+  }
+}
+
+tissue BalanceTissue {
+  flow linear {
+    BalanceDecideCell -> GaitActCell -> StabilizeActCell
+  }
+}
+
+tissue ManipulationTissue {
+  flow linear {
+    GraspDecideCell -> GraspActCell
+  }
+}
+
+tissue InteractionTissue {
+  flow parallel {
+    GestureActCell
+    ExpressionActCell
+    SpeechActCell
+  }
+}
+
+organ PerceptionOrgan {
+  tissues { PerceptionTissue }
+  exports { BodyState }
+}
+
+organ BalanceOrgan {
+  tissues { BalanceTissue }
+  exports { WalkStep }
+}
+
+organ ManipulationOrgan {
+  tissues { ManipulationTissue }
+  exports { GraspPulse }
+}
+
+organ InteractionOrgan {
+  tissues { InteractionTissue }
+  exports { GesturePulse, FaceExpression, Utterance }
+}
+
+organism HumanoidOrganism {
+  organs {
+    PerceptionOrgan
+    BalanceOrgan
+    ManipulationOrgan
+    InteractionOrgan
+  }
+
+  nervous MotorBus {
+    PerceptionOrgan.BodyState -> BalanceOrgan
+    PerceptionOrgan.BodyState -> ManipulationOrgan
+    PerceptionOrgan.BodyState -> InteractionOrgan
+    BalanceOrgan.WalkStep -> InteractionOrgan
+  }
+
+  immune StabilityPolicy {
+    on StabilityFault {
+      strategy: retry;
+      retries: 3;
+      backoff: exponential;
+    }
+  }
+}

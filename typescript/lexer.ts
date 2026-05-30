@@ -36,6 +36,8 @@ export enum TokenType {
   WITH       = 'with',
   EXTENDS    = 'extends',
   WHEN       = 'when',
+  ALWAYS     = 'always',
+  TRANSFORM  = 'transform',
   PRIORITY   = 'priority',
   QUERY      = 'query',
   LET        = 'let',
@@ -116,6 +118,8 @@ const KEYWORDS: Record<string, TokenType> = {
   with:       TokenType.WITH,
   extends:    TokenType.EXTENDS,
   when:       TokenType.WHEN,
+  always:     TokenType.ALWAYS,
+  transform:  TokenType.TRANSFORM,
   priority:   TokenType.PRIORITY,
   query:      TokenType.QUERY,
   let:        TokenType.LET,
@@ -255,9 +259,17 @@ export class Lexer {
 
   private readIdentifier(line: number, col: number): void {
     let value = '';
-    while (this.isAlphaNum(this.peek()) || this.peek() === '_') value += this.advance();
+    while (this.isIdentifierPart(this.peek(), value.length > 0)) {
+      value += this.advance();
+    }
     const type = KEYWORDS[value] ?? TokenType.IDENTIFIER;
     this.push(type, value, line, col);
+  }
+
+  /** identifier · hyphenated strategy (`round-robin`) 지원 */
+  private isIdentifierPart(ch: string, hasBody: boolean): boolean {
+    if (this.isAlphaNum(ch) || ch === '_') return true;
+    return hasBody && ch === '-' && this.isAlpha(this.peek(1));
   }
 
   private push(type: TokenType, value: string, line: number, col: number): void {

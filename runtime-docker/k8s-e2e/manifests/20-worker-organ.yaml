@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: worker-organ-cell
+  namespace: worker-organ
+data:
+  program.cell: |
+    // divide-scale · k8s-e2e (inline copy of typescript/fixtures/divide-scale.cell)
+    signal Task { id: String; }
+    signal Done { id: String; }
+    cell WorkerCell {
+      role: "Queue worker";
+      membrane { accepts: Task; emits: Done; }
+      divide when (queue.depth > 2) { max: 4 strategy: round-robin }
+      on(Task t) { emit Done(id: t.id); }
+    }
+    tissue WorkerTissue { flow linear { WorkerCell } }
+    organ WorkerOrgan { tissues { WorkerTissue } exports { Done } }
+    organism WorkerOrganism { organs { WorkerOrgan } }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-organ
+  namespace: worker-organ
+  labels:
+    cell-coding.io/organ: WorkerOrgan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker-organ
+  template:
+    metadata:
+      labels:
+        app: worker-organ
+        cell-coding.io/organ: WorkerOrgan
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: cell-runtime
+          image: cell-coding/runtime:0.1.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: CELL_PROGRAM
+              value: /config/program.cell
+            - name: CELL_ORGAN
+              value: WorkerOrgan
+            - name: CELL_REDIS_URL
+              value: redis://redis.worker-organ.svc.cluster.local:6379
+            - name: CELL_SIGNAL_STREAM
+              value: cell:signals
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: cell-program
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: cell-program
+          configMap:
+            name: worker-organ-cell
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker-organ
+  namespace: worker-organ
+  labels:
+    cell-coding.io/organ: WorkerOrgan
+spec:
+  selector:
+    app: worker-organ
+  ports:
+    - name: http
+      port: 8080

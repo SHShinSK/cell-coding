@@ -1,0 +1,131 @@
+// Spiderling Bot — PLANKTON reference (5 cells)
+// 거미 새끼 봇 — PLANKTON 레퍼런스 (5세포)
+
+signal ContactEvent {
+  pressure: Number;
+  zone: String;
+}
+
+signal TactilePing {
+  contact: Boolean;
+  intensity: Number;
+}
+
+signal TerrainScan {
+  slope: Number;
+  friction: Number;
+}
+
+signal PathCommand {
+  direction: String;
+  speed: Number;
+}
+
+signal GaitStep {
+  pattern: String;
+  legs: Number;
+}
+
+signal StanceHold {
+  stable: Boolean;
+}
+
+signal LegFault {
+  message: String;
+}
+
+cell TactileSenseCell {
+  role: "Tactile contact sensing · 촉각 접촉 감지";
+
+  membrane {
+    accepts: ContactEvent;
+    emits: TactilePing | LegFault;
+  }
+
+  on(ContactEvent evt) {
+    if (evt.pressure > 0.95) {
+      emit LegFault;
+    } else {
+      emit TactilePing;
+    }
+  }
+}
+
+cell TerrainSenseCell {
+  role: "Terrain slope and friction scan · 지형 경사·마찰 스캔";
+
+  membrane {
+    accepts: TactilePing;
+    emits: TerrainScan;
+  }
+
+  on(TactilePing ping) {
+    emit TerrainScan;
+  }
+}
+
+cell PathDecideCell {
+  role: "Path and gait routing · 경로·보행 라우팅";
+
+  membrane {
+    accepts: TerrainScan;
+    emits: PathCommand;
+  }
+
+  on(TerrainScan scan) {
+    if (scan.slope > 0.5) {
+      emit PathCommand(direction: "turn", speed: 0.2);
+    } else {
+      emit PathCommand(direction: "forward", speed: 0.6);
+    }
+  }
+}
+
+cell GaitActCell {
+  role: "Leg gait execution · 다리 보행 실행";
+
+  membrane {
+    accepts: PathCommand;
+    emits: GaitStep;
+  }
+
+  on(PathCommand cmd) {
+    emit GaitStep;
+  }
+}
+
+cell StanceActCell {
+  role: "Posture stabilization · 자세 안정화";
+
+  membrane {
+    accepts: GaitStep;
+    emits: StanceHold;
+  }
+
+  on(GaitStep step) {
+    emit StanceHold;
+  }
+}
+
+tissue LocomotionTissue {
+  flow linear {
+    TactileSenseCell -> TerrainSenseCell -> PathDecideCell -> GaitActCell -> StanceActCell
+  }
+}
+
+organ SpiderThorax {
+  tissues { LocomotionTissue }
+  exports { StanceHold }
+}
+
+organism SpiderlingOrganism {
+  organs { SpiderThorax }
+
+  immune LegPolicy {
+    on LegFault {
+      strategy: retry;
+      retries: 2;
+      backoff: linear;
+    }
+  }
+}

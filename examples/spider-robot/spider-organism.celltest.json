@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "suites": [
+    {
+      "name": "VisionSenseCell isolation · 시각 감지 격리",
+      "target": "VisionSenseCell",
+      "cases": [
+        {
+          "name": "low contrast emits SensorFault",
+          "inject": { "type": "VisionFrame", "data": { "contrast": 0.05, "motion": 0.1 } },
+          "expect": [
+            { "kind": "trace", "from": "VisionSenseCell", "signal": "SensorFault" },
+            { "kind": "none", "signal": "VisualCue" }
+          ]
+        },
+        {
+          "name": "healthy frame emits VisualCue",
+          "inject": { "type": "VisionFrame", "data": { "contrast": 0.6, "motion": 0.3 } },
+          "expect": [
+            { "kind": "trace", "from": "VisionSenseCell", "signal": "VisualCue" },
+            { "kind": "none", "signal": "SensorFault" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PathDecideCell retreat branch · 후퇴 분기",
+      "target": "PathDecideCell",
+      "cases": [
+        {
+          "name": "high threat retreat",
+          "inject": { "type": "ThreatAssessment", "data": { "level": 0.9, "source": "fuse" } },
+          "expect": [
+            {
+              "kind": "trace",
+              "from": "PathDecideCell",
+              "signal": "PathCommand",
+              "data": { "direction": "retreat" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SensingOrgan nervous integration · 감각 기관 연쇄",
+      "target": "SensingOrgan",
+      "cases": [
+        {
+          "name": "vision frame reaches ThreatAssessment",
+          "inject": { "type": "VisionFrame", "data": { "contrast": 0.6, "motion": 0.3 } },
+          "expect": [
+            { "kind": "trace", "signal": "ThreatAssessment" },
+            { "kind": "count", "signal": "ThreatAssessment", "count": 1 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SpiderOrganism locomotion via nervous · nervous 보행",
+      "target": "SpiderOrganism",
+      "immune": false,
+      "cases": [
+        {
+          "name": "full chain to StanceHold",
+          "inject": { "type": "VisionFrame", "data": { "contrast": 0.6, "motion": 0.3 } },
+          "expect": [
+            { "kind": "trace", "signal": "StanceHold" },
+            { "kind": "trace", "signal": "ThreatAssessment" }
+          ]
+        }
+      ]
+    }
+  ]
+}

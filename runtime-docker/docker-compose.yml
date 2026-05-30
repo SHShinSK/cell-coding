@@ -1,0 +1,220 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  auth-organ:
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_PROGRAM: /config/auth-organ.cell
+      CELL_ORGAN: AuthOrgan
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+      CELL_SIGNAL_STREAM: cell:signals
+      CELL_OTEL: "true"
+      CELL_OTEL_EXPORT: otlp
+      CELL_OTEL_ENDPOINT: http://otel-collector:4318/v1/traces
+    volumes:
+      - ../registry/packages/community/auth-organ/auth-organ.cell:/config/auth-organ.cell:ro
+    ports:
+      - "8081:8080"
+    depends_on:
+      - redis
+
+  sponge:
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_PROGRAM: /config/sponge-organism.cell
+      CELL_ORGAN: SpongeBody
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+      CELL_OTEL: "true"
+      CELL_OTEL_EXPORT: otlp
+      CELL_OTEL_ENDPOINT: http://otel-collector:4318/v1/traces
+    volumes:
+      - ../examples/porifera-filter/sponge-organism.cell:/config/sponge-organism.cell:ro
+    ports:
+      - "8082:8080"
+    depends_on:
+      - redis
+
+  motion-alarm:
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_PROGRAM: /config/motion-alarm.cell
+      CELL_ORGAN: AlarmOrgan
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+    volumes:
+      - ../examples/motion-alarm/motion-alarm.cell:/config/motion-alarm.cell:ro
+    ports:
+      - "8087:8080"
+    depends_on:
+      - redis
+
+  organ-a:
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_PROGRAM: /config/routed-organism.cell
+      CELL_ORGAN: OrganA
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+      CELL_NERVOUS_POLL_MS: "500"
+    volumes:
+      - ../typescript/fixtures/routed-organs.cell:/config/routed-organism.cell:ro
+    ports:
+      - "8083:8080"
+    depends_on:
+      - redis
+
+  organ-b:
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_PROGRAM: /config/routed-organism.cell
+      CELL_ORGAN: OrganB
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+      CELL_NERVOUS_POLL_MS: "500"
+    volumes:
+      - ../typescript/fixtures/routed-organs.cell:/config/routed-organism.cell:ro
+    ports:
+      - "8084:8080"
+    depends_on:
+      - redis
+
+  worker-organ:
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_PROGRAM: /config/divide-scale.cell
+      CELL_ORGAN: WorkerOrgan
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+      CELL_SIGNAL_STREAM: cell:signals
+      CELL_OTEL: "true"
+      CELL_OTEL_EXPORT: otlp
+      CELL_OTEL_ENDPOINT: http://otel-collector:4318/v1/traces
+    volumes:
+      - ../typescript/fixtures/divide-scale.cell:/config/divide-scale.cell:ro
+    ports:
+      - "8085:8080"
+    depends_on:
+      - redis
+
+  worker-replica-0:
+    profiles: [divide-scale]
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_PROGRAM: /config/divide-scale.cell
+      CELL_ORGAN: WorkerOrgan
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+      CELL_REPLICA_INDEX: "0"
+      CELL_REPLICA_COUNT: "3"
+      CELL_DIVIDE_SHARED: "1"
+    volumes:
+      - ../typescript/fixtures/divide-scale.cell:/config/divide-scale.cell:ro
+    depends_on:
+      - redis
+
+  worker-replica-1:
+    profiles: [divide-scale]
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_PROGRAM: /config/divide-scale.cell
+      CELL_ORGAN: WorkerOrgan
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+      CELL_REPLICA_INDEX: "1"
+      CELL_REPLICA_COUNT: "3"
+      CELL_DIVIDE_SHARED: "1"
+    volumes:
+      - ../typescript/fixtures/divide-scale.cell:/config/divide-scale.cell:ro
+    depends_on:
+      - redis
+
+  worker-replica-2:
+    profiles: [divide-scale]
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_PROGRAM: /config/divide-scale.cell
+      CELL_ORGAN: WorkerOrgan
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+      CELL_REPLICA_INDEX: "2"
+      CELL_REPLICA_COUNT: "3"
+      CELL_DIVIDE_SHARED: "1"
+    volumes:
+      - ../typescript/fixtures/divide-scale.cell:/config/divide-scale.cell:ro
+    depends_on:
+      - redis
+
+  worker-gateway:
+    profiles: [divide-scale]
+    build:
+      context: ..
+      dockerfile: runtime-docker/Dockerfile
+    environment:
+      CELL_ROLE: gateway
+      CELL_PROGRAM: /config/divide-scale.cell
+      CELL_ORGAN: WorkerOrgan
+      CELL_PORT: "8080"
+      CELL_REDIS_URL: redis://redis:6379
+      CELL_DIVIDE_UPSTREAMS: http://worker-replica-0:8080,http://worker-replica-1:8080,http://worker-replica-2:8080
+    volumes:
+      - ../typescript/fixtures/divide-scale.cell:/config/divide-scale.cell:ro
+    ports:
+      - "8086:8080"
+    depends_on:
+      - worker-replica-0
+      - worker-replica-1
+      - worker-replica-2
+      - redis
+
+  prometheus:
+    profiles: [observability]
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - worker-organ
+
+  jaeger:
+    profiles: [observability]
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+
+  otel-collector:
+    profiles: [observability]
+    image: otel/opentelemetry-collector-contrib:0.115.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      - jaeger

@@ -1,0 +1,4 @@
+cell Broken {
+  role: "broken";
+  on(Ping p) { emit Pong; }
+}

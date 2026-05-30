@@ -1,0 +1,104 @@
+// Porifera Filter Bot — MICROBE reference (3 cells)
+// 해면동물 필터 봇 — MICROBE 레퍼런스 (3세포)
+
+signal WaterSample {
+  turbidity: Number;
+  flowRate: Number;
+}
+
+signal ParticleLoad {
+  density: Number;
+  maxSize: Number;
+}
+
+signal FilterCommand {
+  action: String;
+}
+
+signal ExhalePulse {
+  volume: Number;
+  purity: Number;
+}
+
+signal SensorFault {
+  message: String;
+}
+
+cell InflowSenseCell {
+  role: "Water inflow sensing · 물 유입 감지";
+
+  membrane {
+    accepts: WaterSample;
+    emits: ParticleLoad | SensorFault;
+  }
+
+  on(WaterSample sample) {
+    if (sample.turbidity > 0.8) {
+      emit SensorFault;
+    } else {
+      emit ParticleLoad;
+    }
+  }
+}
+
+cell FilterDecideCell {
+  role: "Filter routing · 여과 경로 판단";
+
+  membrane {
+    accepts: ParticleLoad;
+    emits: FilterCommand;
+  }
+
+  on(ParticleLoad load) {
+    if (load.density < 0.3) {
+      emit FilterCommand(action: "pass");
+    } else {
+      emit FilterCommand(action: "absorb");
+    }
+  }
+}
+
+cell OutflowActCell {
+  role: "Filtered outflow · 여과수 배출";
+
+  membrane {
+    accepts: FilterCommand;
+    emits: ExhalePulse;
+  }
+
+  on(FilterCommand cmd) {
+    emit ExhalePulse;
+  }
+}
+
+tissue FilterTissue {
+  flow linear {
+    InflowSenseCell -> FilterDecideCell -> OutflowActCell
+  }
+}
+
+// Organ = functional boundary (aquiferous system / body wall)
+// 기관 = 기능 경계 (수관계 / 몸벽) — 해부학적 장기가 아님
+organ SpongeBody {
+  tissues { FilterTissue }
+  exports { ExhalePulse }
+}
+
+organism SpongeOrganism {
+  organs { SpongeBody }
+
+  immune SensorPolicy {
+    circuit {
+      threshold: 3;
+      window: 60;
+      open: 15;
+      halfOpen: 1;
+    }
+    on SensorFault {
+      strategy: retry;
+      retries: 3;
+      backoff: exponential;
+      escalate: true;
+    }
+  }
+}

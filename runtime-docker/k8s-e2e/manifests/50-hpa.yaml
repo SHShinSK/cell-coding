@@ -1,0 +1,25 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: worker-organ-hpa
+  namespace: worker-organ
+  labels:
+    cell-coding.io/organ: WorkerOrgan
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: worker-organ
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+    - type: External
+      external:
+        metric:
+          name: cell_signal_queue_depth
+          selector:
+            matchLabels:
+              organ: WorkerOrgan
+        target:
+          type: AverageValue
+          averageValue: "2"

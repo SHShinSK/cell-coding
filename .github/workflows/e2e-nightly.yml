@@ -1,0 +1,41 @@
+# K8s prometheus-adapter HPA E2E · nightly / manual
+name: E2E Nightly
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  k8s-hpa-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+
+      - name: Install kind
+        uses: helm/kind-action@v1.12.0
+        with:
+          install_only: true
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Run kind + prometheus-adapter E2E
+        env:
+          VERIFY_TIMEOUT_MS: "180000"
+          HPA_VERIFY_TIMEOUT_MS: "180000"
+        run: node runtime-docker/k8s-e2e/run-e2e.mjs
+
+      - name: Delete kind cluster on failure
+        if: failure()
+        run: kind delete cluster --name cell-coding-e2e || true

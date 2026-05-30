@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "suites": [
+    {
+      "name": "PresenceSenseCell isolation · 주인 감지 격리",
+      "target": "PresenceSenseCell",
+      "cases": [
+        {
+          "name": "weak signal emits DistressSignal",
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.01 } },
+          "expect": [
+            { "kind": "trace", "from": "PresenceSenseCell", "signal": "DistressSignal" },
+            { "kind": "none", "signal": "OwnerPresence" }
+          ]
+        },
+        {
+          "name": "strong signal emits OwnerPresence",
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.8 } },
+          "expect": [
+            { "kind": "trace", "from": "PresenceSenseCell", "signal": "OwnerPresence" },
+            { "kind": "none", "signal": "DistressSignal" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MoodDecideCell comfort branch · comfort 분기",
+      "target": "MoodDecideCell",
+      "cases": [
+        {
+          "name": "positive valence comfort intent",
+          "inject": { "type": "AffectState", "data": { "valence": 0.8, "arousal": 0.3 } },
+          "expect": [
+            {
+              "kind": "trace",
+              "from": "MoodDecideCell",
+              "signal": "SocialIntent",
+              "data": { "mode": "comfort" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PetOrganism immune fallback · immune fallback",
+      "target": "PetOrganism",
+      "immune": true,
+      "cases": [
+        {
+          "name": "distress triggers ComfortAction fallback",
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.01 } },
+          "expect": [
+            { "kind": "trace", "signal": "DistressSignal" },
+            { "kind": "trace", "from": "immune:SafetyPolicy#fallback", "signal": "ComfortAction" }
+          ]
+        },
+        {
+          "name": "healthy ping no immune action",
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.8 } },
+          "expect": [
+            { "kind": "trace", "signal": "OwnerPresence" },
+            { "kind": "none", "from": "immune:", "signal": "ComfortAction" }
+          ]
+        }
+      ]
+    }
+  ]
+}

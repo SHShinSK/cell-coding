@@ -1,4 +1,4 @@
-# TypeScript compiler typecheck · 컴파일러 타입 검사
+# TypeScript compiler · integration & observability E2E
 name: CI
 
 on:
@@ -6,11 +6,13 @@ on:
     branches: [main]
     paths:
       - "typescript/**"
+      - "runtime-docker/**"
       - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
     paths:
       - "typescript/**"
+      - "runtime-docker/**"
       - ".github/workflows/ci.yml"
   workflow_dispatch:
 
@@ -42,3 +44,64 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: npm pack smoke
+        run: npm run pack:smoke
+
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: typescript
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: typescript/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Redis Streams testcontainers
+        env:
+          CELL_INTEGRATION: "1"
+        run: npm run test:integration
+
+  observability-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+
+      - name: Start observability stack
+        working-directory: runtime-docker
+        run: |
+          docker compose --profile observability up -d --build --wait \
+            redis worker-organ prometheus otel-collector jaeger
+
+      - name: Verify Prometheus scrape
+        env:
+          VERIFY_TIMEOUT_MS: "120000"
+        run: node runtime-docker/verify-prometheus.mjs
+
+      - name: Verify OTel Collector → Jaeger
+        env:
+          VERIFY_TIMEOUT_MS: "120000"
+        run: node runtime-docker/verify-otel.mjs
+
+      - name: Tear down stack
+        if: always()
+        working-directory: runtime-docker
+        run: docker compose --profile observability down -v --remove-orphans

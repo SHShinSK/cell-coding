@@ -1,0 +1,43 @@
+# Prometheus Adapter — cell_signal_queue_depth external metric
+# K8s HPA 연동 · 실 manifest: k8s-e2e/manifests/40-prometheus-adapter.yaml
+
+실행 가능한 manifest와 E2E:
+
+```bash
+cd runtime-docker/k8s-e2e
+node run-e2e.mjs          # kind + prometheus-adapter + HPA 전체 E2E
+node verify-hpa.mjs       # custom.metrics.k8s.io API 검증 (클러스터 배포 후)
+```
+
+## adapter rule (요약)
+
+```yaml
+rules:
+  - seriesQuery: 'cell_signal_queue_depth{organ!=""}'
+    resources:
+      overrides:
+        organ: { resource: "namespace" }
+    name:
+      matches: "cell_signal_queue_depth"
+      as: "cell_signal_queue_depth"
+    metricsQuery: 'avg(<<.Series>>{<<.LabelMatchers>>}) by (organ)'
+```
+
+## HPA selector
+
+`cell deploy` 및 `k8s-e2e/manifests/50-hpa.yaml` 은 external metric selector 로 **`organ: WorkerOrgan`** 을 사용합니다 (prometheus-adapter label 매핑과 일치).
+
+## 연동 순서
+
+1. cloud runtime Pod가 `GET /metrics` 노출 (기본 on)
+2. Prometheus가 organ Pod scrape
+3. prometheus-adapter에 rule 적용
+4. HPA `cell_signal_queue_depth` external metric 사용
+
+## 로컬 docker-compose
+
+```bash
+docker compose --profile observability up worker-organ prometheus redis otel-collector jaeger
+node verify-prometheus.mjs
+node verify-otel.mjs
+```

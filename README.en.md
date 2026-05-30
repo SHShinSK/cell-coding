@@ -40,20 +40,29 @@ Cell Coding은 그 단위를 `role`, `membrane`, `signal` 계약을 가진 `Cell
 Cell Coding maps embodied systems into functional cell networks, not one monolithic controller.  
 Cell Coding은 구현체 시스템을 단일 거대 컨트롤러가 아니라 기능 세포 네트워크로 매핑합니다.
 
+**Start here:** [A1](examples/porifera-filter/SCENARIO.md) → [A2](examples/spiderling/SCENARIO.md) → [A3](examples/spider-robot/SCENARIO.md) → [A4 PET](examples/pet-robot/SCENARIO.md) → [A5 Humanoid](examples/humanoid-robot/SCENARIO.md).  
+**시작점:** [A1](examples/porifera-filter/SCENARIO.md) → [A2](examples/spiderling/SCENARIO.md) → [A3](examples/spider-robot/SCENARIO.md) → [A4 PET](examples/pet-robot/SCENARIO.md) → [A5 Humanoid](examples/humanoid-robot/SCENARIO.md).
+
 ### Spider robot | 거미 로봇
 
 A spider robot ingests vision, hearing, tactile, and chemical context simultaneously, then produces locomotion patterns, web generation, and chemical actions — sensing and acting cells adapt to terrain rather than following a fixed pipeline.  
 거미 로봇은 시각·청각·촉각·화학적 맥락을 동시에 받아들이고, 보행 패턴·거미줄 생성·화학적 작동을 만들어냅니다. 감각·행동 세포가 고정 파이프라인이 아니라 지형에 적응합니다.
+
+**Reference · 레퍼런스:** [`examples/spider-robot/`](examples/spider-robot/) — 10 cells, 3 organs, `nervous EventBus` ([SCENARIO.md](examples/spider-robot/SCENARIO.md)).
 
 ### Humanoid robot | 휴머노이드
 
 A humanoid ingests vision, proprioception, balance, hand tactile, and speech context at once. Its actions span bipedal locomotion, grasping, gestures, facial expression, and speech — better modeled as cooperating organs (balance, manipulation, interaction) than one controller pipeline.  
 휴머노이드는 시각·고유수용감각·균형·손 촉각·음성 맥락을 동시에 처리합니다. 이족 보행, 파지, 제스처, 표정, 발화는 단일 컨트롤러가 아니라 균형·조작·상호작용 기관의 협업으로 표현하는 편이 적합합니다.
 
+**Reference · 레퍼런스:** [`examples/humanoid-robot/`](examples/humanoid-robot/) — 14 cells, 4 organs, `nervous MotorBus` ([SCENARIO.md](examples/humanoid-robot/SCENARIO.md)).
+
 ### PET robot | 반려(PET) 로봇
 
 A companion PET robot reads owner presence, touch, voice tone, and ambient home context continuously. Its behaviors include following, responsive vocalization, tail/LED expression, and comfort actions — modeled as affect and safety cells, not discrete I/O events.  
 반려(PET) 로봇은 주인 존재, 터치, 음성 톤, 가정 환경 맥락을 연속적으로 읽습니다. 따라가기, 반응형 발성, 꼬리/LED 표현, 위로 행동은 이산 I/O가 아니라 정서·안전 세포 네트워크로 모델링합니다.
+
+**Reference · 레퍼런스:** [`examples/pet-robot/`](examples/pet-robot/) — 11 cells, affect + safety + interaction ([SCENARIO.md](examples/pet-robot/SCENARIO.md)).
 
 - `Cell`: one specialized function | 단일 특화 기능
 - `Tissue`: cooperating cells for a local goal | 국소 목표를 위한 세포 협업
@@ -88,6 +97,26 @@ Decompose by **role**, declare boundaries with **membrane**, and connect systems
    **확장성**: Python 브리지로 센서/액추에이터 연동
 4. **Progressive DSL**: optional `.cell` syntax later  
    **점진적 DSL**: 이후 `.cell` 문법을 선택적으로 도입
+
+## Quick start | 빠른 시작
+
+Requires **Node.js 20+**.
+
+```bash
+# Physical AI PoC — MotionDetected → AlarmPulse
+npx @cell-coding/cli run ./motion-alarm.cell MotionDetected '{"x":150,"y":220,"confidence":0.98}'
+
+# transpiled TS handlers
+npx @cell-coding/cli run --transpiled ./validator.cell RawInput '{"payload":"hello"}'
+
+# global install
+npm install -g @cell-coding/cli
+cell run ./motion-alarm.cell MotionDetected '{"x":1,"y":2,"confidence":0.9}'
+```
+
+From source: `cd typescript && npm install && npm test` — see [examples/README.md](examples/README.md).
+
+**Release:** [`.github/RELEASE.md`](.github/RELEASE.md) — push tag `v*` to publish npm · PyPI · VS Code extension.
 
 ## Repository | 저장소
 
