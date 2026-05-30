@@ -1,5 +1,10 @@
 # Cell Coding
 
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-2dff8f?style=flat-square&logo=github)](https://shshinsk.github.io/cell-coding/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/SHShinSK/cell-coding?style=flat-square)](https://github.com/SHShinSK/cell-coding/issues)
+[![Discussions](https://img.shields.io/github/discussions/SHShinSK/cell-coding?style=flat-square)](https://github.com/SHShinSK/cell-coding/discussions)
+
 > [한국어 README](README.md) | **English**
 
 A biological programming paradigm for Physical AI, built on event-driven architecture.
@@ -34,7 +39,7 @@ Decompose by **role**, declare boundaries with **membrane**, and connect systems
 ## Repository
 
 - GitHub: https://github.com/SHShinSK/cell-coding
-- Site: https://shshinsk.github.io/cell-coding/ *(after Pages deploy)*
+- Site: https://shshinsk.github.io/cell-coding/
 - Issues: https://github.com/SHShinSK/cell-coding/issues
 - Discussions: https://github.com/SHShinSK/cell-coding/discussions
 

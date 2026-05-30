@@ -1,11 +1,16 @@
 # Cell Coding
 
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-2dff8f?style=flat-square&logo=github)](https://shshinsk.github.io/cell-coding/)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/SHShinSK/cell-coding?style=flat-square)](https://github.com/SHShinSK/cell-coding/issues)
+[![Discussions](https://img.shields.io/github/discussions/SHShinSK/cell-coding?style=flat-square)](https://github.com/SHShinSK/cell-coding/discussions)
+
 > **한국어** | [English README](README.en.md)
 
 Physical AI를 위한 이벤트 기반 생물학적 프로그래밍 패러다임.
 
 **저장소:** https://github.com/SHShinSK/cell-coding  
-**문서 사이트 (Pages):** https://shshinsk.github.io/cell-coding/ *(Actions 배포 후 활성화)*
+**문서 사이트:** https://shshinsk.github.io/cell-coding/
 
 Cell Coding은 기존 프레임워크를 대체하는 언어 운동이 아니라, `TypeScript`/`Python`/`React` 위에 얹어 사용할 수 있는 **확장형 아키텍처 모델**을 지향합니다.
 

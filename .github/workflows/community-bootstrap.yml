@@ -1,0 +1,111 @@
+# Community bootstrap — starter issues + repository About
+#
+# 실행: GitHub → Actions → "Community bootstrap" → Run workflow
+# 최초 1회만 실행 권장 (이슈 중복 방지 옵션 포함)
+
+name: Community bootstrap
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_issues:
+        description: "Create 10 starter issues"
+        type: boolean
+        default: true
+      update_about:
+        description: "Update repo description & homepage"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  issues: write
+  discussions: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update repository About
+        if: inputs.update_about
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --method PATCH repos/${{ github.repository }} \
+            -f description='Physical AI를 위한 이벤트 기반 세포코딩 | Event-driven biological programming for Physical AI' \
+            -f homepage='https://shshinsk.github.io/cell-coding/' \
+            -f has_discussions=true
+
+          gh api --method PUT repos/${{ github.repository }}/topics \
+            -f names[]='physical-ai' \
+            -f names[]='event-driven-architecture' \
+            -f names[]='typescript' \
+            -f names[]='python' \
+            -f names[]='open-source' \
+            -f names[]='dsl' \
+            -f names[]='robotics'
+
+      - name: Ensure labels exist
+        if: inputs.create_issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          labels=(
+            "good first issue:FBCA04:Good for newcomers"
+            "help wanted:008672:Extra attention needed"
+            "bug:d73a4a:Something isn't working"
+            "feature:a2eeef:New feature or request"
+            "docs:0075ca:Documentation"
+            "rfc:d876e3:Design / policy proposal"
+            "question:d876e3:Further information is requested"
+            "area:runtime:5319e7:Runtime core"
+            "area:dsl-compiler:5319e7:DSL compiler"
+            "area:docs:0075ca:Documentation"
+            "priority:low:c5def5:Low priority"
+            "priority:medium:fbca04:Medium priority"
+            "priority:high:d93f0b:High priority"
+          )
+          for entry in "${labels[@]}"; do
+            name="${entry%%:*}"
+            rest="${entry#*:}"
+            color="${rest%%:*}"
+            desc="${rest#*:}"
+            gh label create "$name" --color "$color" --description "$desc" --force 2>/dev/null || true
+          done
+
+      - name: Create starter issues
+        if: inputs.create_issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          shopt -s nullglob
+          for file in .github/issue-drafts/[0-9][0-9]-*.md; do
+            base=$(basename "$file")
+            if [ "$base" = "01-readme-badges.md" ]; then
+              echo "Skip (already implemented): $base"
+              continue
+            fi
+            title=$(head -n1 "$file" | sed 's/^# \[good-first-issue\] //')
+            # Skip if issue with same title already open
+            existing=$(gh issue list --repo "${{ github.repository }}" --search "in:title \"$title\"" --state open --json number --jq 'length')
+            if [ "$existing" != "0" ]; then
+              echo "Skip (exists): $title"
+              continue
+            fi
+            echo "Create: $title"
+            gh issue create \
+              --repo "${{ github.repository }}" \
+              --title "$title" \
+              --body-file "$file" \
+              --label "good first issue" \
+              --label "help wanted"
+            sleep 2
+          done
+
+      - name: Summary
+        run: |
+          echo "Done. Issues: https://github.com/${{ github.repository }}/issues"
+          echo "About: https://github.com/${{ github.repository }}"
