@@ -94,12 +94,12 @@ Current status: **v0.1 concept + compiler draft + community bootstrap**
 
 1. **Issues** — pick a [`good first issue`](https://github.com/SHShinSK/cell-coding/labels/good%20first%20issue)  
    **Issues** — [`good first issue`](https://github.com/SHShinSK/cell-coding/labels/good%20first%20issue)부터 시작
-2. **Show and tell** — share demos, prototypes, or Physical AI use cases  
-   **Show and tell** — 데모, 프로토타입, Physical AI 사례 공유
-3. **Q&A** — ask about design, runtime, or DSL direction  
-   **Q&A** — 설계·런타임·DSL 방향 질문
-4. **Ideas** — propose new cells, organs, or reference scenarios (humanoid, PET, etc.)  
-   **Ideas** — 새 세포·기관·레퍼런스 시나리오(휴머노이드, PET 등) 제안
+2. **Show and tell** — share demos in [Show and tell](https://github.com/SHShinSK/cell-coding/discussions/new?category=show-and-tell)  
+   **Show and tell** — [Show and tell](https://github.com/SHShinSK/cell-coding/discussions/new?category=show-and-tell)에서 데모·프로토타입·Physical AI 사례 공유
+3. **Q&A** — ask in [Q&A](https://github.com/SHShinSK/cell-coding/discussions/new?category=q-a)  
+   **Q&A** — [Q&A](https://github.com/SHShinSK/cell-coding/discussions/new?category=q-a)에서 설계·런타임·DSL 방향 질문
+4. **Ideas** — propose in [Ideas](https://github.com/SHShinSK/cell-coding/discussions/new?category=ideas)  
+   **Ideas** — [Ideas](https://github.com/SHShinSK/cell-coding/discussions/new?category=ideas)에서 새 세포·기관·레퍼런스 시나리오 제안
 5. **RFC** — for design changes, open an issue and discuss in [`rfcs/`](https://github.com/SHShinSK/cell-coding/tree/main/rfcs)  
    **RFC** — 설계 변경은 이슈를 열고 [`rfcs/`](https://github.com/SHShinSK/cell-coding/tree/main/rfcs)에서 논의
 

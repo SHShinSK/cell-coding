@@ -639,6 +639,59 @@
     letter-spacing: 0.1em;
   }
 
+  /* ── Community CTA ── */
+  .community-cta {
+    border-top: 1px solid var(--border-dim);
+    padding: 40px 0 8px;
+    text-align: center;
+  }
+
+  .community-cta h2 {
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(1.2rem, 3vw, 1.6rem);
+    font-weight: 700;
+    color: var(--cell-green);
+    margin-bottom: 12px;
+  }
+
+  .community-cta p {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.75;
+    max-width: 560px;
+    margin: 0 auto 20px;
+  }
+
+  .community-cta .cta-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .community-cta .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .community-cta .btn:hover {
+    border-color: var(--cell-green);
+    color: var(--cell-green);
+  }
+
+  .community-cta .btn-primary {
+    border-color: var(--cell-green);
+    color: var(--cell-green);
+    background: var(--cell-green-dim);
+  }
+
   /* ── Canvas cell animation ── */
   #cell-canvas {
     position: fixed;
@@ -1089,11 +1142,24 @@
 
 </main>
 
+<section class="community-cta">
+  <div class="container">
+    <h2 class="fade-in visible">Grow together · 함께 발전시키기</h2>
+    <p class="fade-in visible">This project is open source. Pick a starter issue, share ideas in Discussions, or open a PR — small contributions welcome.<br>오픈소스 프로젝트입니다. starter issue를 고르거나 Discussions에 아이디어를 남기고 PR을 열어 주세요. 작은 기여도 환영합니다.</p>
+    <div class="cta-buttons fade-in visible">
+      <a class="btn btn-primary" href="https://github.com/SHShinSK/cell-coding">GitHub</a>
+      <a class="btn" href="https://github.com/SHShinSK/cell-coding/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22">Good first issues</a>
+      <a class="btn" href="https://github.com/SHShinSK/cell-coding/discussions">Discussions</a>
+      <a class="btn" href="contributing.html">Contributing · 기여하기</a>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="container">
     <div class="footer-inner">
-      <span>세포코딩 · Cell Coding Paradigm</span>
-      <span>v0.1 · 2025 · All concepts reserved</span>
+      <span>세포코딩 · Cell Coding · Apache-2.0</span>
+      <span><a href="https://github.com/SHShinSK/cell-coding" style="color:inherit;text-decoration:none">SHShinSK/cell-coding</a> · v0.1</span>
     </div>
   </div>
 </footer>
