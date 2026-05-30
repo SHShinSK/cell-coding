@@ -36,11 +36,14 @@ jobs:
           echo "Guide: .github/DISCUSSIONS_SETUP.md"
 
       - name: Update About via PAT (optional)
-        if: ${{ secrets.REPO_ADMIN_TOKEN != '' }}
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
         run: |
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "REPO_ADMIN_TOKEN secret not set — skip API update (use About UI manually)."
+            exit 0
+          fi
           gh api --method PATCH "repos/${{ github.repository }}" \
             -f description='Physical AI를 위한 이벤트 기반 세포코딩 | Event-driven biological programming for Physical AI' \
             -f homepage='https://shshinsk.github.io/cell-coding/'
