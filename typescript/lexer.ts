@@ -1,10 +1,11 @@
 // ═══════════════════════════════════════════════════════════
 //  Cell Coding — Lexer
-//  .cell 파일을 읽어 토큰 스트림으로 변환한다
+//  Tokenizes .cell source into a token stream.
+//  .cell 소스를 토큰 스트림으로 변환한다.
 // ═══════════════════════════════════════════════════════════
 
 export enum TokenType {
-  // 키워드
+  // Keywords · 키워드
   CELL       = 'cell',
   SIGNAL     = 'signal',
   MEMBRANE   = 'membrane',
@@ -42,13 +43,13 @@ export enum TokenType {
   ELSE       = 'else',
   RETURN     = 'return',
 
-  // 리터럴
+  // Literals · 리터럴
   IDENTIFIER = 'IDENTIFIER',
   STRING     = 'STRING',
   NUMBER     = 'NUMBER',
   BOOLEAN    = 'BOOLEAN',
 
-  // 구분자
+  // Delimiters · 구분자
   LBRACE     = '{',
   RBRACE     = '}',
   LPAREN     = '(',
@@ -67,12 +68,13 @@ export enum TokenType {
   AMP        = '&',
   QUESTION   = '?',
 
-  // 연산자
+  // Operators · 연산자
   ASSIGN     = '=',
   EQ         = '==',
   NEQ        = '!=',
-  // 비교 연산 `<` `>` 는 LANGLE/RANGLE 토큰(value='<','>')으로 생성되며
-  // parseBinary()가 문맥 기반으로 처리한다 (제네릭 각괄호와 동일 lexeme).
+  // Comparison `<` `>` use LANGLE/RANGLE (value '<' '>') and are
+  // resolved in parseBinary() by context (same lexeme as generics).
+  // 비교 `<` `>` 는 LANGLE/RANGLE 로 생성되며 parseBinary() 가 문맥으로 처리한다.
   LTE        = '<=',
   GTE        = '>=',
   AND        = '&&',

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Extract discussion body — strip HTML comments and title H1."""
 """Discussion 게시용 본문 추출 — HTML 주석·제목 H1 제거."""
 import re
 import sys

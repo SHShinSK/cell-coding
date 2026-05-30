@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Cell Coding DSL compiler draft (lexer, parser, checker)",
+  "description": "Cell Coding DSL compiler draft (lexer, parser, checker) · 세포코딩 DSL 컴파일러 초안",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc",

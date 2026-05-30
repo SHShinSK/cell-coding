@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════
 //  Cell Coding — Type Checker
-//  AST를 분석해 막 계약, 신호 타입, 불변 규칙을 검증한다
+//  Validates membrane contracts, signal types, and invariants.
+//  막 계약, 신호 타입, 불변 규칙을 검증한다.
 // ═══════════════════════════════════════════════════════════
 
 import * as AST from './ast.js';
@@ -46,7 +47,7 @@ export class TypeChecker {
     return this.errors;
   }
 
-  // ── 1패스: 수집 ───────────────────────────────────────────
+  // ── Pass 1: collect · 1패스: 수집 ────────────────────────
 
   private collect(decl: AST.TopLevelDecl): void {
     switch (decl.kind) {
@@ -77,7 +78,8 @@ export class TypeChecker {
     }
   }
 
-  /** extends 체인을 따라 부모 필드를 병합하고, unknown extends를 검증한다 */
+  /** Merge parent fields along extends chain; validate unknown/cyclic extends. */
+  /** extends 체인을 따라 부모 필드를 병합하고 unknown/cyclic extends를 검증한다. */
   private finalizeSignals(): void {
     for (const [name, info] of this.signals) {
       const merged = new Map(info.fields);
@@ -105,7 +107,7 @@ export class TypeChecker {
     }
   }
 
-  // ── 2패스: 검증 ───────────────────────────────────────────
+  // ── Pass 2: validate · 2패스: 검증 ───────────────────────
 
   private validate(decl: AST.TopLevelDecl): void {
     switch (decl.kind) {
@@ -127,7 +129,7 @@ export class TypeChecker {
     }
   }
 
-  // ── Cell 검증 ─────────────────────────────────────────────
+  // ── Cell validation · Cell 검증 ──────────────────────────
 
   private validateCell(decl: AST.CellDecl): void {
     const { body, name } = decl;
@@ -228,7 +230,7 @@ export class TypeChecker {
     return result;
   }
 
-  // ── Tissue 검증 ───────────────────────────────────────────
+  // ── Tissue validation · Tissue 검증 ──────────────────────
 
   private validateTissue(decl: AST.TissueDecl): void {
     const { flow } = decl;
@@ -261,7 +263,7 @@ export class TypeChecker {
     }
   }
 
-  // ── Organ 검증 ────────────────────────────────────────────
+  // ── Organ validation · Organ 검증 ────────────────────────
 
   private validateOrgan(decl: AST.OrganDecl): void {
     for (const exp of (decl.exports ?? [])) {
@@ -277,7 +279,7 @@ export class TypeChecker {
     }
   }
 
-  // ── Organism 검증 ─────────────────────────────────────────
+  // ── Organism validation · Organism 검증 ──────────────────
 
   private validateOrganism(decl: AST.OrganismDecl): void {
     for (const organName of decl.organs) {
@@ -301,7 +303,7 @@ export class TypeChecker {
     }
   }
 
-  // ── Genome 검증 ───────────────────────────────────────────
+  // ── Genome validation · Genome 검증 ────────────────────────
 
   private validateGenome(decl: AST.GenomeDecl): void {
     if (decl.params.length === 0) {
@@ -319,9 +321,10 @@ export class TypeChecker {
     }
   }
 
-  // ── 헬퍼 ──────────────────────────────────────────────────
+  // ── Helpers · 헬퍼 ───────────────────────────────────────
 
-  /** 막/핸들러/emit에서 사용하는 신호 이름 추출 (제네릭·컨테이너 내부 포함) */
+  /** Extract signal names from membrane/handler types (incl. generics). */
+  /** 막/핸들러 타입에서 신호 이름 추출 (제네릭·컨테이너 포함). */
   private extractSignalNames(type?: AST.TypeExpr): string[] {
     if (!type) return [];
     switch (type.kind) {
@@ -350,7 +353,8 @@ export class TypeChecker {
     }
   }
 
-  /** emitted가 accepted 막 계약을 만족하는지 (extends/subtype 포함, spec §11) */
+  /** Whether emitted satisfies accepted membrane (extends/subtype, spec §11). */
+  /** emitted가 accepted 막 계약을 만족하는지 (extends/subtype, spec §11). */
   private signalsCompatible(emitted: string, accepted: string): boolean {
     if (emitted === accepted) return true;
     return this.isSubtypeOf(emitted, accepted);

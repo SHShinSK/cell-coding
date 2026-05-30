@@ -1,5 +1,6 @@
 // ═══════════════════════════════════════════════════════════
 //  Cell Coding — Compiler entry point
+//  .cell source → tokens → AST → type-check diagnostics
 //  .cell 소스 → 토큰 → AST → 타입 검사 진단
 // ═══════════════════════════════════════════════════════════
 

@@ -1,21 +1,22 @@
 // ═══════════════════════════════════════════════════════════
 //  Cell Coding — AST Node Definitions
-//  파서가 생성하는 추상 구문 트리의 모든 노드 타입
+//  All AST node types produced by the parser.
+//  파서가 생성하는 추상 구문 트리의 모든 노드 타입.
 // ═══════════════════════════════════════════════════════════
 
-// ── 위치 정보 ──────────────────────────────────────────────
+// ── Position · 위치 정보 ───────────────────────────────────
 export interface Position {
   line: number;
   col:  number;
 }
 
-// ── 기반 노드 ──────────────────────────────────────────────
+// ── Base node · 기반 노드 ──────────────────────────────────
 export interface BaseNode {
   kind: string;
   pos:  Position;
 }
 
-// ── 최상위 프로그램 ────────────────────────────────────────
+// ── Program · 최상위 프로그램 ──────────────────────────────
 export interface Program extends BaseNode {
   kind:       'Program';
   statements: TopLevelDecl[];
@@ -30,7 +31,7 @@ export type TopLevelDecl =
   | GenomeDecl;
 
 // ══════════════════════════════════════════════════════════
-//  신호 (Signal)
+//  Signal · 신호
 // ══════════════════════════════════════════════════════════
 
 export interface SignalDecl extends BaseNode {
@@ -49,7 +50,7 @@ export interface FieldDecl extends BaseNode {
   default?:  Expr;
 }
 
-// ── 타입 표현식 ────────────────────────────────────────────
+// ── Type expressions · 타입 표현식 ────────────────────────
 export type TypeExpr =
   | SimpleType
   | UnionType
@@ -68,7 +69,7 @@ export interface OptionType  extends BaseNode { kind: 'OptionType';  inner: Type
 export interface ResultType  extends BaseNode { kind: 'ResultType';  ok: TypeExpr; err: TypeExpr; }
 
 // ══════════════════════════════════════════════════════════
-//  세포 (Cell)
+//  Cell · 세포
 // ══════════════════════════════════════════════════════════
 
 export interface CellDecl extends BaseNode {
@@ -80,18 +81,18 @@ export interface CellDecl extends BaseNode {
 }
 
 export interface CellBody {
-  role:       string;               // 필수
+  role:       string;               // required · 필수
   tags?:      string[];
   lifespan?:  'stateless' | 'persistent' | 'session';
-  membrane:   MembraneDecl;         // 필수
+  membrane:   MembraneDecl;         // required · 필수
   nucleus?:   NucleusDecl;
-  handlers:   HandlerDecl[];        // 최소 1개
+  handlers:   HandlerDecl[];        // at least one · 최소 1개
   apoptosis?: ApoptosisDecl;
   divide?:    DivideDecl;
   mutate?:    MutateDecl;
 }
 
-// ── 막 (Membrane) ──────────────────────────────────────────
+// ── Membrane · 막 ──────────────────────────────────────────
 export interface MembraneDecl extends BaseNode {
   kind:           'MembraneDecl';
   accepts?:       TypeExpr;
@@ -102,13 +103,13 @@ export interface MembraneDecl extends BaseNode {
   passthrough?:   TypeExpr;
 }
 
-// ── 핵 (Nucleus) ───────────────────────────────────────────
+// ── Nucleus · 핵 ───────────────────────────────────────────
 export interface NucleusDecl extends BaseNode {
   kind:   'NucleusDecl';
   fields: FieldDecl[];
 }
 
-// ── 핸들러 (on 블록) ───────────────────────────────────────
+// ── Handler (on block) · 핸들러 (on 블록) ──────────────────
 export interface HandlerDecl extends BaseNode {
   kind:      'HandlerDecl';
   signalType: string;
@@ -117,13 +118,13 @@ export interface HandlerDecl extends BaseNode {
   body:       Stmt[];
 }
 
-// ── 세포사멸 ───────────────────────────────────────────────
+// ── Apoptosis · 세포사멸 ───────────────────────────────────
 export interface ApoptosisDecl extends BaseNode {
   kind: 'ApoptosisDecl';
   body: Stmt[];
 }
 
-// ── 분열 ───────────────────────────────────────────────────
+// ── Divide · 분열 ──────────────────────────────────────────
 export interface DivideDecl extends BaseNode {
   kind:      'DivideDecl';
   condition: Expr;
@@ -131,7 +132,7 @@ export interface DivideDecl extends BaseNode {
   strategy:  'round-robin' | 'least-loaded' | 'random';
 }
 
-// ── 변이 ───────────────────────────────────────────────────
+// ── Mutate · 변이 ──────────────────────────────────────────
 export interface MutateDecl extends BaseNode {
   kind:      'MutateDecl';
   condition: Expr;
@@ -141,7 +142,7 @@ export interface MutateDecl extends BaseNode {
 }
 
 // ══════════════════════════════════════════════════════════
-//  조직 / 기관 / 유기체 (Tissue / Organ / Organism)
+//  Tissue / Organ / Organism · 조직 / 기관 / 유기체
 // ══════════════════════════════════════════════════════════
 
 export interface TissueDecl extends BaseNode {
@@ -155,7 +156,7 @@ export interface TissueDecl extends BaseNode {
 export interface FlowDecl extends BaseNode {
   kind:     'FlowDecl';
   mode:     'linear' | 'parallel' | 'race';
-  steps:    string[];    // 세포/조직 이름 목록
+  steps:    string[];    // cell/tissue names · 세포/조직 이름 목록
   after?:   AfterClause;
 }
 
@@ -168,7 +169,7 @@ export interface AfterClause extends BaseNode {
 export interface WhenClause extends BaseNode {
   kind:      'WhenClause';
   condition: TypeExpr | Expr;
-  body:      string[];   // 세포 이름 목록
+  body:      string[];   // cell names · 세포 이름 목록
 }
 
 export interface OrganDecl extends BaseNode {
@@ -199,7 +200,7 @@ export interface RouteDecl extends BaseNode {
   kind:      'RouteDecl';
   source:    string;        // "OrganName.SignalName"
   targets:   string[];
-  transform?: string;       // 변환 함수 코드 (raw)
+  transform?: string;       // raw transform code · 변환 함수 코드 (raw)
   condition?: Expr;
 }
 
@@ -237,18 +238,18 @@ export interface EnvDecl extends BaseNode {
 }
 
 // ══════════════════════════════════════════════════════════
-//  유전자 템플릿 (Genome)
+//  Genome · 유전자 템플릿
 // ══════════════════════════════════════════════════════════
 
 export interface GenomeDecl extends BaseNode {
   kind:    'GenomeDecl';
   name:    string;
-  params:  string[];   // 제네릭 타입 파라미터
+  params:  string[];   // generic type parameters · 제네릭 타입 파라미터
   body:    CellBody;
 }
 
 // ══════════════════════════════════════════════════════════
-//  문장 (Stmt)
+//  Statements · 문장
 // ══════════════════════════════════════════════════════════
 
 export type Stmt =
@@ -293,7 +294,7 @@ export interface ReturnStmt extends BaseNode {
 }
 
 // ══════════════════════════════════════════════════════════
-//  표현식 (Expr)
+//  Expressions · 표현식
 // ══════════════════════════════════════════════════════════
 
 export type Expr =

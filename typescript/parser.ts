@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════
 //  Cell Coding — Parser
-//  토큰 스트림을 받아 AST(추상 구문 트리)를 생성한다
+//  Builds an AST from the token stream.
+//  토큰 스트림에서 AST(추상 구문 트리)를 생성한다.
 // ═══════════════════════════════════════════════════════════
 
 import { Token, TokenType } from './lexer.js';
@@ -17,7 +18,7 @@ export class Parser {
 
   constructor(private tokens: Token[]) {}
 
-  // ── 유틸리티 ─────────────────────────────────────────────
+  // ── Utilities · 유틸리티 ─────────────────────────────────
 
   private peek(offset = 0): Token {
     return this.tokens[Math.min(this.pos + offset, this.tokens.length - 1)];
@@ -118,7 +119,7 @@ export class Parser {
     let fromGenome: string | undefined;
     if (this.match(TokenType.FROM)) {
       fromGenome = this.expect(TokenType.IDENTIFIER).value;
-      // 제네릭 파라미터 건너뜀
+      // Skip generic args on `from Genome<T>` · from Genome<T> 제네릭 인자 건너뜀
       if (this.check(TokenType.LANGLE)) this.skipGenerics();
     }
 
@@ -183,11 +184,11 @@ export class Parser {
         mutate = this.parseMutateDecl();
 
       } else {
-        // 알 수 없는 토큰은 건너뜀
+        // Skip unknown tokens (forward-compatible) · 알 수 없는 토큰 건너뜀
         this.advance();
       }
 
-      // 선택적 세미콜론
+      // Optional semicolon · 선택적 세미콜론
       this.match(TokenType.SEMICOLON);
     }
 
@@ -623,7 +624,7 @@ export class Parser {
   }
 
   // ══════════════════════════════════════════════════════════
-  //  공통 헬퍼
+  //  Shared helpers · 공통 헬퍼
   // ══════════════════════════════════════════════════════════
 
   private parseFieldDecl(): AST.FieldDecl {

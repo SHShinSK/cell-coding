@@ -11,7 +11,7 @@ signal ErrorSignal {
 }
 
 cell Validator {
-  role: "입력값 유효성 검사";
+  role: "Input validation · 입력값 유효성 검사";
 
   membrane {
     accepts: RawInput;
