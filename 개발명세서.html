@@ -1,5 +1,3 @@
-html
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -684,12 +682,12 @@ code {
     <div class="nav-section">
       <span class="nav-label">Core Units</span>
       <a class="nav-item" href="#cell"><span class="nav-dot"></span>cell — 세포</a>
-      <a class="nav-sub" href="#cell-anatomy">해부 구조</a>
-      <a class="nav-sub" href="#cell-membrane">막 (Membrane)</a>
-      <a class="nav-sub" href="#cell-lifecycle">생존 주기</a>
+      <a class="nav-sub" href="#cell-anatomy">Anatomy · 해부 구조</a>
+      <a class="nav-sub" href="#cell-membrane">Membrane · 막</a>
+      <a class="nav-sub" href="#cell-lifecycle">Lifecycle · 생존 주기</a>
       <a class="nav-item" href="#signal"><span class="nav-dot"></span>signal — 신호</a>
-      <a class="nav-sub" href="#signal-types">신호 유형</a>
-      <a class="nav-sub" href="#signal-routing">라우팅</a>
+      <a class="nav-sub" href="#signal-types">Signal types · 신호 유형</a>
+      <a class="nav-sub" href="#signal-routing">Routing · 라우팅</a>
     </div>
 
     <div class="nav-section">
@@ -708,10 +706,10 @@ code {
 
     <div class="nav-section">
       <span class="nav-label">Advanced</span>
-      <a class="nav-item" href="#mutation"><span class="nav-dot"></span>변이 및 분화</a>
-      <a class="nav-item" href="#typing"><span class="nav-dot"></span>타입 시스템</a>
-      <a class="nav-item" href="#grammar"><span class="nav-dot"></span>공식 문법 (EBNF)</a>
-      <a class="nav-item" href="#interop"><span class="nav-dot"></span>상호운용성</a>
+      <a class="nav-item" href="#mutation"><span class="nav-dot"></span>Mutation · 변이/분화</a>
+      <a class="nav-item" href="#typing"><span class="nav-dot"></span>Type System · 타입</a>
+      <a class="nav-item" href="#grammar"><span class="nav-dot"></span>Grammar (EBNF) · 문법</a>
+      <a class="nav-item" href="#interop"><span class="nav-dot"></span>Interoperability · 상호운용</a>
     </div>
   </nav>
 </aside>
@@ -784,22 +782,22 @@ code {
       </table>
 
       <div class="callout note">
-        <span class="callout-label">📐 핵심 철학</span>
-        <span class="callout-body">세포는 상태를 숨기는 것이 아니라 <strong>역할을 선언</strong>한다. 세포는 다른 세포를 호출하는 것이 아니라 <strong>신호에 반응</strong>한다. 세포는 단독으로 살아남을 수 있어야 하며, 집합적으로 유기체를 이룬다.</span>
+        <span class="callout-label">📐 Core philosophy · 핵심 철학</span>
+        <span class="callout-body">A cell <strong>declares its role</strong> rather than hiding state; it <strong>reacts to signals</strong> rather than calling other cells; it must be able to survive on its own and, collectively, form an organism.<br>세포는 상태를 숨기는 것이 아니라 <strong>역할을 선언</strong>한다. 세포는 다른 세포를 호출하는 것이 아니라 <strong>신호에 반응</strong>한다. 세포는 단독으로 살아남을 수 있어야 하며, 집합적으로 유기체를 이룬다.</span>
       </div>
 
-      <h3 class="sub-heading">설계 목표</h3>
+      <h3 class="sub-heading">Design Goals · 설계 목표</h3>
 
       <table class="grammar-table">
         <thead>
-          <tr><th>목표</th><th>설명</th><th>측정 기준</th></tr>
+          <tr><th>Goal · 목표</th><th>Description · 설명</th><th>Metric · 측정 기준</th></tr>
         </thead>
         <tbody>
-          <tr><td>독립성</td><td>각 세포는 다른 세포의 내부 구현을 알지 못한다</td><td>세포 단독 테스트 가능 여부</td></tr>
-          <tr><td>역할 명확성</td><td>세포의 역할이 코드 외부에서 선언적으로 읽힌다</td><td>role 필드 필수화</td></tr>
-          <tr><td>유기적 연결</td><td>세포 간 통신은 신호와 막을 통해서만 이루어진다</td><td>직접 참조 금지</td></tr>
-          <tr><td>복잡도 계층</td><td>시스템 복잡도가 생물학적 계층으로 자연스럽게 표현된다</td><td>cell/tissue/organ/organism 구분</td></tr>
-          <tr><td>상호운용성</td><td>기존 언어 코드베이스와 공존할 수 있다</td><td>트랜스파일 지원</td></tr>
+          <tr><td>Independence · 독립성</td><td>Each cell is unaware of other cells' internals · 각 세포는 다른 세포의 내부 구현을 알지 못한다</td><td>Cell testable in isolation · 세포 단독 테스트 가능 여부</td></tr>
+          <tr><td>Role clarity · 역할 명확성</td><td>A cell's role is declaratively readable from outside the code · 세포의 역할이 코드 외부에서 선언적으로 읽힌다</td><td><code>role</code> field required · role 필드 필수화</td></tr>
+          <tr><td>Organic connection · 유기적 연결</td><td>Cells communicate only through signals and membranes · 세포 간 통신은 신호와 막을 통해서만 이루어진다</td><td>No direct references · 직접 참조 금지</td></tr>
+          <tr><td>Complexity tiers · 복잡도 계층</td><td>System complexity maps naturally onto biological tiers · 시스템 복잡도가 생물학적 계층으로 자연스럽게 표현된다</td><td>cell/tissue/organ/organism split · 계층 구분</td></tr>
+          <tr><td>Interoperability · 상호운용성</td><td>Coexists with existing language codebases · 기존 언어 코드베이스와 공존할 수 있다</td><td>Transpile support · 트랜스파일 지원</td></tr>
         </tbody>
       </table>
     </div>
@@ -811,93 +809,95 @@ code {
       <div class="section-header">
         <span class="section-num">§ 1</span>
         <div>
-          <div class="section-title">키워드 인덱스</div>
-          <div class="section-en">Keyword Index</div>
+          <div class="section-title">Keyword Index · 키워드 인덱스</div>
+          <div class="section-en">Reserved Keywords</div>
         </div>
       </div>
 
-      <p class="body-text">세포코딩의 모든 예약어(reserved keyword)는 생물학적 용어를 기반으로 한다. 총 24개의 키워드로 언어 전체를 구성한다.</p>
+      <p class="body-text">Every reserved keyword in Cell Coding is grounded in a biological term. The 16 core keywords below form the backbone of the language; structural keywords (<code>flow</code>, <code>when</code>, <code>query</code>, <code>from</code>, <code>with</code>, etc.) are introduced in context.</p>
+
+      <p class="body-text">세포코딩의 모든 예약어(reserved keyword)는 생물학적 용어를 기반으로 한다. 아래 16개의 핵심 키워드가 언어의 골격을 이루며, 구조 키워드(<code>flow</code>, <code>when</code>, <code>query</code>, <code>from</code>, <code>with</code> 등)는 문맥에서 함께 소개된다.</p>
 
       <div class="index-grid">
         <div class="index-card">
           <div class="index-card-kw">cell</div>
           <div class="index-card-en">UNIT · 세포</div>
-          <div class="index-card-desc">모든 구성의 최소 단위. 단 하나의 역할을 가진다.</div>
+          <div class="index-card-desc">Smallest unit of composition; holds exactly one role. · 모든 구성의 최소 단위. 단 하나의 역할을 가진다.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">tissue</div>
           <div class="index-card-en">COMPOSITION · 조직</div>
-          <div class="index-card-desc">같은 목적을 가진 세포들의 선형/병렬 클러스터.</div>
+          <div class="index-card-desc">Linear/parallel cluster of cells with a shared purpose. · 같은 목적을 가진 세포들의 선형/병렬 클러스터.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">organ</div>
           <div class="index-card-en">COMPOSITION · 기관</div>
-          <div class="index-card-desc">여러 조직이 하나의 기능을 위해 협력하는 단위.</div>
+          <div class="index-card-desc">Unit where multiple tissues cooperate for one function. · 여러 조직이 하나의 기능을 위해 협력하는 단위.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">organism</div>
           <div class="index-card-en">COMPOSITION · 유기체</div>
-          <div class="index-card-desc">전체 시스템. 기관들의 최상위 컨테이너.</div>
+          <div class="index-card-desc">The whole system; top-level container of organs. · 전체 시스템. 기관들의 최상위 컨테이너.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">signal</div>
           <div class="index-card-en">COMMUNICATION · 신호</div>
-          <div class="index-card-desc">세포 간 유일한 통신 수단. 불변(immutable)이다.</div>
+          <div class="index-card-desc">The only means of inter-cell communication; immutable. · 세포 간 유일한 통신 수단. 불변(immutable)이다.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">membrane</div>
           <div class="index-card-en">INTERFACE · 막</div>
-          <div class="index-card-desc">세포의 입출력 계약. 수용·방출 신호를 정의한다.</div>
+          <div class="index-card-desc">A cell's I/O contract; defines accepted/emitted signals. · 세포의 입출력 계약. 수용·방출 신호를 정의한다.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">genome</div>
           <div class="index-card-en">TEMPLATE · 유전자</div>
-          <div class="index-card-desc">재사용 가능한 세포 설계도. 제네릭 템플릿.</div>
+          <div class="index-card-desc">Reusable cell blueprint; a generic template. · 재사용 가능한 세포 설계도. 제네릭 템플릿.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">nervous</div>
           <div class="index-card-en">SYSTEM · 신경계</div>
-          <div class="index-card-desc">기관 간 신호를 중계하는 이벤트 버스.</div>
+          <div class="index-card-desc">Event bus that relays signals between organs. · 기관 간 신호를 중계하는 이벤트 버스.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">immune</div>
           <div class="index-card-en">SYSTEM · 면역계</div>
-          <div class="index-card-desc">오류 세포를 격리하고 시스템을 보호한다.</div>
+          <div class="index-card-desc">Quarantines faulty cells and protects the system. · 오류 세포를 격리하고 시스템을 보호한다.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">on</div>
           <div class="index-card-en">HANDLER · 반응</div>
-          <div class="index-card-desc">특정 신호를 수신했을 때 실행할 로직 선언.</div>
+          <div class="index-card-desc">Declares logic to run when a given signal arrives. · 특정 신호를 수신했을 때 실행할 로직 선언.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">emit</div>
           <div class="index-card-en">ACTION · 방출</div>
-          <div class="index-card-desc">신호를 외부로 발송한다. 반환값이 아니다.</div>
+          <div class="index-card-desc">Sends a signal outward; it is not a return value. · 신호를 외부로 발송한다. 반환값이 아니다.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">absorb</div>
           <div class="index-card-en">ACTION · 흡수</div>
-          <div class="index-card-desc">신호를 소비하여 더 이상 전파되지 않게 한다.</div>
+          <div class="index-card-desc">Consumes a signal so it propagates no further. · 신호를 소비하여 더 이상 전파되지 않게 한다.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">divide</div>
           <div class="index-card-en">OPERATION · 분열</div>
-          <div class="index-card-desc">세포를 동적으로 복제·병렬화한다.</div>
+          <div class="index-card-desc">Dynamically replicates/parallelizes a cell. · 세포를 동적으로 복제·병렬화한다.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">mutate</div>
           <div class="index-card-en">OPERATION · 변이</div>
-          <div class="index-card-desc">세포의 역할이나 막을 런타임에 재정의한다.</div>
+          <div class="index-card-desc">Redefines a cell's role or membrane at runtime. · 세포의 역할이나 막을 런타임에 재정의한다.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">apoptosis</div>
           <div class="index-card-en">LIFECYCLE · 세포사멸</div>
-          <div class="index-card-desc">세포의 자발적 종료 및 자원 해제.</div>
+          <div class="index-card-desc">Voluntary cell termination and resource release. · 세포의 자발적 종료 및 자원 해제.</div>
         </div>
         <div class="index-card">
           <div class="index-card-kw">role</div>
           <div class="index-card-en">METADATA · 역할</div>
-          <div class="index-card-desc">세포가 하는 일을 자연어로 선언하는 필수 속성.</div>
+          <div class="index-card-desc">Required attribute declaring a cell's job in natural language. · 세포가 하는 일을 자연어로 선언하는 필수 속성.</div>
         </div>
       </div>
     </div>
@@ -914,115 +914,119 @@ code {
         </div>
       </div>
 
+      <p class="body-text">A <code>cell</code> is the smallest independent unit in Cell Coding. It must declare a <code>role</code>, communicates with the outside through its <code>membrane</code>, and reacts to signals via <code>on</code> handlers. A cell cannot directly reference or call another cell.</p>
+
       <p class="body-text"><code>cell</code>은 세포코딩의 가장 작은 독립 단위다. 세포는 반드시 <code>role</code>을 가져야 하며, <code>membrane</code>을 통해 외부와 통신하고, <code>on</code> 핸들러로 신호에 반응한다. 세포는 다른 세포를 직접 참조하거나 호출할 수 없다.</p>
 
       <div class="callout rule">
-        <span class="callout-label">📏 불변 규칙</span>
-        <span class="callout-body">① 세포는 반드시 <code>role</code> 을 선언해야 한다. ② 세포는 <code>membrane</code> 에 선언되지 않은 신호를 emit할 수 없다. ③ 세포는 다른 세포를 import하거나 직접 호출할 수 없다.</span>
+        <span class="callout-label">📏 Invariants · 불변 규칙</span>
+        <span class="callout-body">① A cell must declare a <code>role</code>. ② A cell cannot emit signals not declared in its <code>membrane</code>. ③ A cell cannot import or directly call another cell.<br>① 세포는 반드시 <code>role</code> 을 선언해야 한다. ② 세포는 <code>membrane</code> 에 선언되지 않은 신호를 emit할 수 없다. ③ 세포는 다른 세포를 import하거나 직접 호출할 수 없다.</span>
       </div>
 
-      <h3 class="sub-heading" id="cell-anatomy">해부 구조</h3>
+      <h3 class="sub-heading" id="cell-anatomy">Anatomy · 해부 구조</h3>
 
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-lang">cell-code</span>
           <span class="code-fname">anatomy.cell</span>
         </div>
-        <div class="code-body"><pre><span class="c">// ── 세포의 완전한 해부 구조 ──────────────────────────────</span>
+        <div class="code-body"><pre><span class="c">// ── Full anatomy of a cell · 세포의 완전한 해부 구조 ──────</span>
 
 <span class="k">cell</span> <span class="t">EmailValidator</span> <span class="p">{</span>
 
-  <span class="c">// [필수] 역할 선언 — 자연어, 이 세포의 존재 이유</span>
-  <span class="a">role</span>     <span class="p">:</span> <span class="s">"이메일 주소의 형식과 도메인 유효성을 검사한다"</span>
+  <span class="c">// [required] role — natural language, the reason this cell exists · 역할 선언</span>
+  <span class="a">role</span>     <span class="p">:</span> <span class="s">"Validate the format and domain of an email address"</span>
 
-  <span class="c">// [선택] 세포 태그 — 검색·분류용 메타데이터</span>
+  <span class="c">// [optional] tags — metadata for search/classification · 검색·분류용 메타데이터</span>
   <span class="a">tags</span>     <span class="p">:</span> <span class="p">[</span><span class="s">"validation"</span><span class="p">,</span> <span class="s">"auth"</span><span class="p">,</span> <span class="s">"input"</span><span class="p">]</span>
 
-  <span class="c">// [선택] 생존 범위 — 세포의 수명 정책</span>
+  <span class="c">// [optional] lifespan — the cell's lifetime policy · 수명 정책</span>
   <span class="a">lifespan</span> <span class="p">:</span> <span class="k">stateless</span>   <span class="c">// stateless | persistent | session</span>
 
-  <span class="c">// [필수] 막 — 입출력 계약</span>
+  <span class="c">// [required] membrane — the I/O contract · 입출력 계약</span>
   <span class="k">membrane</span> <span class="p">{</span>
     <span class="a">accepts</span><span class="p">:</span> <span class="t">RawEmailInput</span>
     <span class="a">emits</span>  <span class="p">:</span> <span class="t">ValidEmail</span> <span class="op">|</span> <span class="t">InvalidEmail</span>
-    <span class="a">rejects</span><span class="p">:</span> <span class="t">NullInput</span>    <span class="c">// 이 신호는 통과시키지 않는다</span>
+    <span class="a">rejects</span><span class="p">:</span> <span class="t">NullInput</span>    <span class="c">// this signal is not let through · 통과 불가</span>
   <span class="p">}</span>
 
-  <span class="c">// [선택] 내부 상태 — lifespan이 persistent일 때만 유효</span>
+  <span class="c">// [optional] internal state — only valid when lifespan is persistent · 내부 상태</span>
   <span class="k">nucleus</span> <span class="p">{</span>
     <span class="a">cache</span><span class="p">:</span> <span class="t">Map</span><span class="p">&lt;</span><span class="t">String</span><span class="p">,</span> <span class="t">Bool</span><span class="p">&gt;</span>
   <span class="p">}</span>
 
-  <span class="c">// [필수] 신호 핸들러</span>
+  <span class="c">// [required] signal handler · 신호 핸들러</span>
   <span class="k">on</span> <span class="p">(</span><span class="t">RawEmailInput</span> <span class="a">input</span><span class="p">) {</span>
     <span class="k">if</span> <span class="fn">isValidFormat</span><span class="p">(</span><span class="a">input</span><span class="p">.</span><span class="a">address</span><span class="p">)</span> <span class="op">&amp;&amp;</span> <span class="fn">domainExists</span><span class="p">(</span><span class="a">input</span><span class="p">.</span><span class="a">address</span><span class="p">) {</span>
       <span class="k">emit</span> <span class="t">ValidEmail</span><span class="p">(</span><span class="a">address</span><span class="p">:</span> <span class="a">input</span><span class="p">.</span><span class="a">address</span><span class="p">)</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-      <span class="k">emit</span> <span class="t">InvalidEmail</span><span class="p">(</span><span class="a">reason</span><span class="p">:</span> <span class="s">"형식 오류 또는 도메인 불일치"</span><span class="p">)</span>
+      <span class="k">emit</span> <span class="t">InvalidEmail</span><span class="p">(</span><span class="a">reason</span><span class="p">:</span> <span class="s">"Invalid format or domain mismatch"</span><span class="p">)</span>
     <span class="p">}</span>
   <span class="p">}</span>
 
-  <span class="c">// [선택] 세포 사멸 훅</span>
+  <span class="c">// [optional] apoptosis hook · 세포 사멸 훅</span>
   <span class="k">apoptosis</span> <span class="p">{</span>
     <span class="fn">clearCache</span><span class="p">(</span><span class="k">nucleus</span><span class="p">.</span><span class="a">cache</span><span class="p">)</span>
   <span class="p">}</span>
 <span class="p">}</span></pre></div>
       </div>
 
-      <h3 class="sub-heading" id="cell-membrane">막 (Membrane)</h3>
+      <h3 class="sub-heading" id="cell-membrane">Membrane · 막</h3>
+
+      <p class="body-text">The membrane is a cell's I/O contract. Only signals declared in the membrane may pass through the cell. The membrane is the cell's public API and its only interface.</p>
 
       <p class="body-text">막은 세포의 입출력 계약이다. 막에 선언된 신호만이 세포를 관통할 수 있다. 막은 세포의 공개 API이자 유일한 인터페이스다.</p>
 
       <table class="grammar-table">
         <thead>
-          <tr><th>키워드</th><th>의미</th><th>예시</th></tr>
+          <tr><th>Keyword · 키워드</th><th>Meaning · 의미</th><th>Example · 예시</th></tr>
         </thead>
         <tbody>
-          <tr><td>accepts</td><td>이 신호가 올 때 세포가 활성화된다</td><td><code>accepts: LoginRequest</code></td></tr>
-          <tr><td>emits</td><td>세포가 처리 후 방출할 수 있는 신호</td><td><code>emits: TokenIssued | AuthFailed</code></td></tr>
-          <tr><td>rejects</td><td>이 신호는 명시적으로 차단한다</td><td><code>rejects: GuestRequest</code></td></tr>
-          <tr><td>observes</td><td>반응하지는 않지만 감지·로깅한다</td><td><code>observes: AnySignal</code></td></tr>
-          <tr><td>passthrough</td><td>신호를 변환 없이 그대로 전달한다</td><td><code>passthrough: HealthCheck</code></td></tr>
+          <tr><td>accepts</td><td>Activates the cell when this signal arrives · 이 신호가 올 때 세포가 활성화된다</td><td><code>accepts: LoginRequest</code></td></tr>
+          <tr><td>emits</td><td>Signals the cell may emit after processing · 처리 후 방출할 수 있는 신호</td><td><code>emits: TokenIssued | AuthFailed</code></td></tr>
+          <tr><td>rejects</td><td>Explicitly blocks this signal · 이 신호는 명시적으로 차단한다</td><td><code>rejects: GuestRequest</code></td></tr>
+          <tr><td>observes</td><td>Does not react but senses/logs it · 반응하지 않고 감지·로깅한다</td><td><code>observes: AnySignal</code></td></tr>
+          <tr><td>passthrough</td><td>Forwards the signal unchanged · 변환 없이 그대로 전달한다</td><td><code>passthrough: HealthCheck</code></td></tr>
         </tbody>
       </table>
 
-      <h3 class="sub-heading" id="cell-lifecycle">세포 생존 주기</h3>
+      <h3 class="sub-heading" id="cell-lifecycle">Cell Lifecycle · 세포 생존 주기</h3>
 
       <div class="lifecycle">
         <div class="lc-step">
           <div class="lc-step-icon">🌱</div>
           <div class="lc-step-name">genesis</div>
-          <div class="lc-step-desc">세포 생성<br>초기화</div>
+          <div class="lc-step-desc">Created<br>세포 생성·초기화</div>
         </div>
         <div class="lc-arrow">→</div>
         <div class="lc-step">
           <div class="lc-step-icon">👁</div>
           <div class="lc-step-name">dormant</div>
-          <div class="lc-step-desc">신호 대기<br>대기 상태</div>
+          <div class="lc-step-desc">Awaiting<br>신호 대기</div>
         </div>
         <div class="lc-arrow">→</div>
         <div class="lc-step">
           <div class="lc-step-icon">⚡</div>
           <div class="lc-step-name">active</div>
-          <div class="lc-step-desc">신호 수신<br>처리 중</div>
+          <div class="lc-step-desc">Processing<br>신호 수신·처리</div>
         </div>
         <div class="lc-arrow">→</div>
         <div class="lc-step">
           <div class="lc-step-icon">📡</div>
           <div class="lc-step-name">emitting</div>
-          <div class="lc-step-desc">신호 방출<br>전파 중</div>
+          <div class="lc-step-desc">Emitting<br>신호 방출·전파</div>
         </div>
         <div class="lc-arrow">→</div>
         <div class="lc-step">
           <div class="lc-step-icon">💤</div>
           <div class="lc-step-name">dormant</div>
-          <div class="lc-step-desc">다음 신호<br>대기</div>
+          <div class="lc-step-desc">Waiting<br>다음 신호 대기</div>
         </div>
         <div class="lc-arrow">→</div>
         <div class="lc-step">
           <div class="lc-step-icon">🌸</div>
           <div class="lc-step-name">apoptosis</div>
-          <div class="lc-step-desc">세포 사멸<br>자원 해제</div>
+          <div class="lc-step-desc">Terminated<br>세포 사멸·자원 해제</div>
         </div>
       </div>
     </div>
@@ -1039,41 +1043,43 @@ code {
         </div>
       </div>
 
+      <p class="body-text">A signal is the only means of communication between cells. Signals are immutable and cannot be modified after creation. A signal carries data but does not command behavior — what a receiving cell does with it is entirely that cell's responsibility.</p>
+
       <p class="body-text">신호는 세포 간 유일한 통신 수단이다. 신호는 불변(immutable)이며, 생성 후 수정될 수 없다. 신호는 데이터를 운반하지만 행동을 명령하지 않는다. 어떤 세포가 신호를 받아 무엇을 할지는 전적으로 수신 세포의 책임이다.</p>
 
       <div class="callout info">
-        <span class="callout-label">💡 메시지 vs 신호</span>
-        <span class="callout-body">OOP의 메시지는 수신자를 알고 있다. 세포코딩의 신호는 수신자를 모른다. 신호는 공기 중에 방출되고, 관심 있는 세포들이 반응할 뿐이다. 이것이 결합도를 근본적으로 낮춘다.</span>
+        <span class="callout-label">💡 Message vs Signal · 메시지 vs 신호</span>
+        <span class="callout-body">An OOP message knows its receiver. A Cell Coding signal does not. A signal is released into the air, and only interested cells react — this fundamentally lowers coupling.<br>OOP의 메시지는 수신자를 알고 있다. 세포코딩의 신호는 수신자를 모른다. 신호는 공기 중에 방출되고, 관심 있는 세포들이 반응할 뿐이다. 이것이 결합도를 근본적으로 낮춘다.</span>
       </div>
 
-      <h3 class="sub-heading" id="signal-types">신호 유형</h3>
+      <h3 class="sub-heading" id="signal-types">Signal Types · 신호 유형</h3>
 
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-lang">cell-code</span>
           <span class="code-fname">signals.cell</span>
         </div>
-        <div class="code-body"><pre><span class="c">// ── 신호 정의 ────────────────────────────────────────────</span>
+        <div class="code-body"><pre><span class="c">// ── Signal definitions · 신호 정의 ───────────────────────</span>
 
-<span class="c">// 1. 데이터 신호 (가장 일반적) — 불변 데이터 운반</span>
+<span class="c">// 1. Data signal (most common) — carries immutable data · 데이터 신호</span>
 <span class="k">signal</span> <span class="t">UserRegistered</span> <span class="p">{</span>
   <span class="a">userId</span>   <span class="p">:</span> <span class="t">UUID</span>
   <span class="a">email</span>    <span class="p">:</span> <span class="t">Email</span>
   <span class="a">createdAt</span><span class="p">:</span> <span class="t">Timestamp</span>
 <span class="p">}</span>
 
-<span class="c">// 2. 에러 신호 — immune 시스템이 감지</span>
+<span class="c">// 2. Error signal — detected by the immune system · 에러 신호</span>
 <span class="k">signal</span> <span class="t">DatabaseError</span> <span class="k">extends</span> <span class="t">ErrorSignal</span> <span class="p">{</span>
   <span class="a">code</span>     <span class="p">:</span> <span class="t">Int</span>
   <span class="a">message</span>  <span class="p">:</span> <span class="t">String</span>
   <span class="a">retryable</span><span class="p">:</span> <span class="t">Bool</span>
 <span class="p">}</span>
 
-<span class="c">// 3. 빈 신호 — 존재 자체가 의미</span>
-<span class="k">signal</span> <span class="t">SessionExpired</span>   <span class="c">// 데이터 없음, 발생 사실만 전달</span>
-<span class="k">signal</span> <span class="t">HealthCheckPing</span>  <span class="c">// 상태 확인 요청</span>
+<span class="c">// 3. Empty signal — its mere existence is the meaning · 빈 신호</span>
+<span class="k">signal</span> <span class="t">SessionExpired</span>   <span class="c">// no data, only the fact it occurred · 발생 사실만 전달</span>
+<span class="k">signal</span> <span class="t">HealthCheckPing</span>  <span class="c">// health check request · 상태 확인 요청</span>
 
-<span class="c">// 4. 제네릭 신호 — genome과 함께 사용</span>
+<span class="c">// 4. Generic signal — used with a genome · 제네릭 신호</span>
 <span class="k">signal</span> <span class="t">Paginated</span><span class="p">&lt;</span><span class="t">T</span><span class="p">&gt;</span> <span class="p">{</span>
   <span class="a">items</span>  <span class="p">:</span> <span class="t">List</span><span class="p">&lt;</span><span class="t">T</span><span class="p">&gt;</span>
   <span class="a">total</span>  <span class="p">:</span> <span class="t">Int</span>
@@ -1081,7 +1087,7 @@ code {
   <span class="a">hasMore</span><span class="p">:</span> <span class="t">Bool</span>
 <span class="p">}</span>
 
-<span class="c">// 5. 우선순위 신호 — nervous 시스템이 처리 순서 결정</span>
+<span class="c">// 5. Priority signal — nervous system decides processing order · 우선순위 신호</span>
 <span class="k">signal</span> <span class="t">PaymentFailed</span> <span class="k">priority</span><span class="p">:</span> <span class="n">critical</span> <span class="p">{</span>
   <span class="a">orderId</span> <span class="p">:</span> <span class="t">UUID</span>
   <span class="a">amount</span>  <span class="p">:</span> <span class="t">Money</span>
@@ -1089,18 +1095,18 @@ code {
 <span class="p">}</span></pre></div>
       </div>
 
-      <h3 class="sub-heading" id="signal-routing">신호 라우팅 규칙</h3>
+      <h3 class="sub-heading" id="signal-routing">Signal Routing Rules · 신호 라우팅 규칙</h3>
 
       <table class="grammar-table">
         <thead>
-          <tr><th>규칙</th><th>설명</th><th>예외</th></tr>
+          <tr><th>Rule · 규칙</th><th>Description · 설명</th><th>Exception · 예외</th></tr>
         </thead>
         <tbody>
-          <tr><td>broadcast-first</td><td>신호는 기본적으로 모든 관심 세포에 전파된다</td><td>absorb로 중단 가능</td></tr>
-          <tr><td>immutability</td><td>신호는 전파 중 변경될 수 없다</td><td>없음 (절대 불변)</td></tr>
-          <tr><td>no-reply</td><td>신호는 응답을 기대하지 않는다</td><td>query 패턴 예외</td></tr>
-          <tr><td>priority-order</td><td>critical > high > normal > low 순으로 처리</td><td>nervous 설정으로 오버라이드</td></tr>
-          <tr><td>type-safety</td><td>막에 선언된 타입과 일치하지 않으면 전달되지 않는다</td><td>AnySignal 와일드카드</td></tr>
+          <tr><td>broadcast-first</td><td>By default a signal propagates to all interested cells · 모든 관심 세포에 전파된다</td><td>Can be stopped with <code>absorb</code> · absorb로 중단</td></tr>
+          <tr><td>immutability</td><td>A signal cannot change during propagation · 전파 중 변경될 수 없다</td><td>None (absolutely immutable) · 없음</td></tr>
+          <tr><td>no-reply</td><td>A signal expects no response · 응답을 기대하지 않는다</td><td><code>query</code> pattern · query 패턴 예외</td></tr>
+          <tr><td>priority-order</td><td>Processed critical &gt; high &gt; normal &gt; low · 우선순위 순으로 처리</td><td>Override via <code>nervous</code> · nervous 설정으로 오버라이드</td></tr>
+          <tr><td>type-safety</td><td>Not delivered if it mismatches the membrane type · 타입 불일치 시 전달 안 됨</td><td><code>AnySignal</code> wildcard · 와일드카드</td></tr>
         </tbody>
       </table>
 
@@ -1109,15 +1115,15 @@ code {
           <span class="code-lang">cell-code</span>
           <span class="code-fname">signal-routing.cell</span>
         </div>
-        <div class="code-body"><pre><span class="c">// ── 신호 흐름 패턴 ───────────────────────────────────────</span>
+        <div class="code-body"><pre><span class="c">// ── Signal flow patterns · 신호 흐름 패턴 ────────────────</span>
 
-<span class="c">// 패턴 1: 파이프라인 (A → B → C)</span>
+<span class="c">// Pattern 1: Pipeline (A → B → C) · 파이프라인</span>
 <span class="k">cell</span> <span class="t">Parser</span> <span class="p">{</span>
   <span class="k">membrane</span> <span class="p">{</span> <span class="a">accepts</span><span class="p">:</span> <span class="t">RawInput</span><span class="p">;</span> <span class="a">emits</span><span class="p">:</span> <span class="t">ParsedData</span> <span class="p">}</span>
   <span class="k">on</span><span class="p">(</span><span class="t">RawInput</span> <span class="a">raw</span><span class="p">) {</span> <span class="k">emit</span> <span class="t">ParsedData</span><span class="p">(</span><span class="fn">parse</span><span class="p">(</span><span class="a">raw</span><span class="p">)) }</span>
 <span class="p">}</span>
 
-<span class="c">// 패턴 2: 분기 (one signal → many cells)</span>
+<span class="c">// Pattern 2: Fan-out (one signal → many cells) · 분기</span>
 <span class="k">cell</span> <span class="t">OrderCompleted_EmailNotifier</span> <span class="p">{</span>
   <span class="k">membrane</span> <span class="p">{</span> <span class="a">accepts</span><span class="p">:</span> <span class="t">OrderCompleted</span><span class="p">;</span> <span class="a">emits</span><span class="p">:</span> <span class="t">EmailSent</span> <span class="p">}</span>
   <span class="k">on</span><span class="p">(</span><span class="t">OrderCompleted</span> <span class="a">e</span><span class="p">) {</span> <span class="k">emit</span> <span class="t">EmailSent</span><span class="p">(</span><span class="a">to</span><span class="p">:</span> <span class="a">e</span><span class="p">.</span><span class="a">userEmail</span><span class="p">) }</span>
@@ -1128,21 +1134,21 @@ code {
   <span class="k">on</span><span class="p">(</span><span class="t">OrderCompleted</span> <span class="a">e</span><span class="p">) {</span> <span class="k">emit</span> <span class="t">StockUpdated</span><span class="p">(</span><span class="a">sku</span><span class="p">:</span> <span class="a">e</span><span class="p">.</span><span class="a">sku</span><span class="p">) }</span>
 <span class="p">}</span>
 
-<span class="c">// 패턴 3: 흡수 (신호 전파 중단)</span>
+<span class="c">// Pattern 3: Absorb (stop signal propagation) · 흡수</span>
 <span class="k">cell</span> <span class="t">RateLimiter</span> <span class="p">{</span>
   <span class="k">membrane</span> <span class="p">{</span> <span class="a">accepts</span><span class="p">:</span> <span class="t">ApiRequest</span><span class="p">;</span> <span class="a">emits</span><span class="p">:</span> <span class="t">TooManyRequests</span> <span class="p">}</span>
   <span class="k">on</span><span class="p">(</span><span class="t">ApiRequest</span> <span class="a">req</span><span class="p">) {</span>
     <span class="k">if</span> <span class="fn">exceeded</span><span class="p">(</span><span class="a">req</span><span class="p">.</span><span class="a">clientId</span><span class="p">) {</span>
-      <span class="k">absorb</span>   <span class="c">// 신호 전파 중단 — 다음 세포에 도달하지 않음</span>
+      <span class="k">absorb</span>   <span class="c">// stop propagation — never reaches the next cell · 전파 중단</span>
       <span class="k">emit</span> <span class="t">TooManyRequests</span><span class="p">(</span><span class="a">clientId</span><span class="p">:</span> <span class="a">req</span><span class="p">.</span><span class="a">clientId</span><span class="p">)</span>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="c">// 패턴 4: 질의 (query — 응답을 기다리는 특수 신호)</span>
+<span class="c">// Pattern 4: Query (a special signal that awaits a reply) · 질의</span>
 <span class="k">cell</span> <span class="t">UserFinder</span> <span class="p">{</span>
   <span class="k">membrane</span> <span class="p">{</span>
-    <span class="a">accepts</span><span class="p">:</span> <span class="t">FindUser</span> <span class="k">query</span>       <span class="c">// query 키워드: 응답 신호 기다림</span>
+    <span class="a">accepts</span><span class="p">:</span> <span class="t">FindUser</span> <span class="k">query</span>       <span class="c">// query keyword: awaits a response signal · 응답 신호 대기</span>
     <span class="a">emits</span>  <span class="p">:</span> <span class="t">UserFound</span> <span class="op">|</span> <span class="t">UserNotFound</span>
   <span class="p">}</span>
   <span class="k">on</span><span class="p">(</span><span class="t">FindUser</span> <span class="a">q</span><span class="p">) {</span>
@@ -1165,6 +1171,8 @@ code {
         </div>
       </div>
 
+      <p class="body-text">A <code>tissue</code> is a bundle of cells sharing the same purpose. Cells within a tissue are connected by linear, parallel, or conditional flows. A tissue has its own membrane, so from the outside it looks like a single cell.</p>
+
       <p class="body-text"><code>tissue</code>는 같은 목적을 가진 세포들의 묶음이다. 조직 내 세포들은 선형(linear), 병렬(parallel), 또는 조건부(conditional) 흐름으로 연결된다. 조직은 그 자체가 하나의 막을 가져 외부에서는 단일 세포처럼 보인다.</p>
 
       <div class="code-block">
@@ -1172,32 +1180,32 @@ code {
           <span class="code-lang">cell-code</span>
           <span class="code-fname">auth-tissue.cell</span>
         </div>
-        <div class="code-body"><pre><span class="c">// ── 조직: 인증 파이프라인 ────────────────────────────────</span>
+        <div class="code-body"><pre><span class="c">// ── Tissue: authentication pipeline · 인증 파이프라인 ─────</span>
 
 <span class="k">tissue</span> <span class="t">AuthPipeline</span> <span class="p">{</span>
 
-  <span class="c">// 조직의 외부 계약</span>
+  <span class="c">// the tissue's external contract · 외부 계약</span>
   <span class="k">membrane</span> <span class="p">{</span>
     <span class="a">accepts</span><span class="p">:</span> <span class="t">LoginRequest</span>
     <span class="a">emits</span>  <span class="p">:</span> <span class="t">SessionCreated</span> <span class="op">|</span> <span class="t">AuthDenied</span>
   <span class="p">}</span>
 
-  <span class="c">// 선형 흐름: 순서대로 실행</span>
+  <span class="c">// linear flow: run in order · 선형 흐름</span>
   <span class="k">flow</span> <span class="k">linear</span> <span class="p">{</span>
-    <span class="t">InputSanitizer</span>    <span class="c">// 1. 입력 정제</span>
-    <span class="op">→</span> <span class="t">CredentialChecker</span> <span class="c">// 2. 자격 확인</span>
-    <span class="op">→</span> <span class="t">TokenIssuer</span>       <span class="c">// 3. 토큰 발급</span>
-    <span class="op">→</span> <span class="t">SessionCreator</span>    <span class="c">// 4. 세션 생성</span>
+    <span class="t">InputSanitizer</span>    <span class="c">// 1. sanitize input · 입력 정제</span>
+    <span class="op">→</span> <span class="t">CredentialChecker</span> <span class="c">// 2. check credentials · 자격 확인</span>
+    <span class="op">→</span> <span class="t">TokenIssuer</span>       <span class="c">// 3. issue token · 토큰 발급</span>
+    <span class="op">→</span> <span class="t">SessionCreator</span>    <span class="c">// 4. create session · 세션 생성</span>
   <span class="p">}</span>
 
-  <span class="c">// 조건부 분기</span>
+  <span class="c">// conditional branch · 조건부 분기</span>
   <span class="k">when</span> <span class="p">(</span><span class="t">AuthDenied</span><span class="p">) {</span>
-    <span class="t">AuditLogger</span>     <span class="c">// 실패시 감사 로그</span>
-    <span class="t">BruteForceGuard</span> <span class="c">// 브루트포스 감지</span>
+    <span class="t">AuditLogger</span>     <span class="c">// audit log on failure · 실패 시 감사 로그</span>
+    <span class="t">BruteForceGuard</span> <span class="c">// brute-force detection · 브루트포스 감지</span>
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="c">// ── 병렬 조직 ────────────────────────────────────────────</span>
+<span class="c">// ── Parallel tissue · 병렬 조직 ──────────────────────────</span>
 <span class="k">tissue</span> <span class="t">OrderNotifications</span> <span class="p">{</span>
 
   <span class="k">membrane</span> <span class="p">{</span>
@@ -1205,7 +1213,7 @@ code {
     <span class="a">emits</span>  <span class="p">:</span> <span class="t">AllNotified</span>
   <span class="p">}</span>
 
-  <span class="c">// 병렬 흐름: 동시 실행, 모두 완료 후 emit</span>
+  <span class="c">// parallel flow: run together, emit after all complete · 병렬 흐름</span>
   <span class="k">flow</span> <span class="k">parallel</span> <span class="p">{</span>
     <span class="t">EmailNotifier</span>
     <span class="t">SmsNotifier</span>
@@ -1232,6 +1240,8 @@ code {
         </div>
       </div>
 
+      <p class="body-text">An <code>organ</code> is a unit where multiple tissues cooperate to handle one domain function. An organ has its own signal namespace; signals inside an organ do not automatically propagate outside it. Inter-organ communication is possible only through the <code>nervous</code> system.</p>
+
       <p class="body-text"><code>organ</code>은 여러 조직이 협력하여 하나의 도메인 기능을 담당하는 단위다. 기관은 독립적인 신호 공간(signal namespace)을 가지며, 기관 내부의 신호는 기관 밖으로 자동 전파되지 않는다. 기관 간 통신은 <code>nervous</code>를 통해서만 가능하다.</p>
 
       <div class="code-block">
@@ -1241,27 +1251,27 @@ code {
         </div>
         <div class="code-body"><pre><span class="k">organ</span> <span class="t">UserOrgan</span> <span class="p">{</span>
 
-  <span class="c">// 기관의 외부 계약</span>
+  <span class="c">// the organ's external contract · 기관의 외부 계약</span>
   <span class="k">membrane</span> <span class="p">{</span>
     <span class="a">accepts</span><span class="p">:</span> <span class="t">LoginRequest</span> <span class="op">|</span> <span class="t">RegisterRequest</span> <span class="op">|</span> <span class="t">ProfileUpdateRequest</span>
-    <span class="a">emits</span>  <span class="p">:</span> <span class="t">UserEvent</span>    <span class="c">// 기관의 외부 신호 타입</span>
+    <span class="a">emits</span>  <span class="p">:</span> <span class="t">UserEvent</span>    <span class="c">// the organ's external signal type · 외부 신호 타입</span>
   <span class="p">}</span>
 
-  <span class="c">// 내부 조직 구성</span>
+  <span class="c">// internal tissue composition · 내부 조직 구성</span>
   <span class="k">tissues</span> <span class="p">{</span>
-    <span class="t">AuthPipeline</span>     <span class="c">// 인증 처리</span>
-    <span class="t">RegistrationFlow</span> <span class="c">// 회원가입 처리</span>
-    <span class="t">ProfileManager</span>   <span class="c">// 프로필 관리</span>
+    <span class="t">AuthPipeline</span>     <span class="c">// authentication · 인증 처리</span>
+    <span class="t">RegistrationFlow</span> <span class="c">// sign-up · 회원가입 처리</span>
+    <span class="t">ProfileManager</span>   <span class="c">// profile management · 프로필 관리</span>
   <span class="p">}</span>
 
-  <span class="c">// 기관이 외부에 공개하는 신호 (나머지는 격리)</span>
+  <span class="c">// signals the organ exposes (the rest stay isolated) · 외부 공개 신호</span>
   <span class="k">exports</span> <span class="p">{</span>
     <span class="t">UserRegistered</span>
     <span class="t">UserLoggedIn</span>
     <span class="t">UserDeleted</span>
   <span class="p">}</span>
 
-  <span class="c">// 기관 수준 상태 (모든 조직이 공유)</span>
+  <span class="c">// organ-level state (shared by all tissues) · 기관 수준 공유 상태</span>
   <span class="k">shared</span> <span class="p">{</span>
     <span class="a">userRepository</span><span class="p">:</span> <span class="t">UserRepository</span>
     <span class="a">auditLog</span>       <span class="p">:</span> <span class="t">AuditLogger</span>
@@ -1282,6 +1292,8 @@ code {
         </div>
       </div>
 
+      <p class="body-text">An <code>organism</code> is the top-level container of the whole system. It defines the list of organs, the nervous system (event bus), the immune system (error handler), and the environment configuration.</p>
+
       <p class="body-text"><code>organism</code>은 전체 시스템의 최상위 컨테이너다. 유기체는 기관들의 목록, 신경계(eventbus), 면역계(error handler), 그리고 환경(environment) 설정을 정의한다.</p>
 
       <div class="code-block">
@@ -1291,7 +1303,7 @@ code {
         </div>
         <div class="code-body"><pre><span class="k">organism</span> <span class="t">ECommerceApp</span> <span class="p">{</span>
 
-  <span class="c">// ① 기관 목록</span>
+  <span class="c">// ① organ list · 기관 목록</span>
   <span class="k">organs</span> <span class="p">{</span>
     <span class="t">UserOrgan</span>
     <span class="t">ProductOrgan</span>
@@ -1300,16 +1312,16 @@ code {
     <span class="t">NotificationOrgan</span>
   <span class="p">}</span>
 
-  <span class="c">// ② 신경계 — 기관 간 신호 라우팅</span>
+  <span class="c">// ② nervous — inter-organ signal routing · 신경계</span>
   <span class="k">nervous</span> <span class="t">EventBus</span> <span class="p">{</span>
-    <span class="c">// 어떤 신호가 어느 기관으로 흐르는지 명시</span>
+    <span class="c">// declare which signal flows to which organ · 신호 흐름 명시</span>
     <span class="t">UserOrgan</span><span class="p">.</span><span class="t">UserRegistered</span>    <span class="op">→</span> <span class="t">NotificationOrgan</span>
     <span class="t">OrderOrgan</span><span class="p">.</span><span class="t">OrderPlaced</span>       <span class="op">→</span> <span class="p">[</span><span class="t">PaymentOrgan</span><span class="p">,</span> <span class="t">ProductOrgan</span><span class="p">]</span>
     <span class="t">PaymentOrgan</span><span class="p">.</span><span class="t">PaymentConfirmed</span> <span class="op">→</span> <span class="p">[</span><span class="t">OrderOrgan</span><span class="p">,</span> <span class="t">NotificationOrgan</span><span class="p">]</span>
     <span class="t">PaymentOrgan</span><span class="p">.</span><span class="t">PaymentFailed</span>    <span class="op">→</span> <span class="p">[</span><span class="t">OrderOrgan</span><span class="p">,</span> <span class="t">NotificationOrgan</span><span class="p">]</span>
   <span class="p">}</span>
 
-  <span class="c">// ③ 면역계 — 오류 처리 전략</span>
+  <span class="c">// ③ immune — error-handling strategy · 면역계</span>
   <span class="k">immune</span> <span class="t">ErrorPolicy</span> <span class="p">{</span>
     <span class="k">on</span> <span class="t">DatabaseError</span>   <span class="op">→</span> <span class="fn">retry</span><span class="p">(</span><span class="n">3</span><span class="p">)</span> <span class="k">then</span> <span class="fn">quarantine</span>
     <span class="k">on</span> <span class="t">NetworkTimeout</span>  <span class="op">→</span> <span class="fn">retry</span><span class="p">(</span><span class="n">2</span><span class="p">)</span> <span class="k">then</span> <span class="fn">fallback</span>
@@ -1317,11 +1329,11 @@ code {
     <span class="a">escalate</span>           <span class="op">:</span> <span class="t">CriticalAlertOrgan</span>
   <span class="p">}</span>
 
-  <span class="c">// ④ 환경 설정</span>
+  <span class="c">// ④ environment configuration · 환경 설정</span>
   <span class="k">environment</span> <span class="p">{</span>
     <span class="a">runtime</span>  <span class="p">:</span> <span class="s">"node:20"</span>
-    <span class="a">transport</span><span class="p">:</span> <span class="s">"redis"</span>    <span class="c">// nervous 의 실제 전송 계층</span>
-    <span class="a">scale</span>    <span class="p">:</span> <span class="k">auto</span>        <span class="c">// 세포 자동 분열·스케일링</span>
+    <span class="a">transport</span><span class="p">:</span> <span class="s">"redis"</span>    <span class="c">// actual transport layer for nervous · 전송 계층</span>
+    <span class="a">scale</span>    <span class="p">:</span> <span class="k">auto</span>        <span class="c">// automatic cell division/scaling · 자동 분열·스케일링</span>
     <span class="a">observe</span>  <span class="p">:</span> <span class="s">"opentelemetry"</span>
   <span class="p">}</span>
 <span class="p">}</span></pre></div>
@@ -1340,6 +1352,8 @@ code {
         </div>
       </div>
 
+      <p class="body-text">The nervous system governs the flow of signals between organs. Without it, organs are completely isolated islands. Because the nervous system owns the wiring, the organs themselves need to know nothing about routing.</p>
+
       <p class="body-text">신경계는 기관 간 신호의 흐름을 관장한다. 신경계 없이 기관은 완전히 격리된 섬이다. 신경계가 배선(wiring)을 담당함으로써 기관 자체는 라우팅에 대해 전혀 알 필요가 없다.</p>
 
       <div class="code-block">
@@ -1349,20 +1363,20 @@ code {
         </div>
         <div class="code-body"><pre><span class="k">nervous</span> <span class="t">AppNervousSystem</span> <span class="p">{</span>
 
-  <span class="c">// 기본 라우팅</span>
-  <span class="t">UserOrgan</span><span class="p">.</span><span class="t">UserBanned</span> <span class="op">→</span> <span class="t">OrderOrgan</span>  <span class="c">// 단순 전달</span>
+  <span class="c">// basic routing · 기본 라우팅</span>
+  <span class="t">UserOrgan</span><span class="p">.</span><span class="t">UserBanned</span> <span class="op">→</span> <span class="t">OrderOrgan</span>  <span class="c">// simple forward · 단순 전달</span>
 
-  <span class="c">// 변환 라우팅 — 신호를 변환하여 전달</span>
+  <span class="c">// transform routing — convert then forward · 변환 라우팅</span>
   <span class="t">PaymentOrgan</span><span class="p">.</span><span class="t">PaymentConfirmed</span>
     <span class="op">→</span> <span class="fn">transform</span><span class="p">(</span><span class="a">p</span><span class="p">)</span> <span class="p">{</span> <span class="t">OrderApproved</span><span class="p">(</span><span class="a">orderId</span><span class="p">:</span> <span class="a">p</span><span class="p">.</span><span class="a">orderId</span><span class="p">) }</span>
     <span class="op">→</span> <span class="t">OrderOrgan</span>
 
-  <span class="c">// 조건부 라우팅</span>
+  <span class="c">// conditional routing · 조건부 라우팅</span>
   <span class="t">OrderOrgan</span><span class="p">.</span><span class="t">OrderPlaced</span>
     <span class="op">→</span> <span class="k">when</span> <span class="p">(</span><span class="a">o</span><span class="p">.</span><span class="a">amount</span> <span class="op">&gt;</span> <span class="n">1000000</span><span class="p">)</span> <span class="op">→</span> <span class="t">FraudDetectionOrgan</span>
     <span class="op">→</span> <span class="k">always</span>                    <span class="op">→</span> <span class="t">PaymentOrgan</span>
 
-  <span class="c">// 신호 집계 — 여러 신호가 모두 도착해야 발화</span>
+  <span class="c">// signal aggregation — fires only when all signals arrive · 신호 집계</span>
   <span class="k">aggregate</span> <span class="p">{</span>
     <span class="a">wait</span><span class="p">:</span> <span class="p">[</span><span class="t">PaymentConfirmed</span><span class="p">,</span> <span class="t">InventoryReserved</span><span class="p">]</span>
     <span class="a">emit</span><span class="p">:</span> <span class="t">ReadyToShip</span>
@@ -1384,6 +1398,8 @@ code {
         </div>
       </div>
 
+      <p class="body-text">The immune system detects abnormal cells (those raising errors), quarantines them, and protects the system so it keeps surviving. Each organ may have its own immune policy, and a global policy is defined at the organism level.</p>
+
       <p class="body-text">면역계는 이상 세포(오류 발생 세포)를 감지하고, 격리하며, 시스템이 계속 생존할 수 있도록 보호한다. 각 기관이 자체 면역 정책을 가질 수 있고, organism 레벨에서 전역 정책을 정의한다.</p>
 
       <div class="code-block">
@@ -1393,7 +1409,7 @@ code {
         </div>
         <div class="code-body"><pre><span class="k">immune</span> <span class="t">GlobalPolicy</span> <span class="p">{</span>
 
-  <span class="c">// 오류 유형별 대응 전략</span>
+  <span class="c">// strategy per error type · 오류 유형별 대응 전략</span>
   <span class="k">on</span> <span class="t">DatabaseError</span> <span class="p">{</span>
     <span class="a">strategy</span><span class="p">:</span> <span class="fn">retry</span><span class="p">(</span><span class="a">attempts</span><span class="p">:</span> <span class="n">3</span><span class="p">,</span> <span class="a">backoff</span><span class="p">:</span> <span class="k">exponential</span><span class="p">)</span>
     <span class="a">fallback</span><span class="p">:</span> <span class="fn">useCache</span>
@@ -1401,20 +1417,20 @@ code {
   <span class="p">}</span>
 
   <span class="k">on</span> <span class="t">MemoryExceeded</span> <span class="p">{</span>
-    <span class="a">strategy</span><span class="p">:</span> <span class="fn">quarantine</span>   <span class="c">// 세포 격리, 신호 차단</span>
-    <span class="a">recover</span> <span class="p">:</span> <span class="fn">divide</span>        <span class="c">// 부하를 분산 세포로 분열</span>
+    <span class="a">strategy</span><span class="p">:</span> <span class="fn">quarantine</span>   <span class="c">// isolate cell, block signals · 세포 격리</span>
+    <span class="a">recover</span> <span class="p">:</span> <span class="fn">divide</span>        <span class="c">// split load to new cells · 부하 분산 분열</span>
   <span class="p">}</span>
 
   <span class="k">on</span> <span class="t">UnhandledSignal</span> <span class="p">{</span>
-    <span class="a">strategy</span><span class="p">:</span> <span class="fn">deadLetter</span>   <span class="c">// 처리 불가 신호를 보관</span>
+    <span class="a">strategy</span><span class="p">:</span> <span class="fn">deadLetter</span>   <span class="c">// store undeliverable signals · 처리 불가 신호 보관</span>
     <span class="a">alert</span>   <span class="p">:</span> <span class="k">true</span>
   <span class="p">}</span>
 
-  <span class="c">// 회로 차단기 (Circuit Breaker)</span>
+  <span class="c">// Circuit Breaker · 회로 차단기</span>
   <span class="k">circuit</span> <span class="p">{</span>
     <span class="a">threshold</span>  <span class="p">:</span> <span class="n">5</span> <span class="k">failures</span> <span class="k">in</span> <span class="n">60</span><span class="a">s</span>
-    <span class="a">open</span>       <span class="p">:</span> <span class="n">30</span><span class="a">s</span>   <span class="c">// 차단 시간</span>
-    <span class="a">halfOpen</span>   <span class="p">:</span> <span class="n">1</span> <span class="k">probe</span>  <span class="c">// 회복 탐침</span>
+    <span class="a">open</span>       <span class="p">:</span> <span class="n">30</span><span class="a">s</span>   <span class="c">// break duration · 차단 시간</span>
+    <span class="a">halfOpen</span>   <span class="p">:</span> <span class="n">1</span> <span class="k">probe</span>  <span class="c">// recovery probe · 회복 탐침</span>
   <span class="p">}</span>
 <span class="p">}</span></pre></div>
       </div>
@@ -1432,6 +1448,8 @@ code {
         </div>
       </div>
 
+      <p class="body-text">A <code>genome</code> is a reusable cell blueprint. It is specialized by type parameters — similar to an OOP generic class or a Rust trait, but designed around roles.</p>
+
       <p class="body-text"><code>genome</code>은 재사용 가능한 세포 설계도다. 타입 파라미터를 받아 구체화되며, OOP의 제네릭 클래스나 Rust의 트레이트와 유사하지만 역할 중심으로 설계된다.</p>
 
       <div class="code-block">
@@ -1439,7 +1457,7 @@ code {
           <span class="code-lang">cell-code</span>
           <span class="code-fname">genome.cell</span>
         </div>
-        <div class="code-body"><pre><span class="c">// ── Genome: 재사용 가능한 세포 템플릿 ───────────────────</span>
+        <div class="code-body"><pre><span class="c">// ── Genome: reusable cell template · 재사용 가능한 세포 템플릿 ──</span>
 
 <span class="k">genome</span> <span class="t">CrudCell</span><span class="p">&lt;</span><span class="t">Entity</span><span class="p">,</span> <span class="t">CreateCmd</span><span class="p">,</span> <span class="t">UpdateCmd</span><span class="p">&gt;</span> <span class="p">{</span>
   <span class="k">membrane</span> <span class="p">{</span>
@@ -1452,11 +1470,11 @@ code {
   <span class="k">on</span><span class="p">(</span><span class="t">DeleteCmd</span><span class="p">&lt;</span><span class="t">Entity</span><span class="p">&gt; </span><span class="a">cmd</span><span class="p">) { </span><span class="k">emit</span> <span class="t">Deleted</span><span class="p">&lt;</span><span class="t">Entity</span><span class="p">&gt;(</span><span class="a">cmd</span><span class="p">.</span><span class="a">id</span><span class="p">) }</span>
 <span class="p">}</span>
 
-<span class="c">// genome 인스턴스화 — 구체 세포 생성</span>
+<span class="c">// instantiate the genome — create concrete cells · genome 인스턴스화</span>
 <span class="k">cell</span> <span class="t">ProductCell</span> <span class="k">from</span> <span class="t">CrudCell</span><span class="p">&lt;</span><span class="t">Product</span><span class="p">,</span> <span class="t">CreateProduct</span><span class="p">,</span> <span class="t">UpdateProduct</span><span class="p">&gt;</span>
 <span class="k">cell</span> <span class="t">UserCell</span>    <span class="k">from</span> <span class="t">CrudCell</span><span class="p">&lt;</span><span class="t">User</span><span class="p">,</span>    <span class="t">CreateUser</span><span class="p">,</span>    <span class="t">UpdateUser</span><span class="p">&gt;</span>
 
-<span class="c">// ── 행동 Genome (인터페이스처럼 사용) ─────────────────</span>
+<span class="c">// ── Behavioral genome (used like an interface) · 행동 Genome ──</span>
 <span class="k">genome</span> <span class="t">Retryable</span> <span class="p">{</span>
   <span class="a">maxRetries</span><span class="p">:</span> <span class="t">Int</span> <span class="op">=</span> <span class="n">3</span>
   <span class="a">backoff</span>   <span class="p">:</span> <span class="t">BackoffStrategy</span> <span class="op">=</span> <span class="k">exponential</span>
@@ -1467,14 +1485,14 @@ code {
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="c">// 세포에 genome 믹스인</span>
+<span class="c">// mix a genome into a cell · 세포에 genome 믹스인</span>
 <span class="k">cell</span> <span class="t">PaymentProcessor</span> <span class="k">with</span> <span class="t">Retryable</span> <span class="p">{</span>
-  <span class="a">role</span><span class="p">:</span> <span class="s">"결제 처리 및 자동 재시도"</span>
+  <span class="a">role</span><span class="p">:</span> <span class="s">"Process payments and auto-retry"</span>
   <span class="k">membrane</span> <span class="p">{</span>
     <span class="a">accepts</span><span class="p">:</span> <span class="t">ProcessPayment</span>
     <span class="a">emits</span>  <span class="p">:</span> <span class="t">PaymentSuccess</span> <span class="op">|</span> <span class="t">PaymentFailed</span>
   <span class="p">}</span>
-  <span class="c">// Retryable의 재시도 로직이 자동 주입됨</span>
+  <span class="c">// Retryable's retry logic is injected automatically · 재시도 로직 자동 주입</span>
 <span class="p">}</span></pre></div>
       </div>
     </div>
@@ -1486,10 +1504,12 @@ code {
       <div class="section-header">
         <span class="section-num">§ 10</span>
         <div>
-          <div class="section-title">변이 및 분화</div>
-          <div class="section-en">Mutation &amp; Differentiation</div>
+          <div class="section-title">Mutation &amp; Differentiation · 변이 및 분화</div>
+          <div class="section-en">Runtime Adaptation</div>
         </div>
       </div>
+
+      <p class="body-text">Cells can <code>divide</code> or <code>mutate</code> at runtime. This is the mechanism that supports scaling, A/B testing, rolling deployments, and feature flags at the language level.</p>
 
       <p class="body-text">세포는 런타임에 분열(divide)하거나 변이(mutate)할 수 있다. 이는 스케일링, A/B 테스트, 롤링 배포, 기능 플래그를 언어 수준에서 지원하는 메커니즘이다.</p>
 
@@ -1498,14 +1518,14 @@ code {
           <span class="code-lang">cell-code</span>
           <span class="code-fname">mutation.cell</span>
         </div>
-        <div class="code-body"><pre><span class="c">// ── 세포 분열 — 수평 스케일링 ───────────────────────────</span>
+        <div class="code-body"><pre><span class="c">// ── Cell division — horizontal scaling · 세포 분열 ───────</span>
 <span class="k">cell</span> <span class="t">ImageProcessor</span> <span class="p">{</span>
-  <span class="a">role</span><span class="p">:</span> <span class="s">"이미지 리사이징 및 압축"</span>
+  <span class="a">role</span><span class="p">:</span> <span class="s">"Resize and compress images"</span>
   <span class="a">lifespan</span><span class="p">:</span> <span class="k">stateless</span>
 
-  <span class="c">// 부하에 따라 자동으로 세포 분열</span>
+  <span class="c">// auto-divide under load · 부하에 따라 자동 분열</span>
   <span class="k">divide</span> <span class="k">when</span> <span class="p">(</span><span class="a">queue.depth</span> <span class="op">&gt;</span> <span class="n">100</span><span class="p">)</span> <span class="p">{</span>
-    <span class="a">max</span>     <span class="p">:</span> <span class="n">16</span>         <span class="c">// 최대 16개 복제</span>
+    <span class="a">max</span>     <span class="p">:</span> <span class="n">16</span>         <span class="c">// up to 16 replicas · 최대 16개 복제</span>
     <span class="a">strategy</span><span class="p">:</span> <span class="k">round-robin</span>
   <span class="p">}</span>
 
@@ -1513,18 +1533,18 @@ code {
   <span class="k">on</span><span class="p">(</span><span class="t">ImageTask</span> <span class="a">t</span><span class="p">) {</span> <span class="k">emit</span> <span class="t">ImageReady</span><span class="p">(</span><span class="fn">process</span><span class="p">(</span><span class="a">t</span><span class="p">)) }</span>
 <span class="p">}</span>
 
-<span class="c">// ── 세포 변이 — A/B 테스트 / 기능 플래그 ────────────────</span>
+<span class="c">// ── Cell mutation — A/B test / feature flag · 세포 변이 ───</span>
 <span class="k">cell</span> <span class="t">RecommendationEngine</span> <span class="p">{</span>
-  <span class="a">role</span><span class="p">:</span> <span class="s">"상품 추천 알고리즘"</span>
+  <span class="a">role</span><span class="p">:</span> <span class="s">"Product recommendation algorithm"</span>
 
-  <span class="c">// 환경 변수에 따라 알고리즘 변이</span>
+  <span class="c">// mutate the algorithm based on an env variable · 환경 변수에 따라 변이</span>
   <span class="k">mutate</span> <span class="k">when</span> <span class="p">(</span><span class="a">env.feature</span><span class="p">.</span><span class="a">mlRecommend</span> <span class="op">==</span> <span class="k">true</span><span class="p">) {</span>
-    <span class="a">role</span><span class="p">:</span> <span class="s">"ML 기반 개인화 추천"</span>
+    <span class="a">role</span><span class="p">:</span> <span class="s">"ML-based personalized recommendation"</span>
     <span class="k">membrane</span> <span class="p">{</span> <span class="a">accepts</span><span class="p">:</span> <span class="t">UserContext</span><span class="p">;</span> <span class="a">emits</span><span class="p">:</span> <span class="t">MLRecommendations</span> <span class="p">}</span>
     <span class="k">on</span><span class="p">(</span><span class="t">UserContext</span> <span class="a">u</span><span class="p">) {</span> <span class="k">emit</span> <span class="t">MLRecommendations</span><span class="p">(</span><span class="fn">mlModel</span><span class="p">.</span><span class="fn">predict</span><span class="p">(</span><span class="a">u</span><span class="p">)) }</span>
   <span class="p">}</span>
 
-  <span class="c">// 기본 동작 (변이 조건 미충족 시)</span>
+  <span class="c">// default behavior (when the mutate condition is not met) · 기본 동작</span>
   <span class="k">membrane</span> <span class="p">{</span> <span class="a">accepts</span><span class="p">:</span> <span class="t">UserContext</span><span class="p">;</span> <span class="a">emits</span><span class="p">:</span> <span class="t">BasicRecommendations</span> <span class="p">}</span>
   <span class="k">on</span><span class="p">(</span><span class="t">UserContext</span> <span class="a">u</span><span class="p">) {</span> <span class="k">emit</span> <span class="t">BasicRecommendations</span><span class="p">(</span><span class="fn">rule</span><span class="p">.</span><span class="fn">apply</span><span class="p">(</span><span class="a">u</span><span class="p">)) }</span>
 <span class="p">}</span></pre></div>
@@ -1538,14 +1558,16 @@ code {
       <div class="section-header">
         <span class="section-num">§ 11</span>
         <div>
-          <div class="section-title">타입 시스템</div>
-          <div class="section-en">Type System</div>
+          <div class="section-title">Type System · 타입 시스템</div>
+          <div class="section-en">Signal-Centric Types</div>
         </div>
       </div>
 
+      <p class="body-text">Cell Coding's type system is signal-centric. The compatibility of signal types determines whether membranes can connect. Type inference is supported, but membrane declarations require explicit types.</p>
+
       <p class="body-text">세포코딩의 타입 시스템은 신호 중심으로 설계된다. 신호 타입의 호환성이 막의 연결 가능성을 결정한다. 타입 추론을 지원하지만 막 선언은 명시적 타입이 필수다.</p>
 
-      <h4 class="mini-heading">기본 타입</h4>
+      <h4 class="mini-heading">Primitive Types · 기본 타입</h4>
       <div class="tag-cluster">
         <span class="tag" style="color:var(--blue);border-color:rgba(121,192,255,0.3);background:rgba(121,192,255,0.08)">Int</span>
         <span class="tag" style="color:var(--blue);border-color:rgba(121,192,255,0.3);background:rgba(121,192,255,0.08)">Float</span>
@@ -1565,17 +1587,17 @@ code {
         <span class="tag" style="color:var(--coral);border-color:rgba(255,123,114,0.3);background:rgba(255,123,114,0.08)">NullSignal</span>
       </div>
 
-      <h4 class="mini-heading">타입 호환성 규칙</h4>
+      <h4 class="mini-heading">Type Compatibility Rules · 타입 호환성 규칙</h4>
       <table class="grammar-table">
         <thead>
-          <tr><th>규칙</th><th>설명</th></tr>
+          <tr><th>Rule · 규칙</th><th>Description · 설명</th></tr>
         </thead>
         <tbody>
-          <tr><td>structural</td><td>이름이 아닌 구조로 호환성 판단 (구조적 서브타이핑)</td></tr>
-          <tr><td>signal union</td><td><code>A | B</code>는 A 또는 B 신호를 수용한다는 의미</td></tr>
-          <tr><td>signal extends</td><td>하위 신호 타입은 상위 타입을 수용하는 막에도 전달된다</td></tr>
-          <tr><td>AnySignal</td><td>모든 신호를 수용 (observes와 함께 사용, accepts에는 지양)</td></tr>
-          <tr><td>NullSignal</td><td>신호 없음. reject나 조건부 emit 불발 시 사용</td></tr>
+          <tr><td>structural</td><td>Compatibility judged by structure, not name (structural subtyping) · 구조로 호환성 판단</td></tr>
+          <tr><td>signal union</td><td><code>A | B</code> means it accepts signal A or B · A 또는 B 신호를 수용</td></tr>
+          <tr><td>signal extends</td><td>A subtype signal is also delivered to membranes accepting its supertype · 상위 타입 막에도 전달</td></tr>
+          <tr><td>AnySignal</td><td>Accepts any signal (use with <code>observes</code>, avoid in <code>accepts</code>) · 모든 신호 수용</td></tr>
+          <tr><td>NullSignal</td><td>No signal; used on reject or a missed conditional emit · 신호 없음</td></tr>
         </tbody>
       </table>
     </div>
@@ -1587,10 +1609,12 @@ code {
       <div class="section-header">
         <span class="section-num">§ 12</span>
         <div>
-          <div class="section-title">공식 문법 (EBNF)</div>
-          <div class="section-en">Formal Grammar</div>
+          <div class="section-title">Formal Grammar (EBNF) · 공식 문법</div>
+          <div class="section-en">Extended Backus-Naur Form</div>
         </div>
       </div>
+
+      <p class="body-text">The official Extended Backus-Naur Form grammar of the Cell Coding language. Parsers and compilers are implemented on top of this grammar.</p>
 
       <p class="body-text">세포코딩 언어의 공식 Extended Backus-Naur Form 문법이다. 이 문법을 기반으로 파서와 컴파일러가 구현된다.</p>
 
@@ -1659,10 +1683,12 @@ code {
       <div class="section-header">
         <span class="section-num">§ 13</span>
         <div>
-          <div class="section-title">상호운용성</div>
-          <div class="section-en">Interoperability</div>
+          <div class="section-title">Interoperability · 상호운용성</div>
+          <div class="section-en">Coexistence with Existing Languages</div>
         </div>
       </div>
+
+      <p class="body-text">Cell Coding coexists with existing languages. A transpiler converts <code>.cell</code> files into the target language, and an adapter pattern lets you wrap existing code as cells.</p>
 
       <p class="body-text">세포코딩은 기존 언어와 공존한다. 트랜스파일러가 <code>.cell</code> 파일을 대상 언어로 변환하며, 기존 코드를 세포로 래핑하는 어댑터 패턴을 지원한다.</p>
 
@@ -1670,57 +1696,57 @@ code {
         <div class="compat-cell">
           <div class="compat-cell-title">Python</div>
           <div class="compat-level">🐍</div>
-          <div class="compat-label">@cell 데코레이터</div>
+          <div class="compat-label">@cell decorator · 데코레이터</div>
         </div>
         <div class="compat-cell">
           <div class="compat-cell-title">TypeScript</div>
           <div class="compat-level">🔷</div>
-          <div class="compat-label">타입 정의 자동 생성</div>
+          <div class="compat-label">Auto-generated type defs · 타입 정의 자동 생성</div>
         </div>
         <div class="compat-cell">
           <div class="compat-cell-title">Go</div>
           <div class="compat-level">🐹</div>
-          <div class="compat-label">인터페이스 매핑</div>
+          <div class="compat-label">Interface mapping · 인터페이스 매핑</div>
         </div>
         <div class="compat-cell">
           <div class="compat-cell-title">Rust</div>
           <div class="compat-level">🦀</div>
-          <div class="compat-label">트레이트 변환</div>
+          <div class="compat-label">Trait conversion · 트레이트 변환</div>
         </div>
         <div class="compat-cell">
           <div class="compat-cell-title">Kubernetes</div>
           <div class="compat-level">☸️</div>
-          <div class="compat-label">organ → 서비스 매핑</div>
+          <div class="compat-label">organ → service mapping · 서비스 매핑</div>
         </div>
         <div class="compat-cell">
           <div class="compat-cell-title">WASM</div>
           <div class="compat-level">🌐</div>
-          <div class="compat-label">브라우저 세포 실행</div>
+          <div class="compat-label">Run cells in browser · 브라우저 세포 실행</div>
         </div>
       </div>
 
       <div class="code-block">
         <div class="code-block-header">
           <span class="code-lang">python</span>
-          <span class="code-fname">cell_compat.py — Python 어댑터 예시</span>
+          <span class="code-fname">cell_compat.py — Python adapter example · 어댑터 예시</span>
         </div>
         <div class="code-body"><pre><span class="k">from</span> <span class="t">cellcoding</span> <span class="k">import</span> <span class="fn">cell</span><span class="p">,</span> <span class="fn">membrane</span><span class="p">,</span> <span class="fn">signal</span><span class="p">,</span> <span class="fn">emit</span>
 
-<span class="c"># 기존 Python 함수를 세포로 래핑</span>
+<span class="c"># wrap an existing Python function as a cell · 기존 함수를 세포로 래핑</span>
 <span class="p">@</span><span class="fn">cell</span><span class="p">(</span>
-    <span class="a">role</span><span class="op">=</span><span class="s">"사용자 이메일 검증"</span><span class="p">,</span>
+    <span class="a">role</span><span class="op">=</span><span class="s">"Validate user email"</span><span class="p">,</span>
     <span class="a">accepts</span><span class="op">=</span><span class="s">"RawEmailInput"</span><span class="p">,</span>
     <span class="a">emits</span><span class="op">=</span><span class="p">[</span><span class="s">"ValidEmail"</span><span class="p">,</span> <span class="s">"InvalidEmail"</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="k">def</span> <span class="fn">email_validator</span><span class="p">(</span><span class="a">input_signal</span><span class="p">):</span>
     <span class="k">if</span> <span class="fn">is_valid_email</span><span class="p">(</span><span class="a">input_signal</span><span class="p">.</span><span class="a">address</span><span class="p">):</span>
         <span class="k">return</span> <span class="fn">emit</span><span class="p">(</span><span class="s">"ValidEmail"</span><span class="p">,</span> <span class="a">address</span><span class="op">=</span><span class="a">input_signal</span><span class="p">.</span><span class="a">address</span><span class="p">)</span>
-    <span class="k">return</span> <span class="fn">emit</span><span class="p">(</span><span class="s">"InvalidEmail"</span><span class="p">,</span> <span class="a">reason</span><span class="op">=</span><span class="s">"형식 오류"</span><span class="p">)</span></pre></div>
+    <span class="k">return</span> <span class="fn">emit</span><span class="p">(</span><span class="s">"InvalidEmail"</span><span class="p">,</span> <span class="a">reason</span><span class="op">=</span><span class="s">"format error"</span><span class="p">)</span></pre></div>
       </div>
 
       <div class="callout warn">
-        <span class="callout-label">⚠️ Draft Notice</span>
-        <span class="callout-body">이 문서는 초안(v0.1-draft)이다. 트랜스파일러 구현, IDE 플러그인, 런타임 라이브러리는 별도 스펙 문서로 관리된다. 키워드와 문법은 구현 과정에서 변경될 수 있다.</span>
+        <span class="callout-label">⚠️ Draft Notice · 초안 안내</span>
+        <span class="callout-body">This document is a draft (v0.1-draft). The transpiler implementation, IDE plugins, and runtime libraries are managed in separate spec documents. Keywords and grammar may change during implementation.<br>이 문서는 초안(v0.1-draft)이다. 트랜스파일러 구현, IDE 플러그인, 런타임 라이브러리는 별도 스펙 문서로 관리된다. 키워드와 문법은 구현 과정에서 변경될 수 있다.</span>
       </div>
     </div>
 
