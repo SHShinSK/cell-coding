@@ -1055,32 +1055,56 @@
         <div class="code-body">
 <pre><span class="c-comment">// ── 단세포: 단일 순수 기능 ──────────────────────────────</span>
 <span class="c-keyword">cell</span> <span class="c-class">Validator</span> <span class="c-paren">{</span>
-  <span class="c-attr">role</span>    <span class="c-val">: "입력값 유효성 검사"</span>
-  <span class="c-attr">membrane</span><span class="c-val">: accepts(RawInput), emits(ValidSignal | ErrorSignal)</span>
+  <span class="c-attr">role</span><span class="c-val">: "입력값 유효성 검사"</span>
 
-  <span class="c-fn">on</span><span class="c-paren">(</span><span class="c-class">RawInput</span><span class="c-paren">)</span> <span class="c-paren">{</span>
-    <span class="c-keyword">if</span> valid<span class="c-paren">(</span>input<span class="c-paren">)</span> <span class="c-keyword">emit</span><span class="c-paren">(</span><span class="c-class">ValidSignal</span><span class="c-paren">)</span>
-    <span class="c-keyword">else</span>        <span class="c-keyword">emit</span><span class="c-paren">(</span><span class="c-class">ErrorSignal</span><span class="c-paren">(</span><span class="c-string">"검증 실패"</span><span class="c-paren">))</span>
+  <span class="c-keyword">membrane</span> <span class="c-paren">{</span>
+    <span class="c-attr">accepts</span><span class="c-val">: RawInput</span>
+    <span class="c-attr">emits</span>  <span class="c-val">: ValidSignal | ErrorSignal</span>
+  <span class="c-paren">}</span>
+
+  <span class="c-fn">on</span><span class="c-paren">(</span><span class="c-class">RawInput</span> input<span class="c-paren">)</span> <span class="c-paren">{</span>
+    <span class="c-keyword">if</span> <span class="c-paren">(</span>valid<span class="c-paren">(</span>input<span class="c-paren">))</span> <span class="c-paren">{</span>
+      <span class="c-keyword">emit</span> ValidSignal;
+    <span class="c-paren">}</span> <span class="c-keyword">else</span> <span class="c-paren">{</span>
+      <span class="c-keyword">emit</span> ErrorSignal;
+    <span class="c-paren">}</span>
   <span class="c-paren">}</span>
 <span class="c-paren">}</span>
 
-<span class="c-comment">// ── 조직: 관련 세포의 클러스터 ──────────────────────────</span>
+<span class="c-comment">// ── 조직: 관련 세포의 flow ──────────────────────────────</span>
 <span class="c-keyword">tissue</span> <span class="c-class">AuthTissue</span> <span class="c-paren">{</span>
-  <span class="c-attr">cells</span>: <span class="c-paren">[</span><span class="c-class">TokenParser</span>, <span class="c-class">Authenticator</span>, <span class="c-class">SessionManager</span><span class="c-paren">]</span>
-  <span class="c-attr">flow</span> <span class="c-val">: TokenParser → Authenticator → SessionManager</span>
+  <span class="c-keyword">flow</span> linear <span class="c-paren">{</span>
+    TokenParser <span class="c-val">-></span> Authenticator <span class="c-val">-></span> SessionManager
+  <span class="c-paren">}</span>
 <span class="c-paren">}</span>
 
 <span class="c-comment">// ── 기관: 조직들의 협력 ──────────────────────────────────</span>
 <span class="c-keyword">organ</span> <span class="c-class">UserOrgan</span> <span class="c-paren">{</span>
-  <span class="c-attr">tissues</span>: <span class="c-paren">[</span><span class="c-class">AuthTissue</span>, <span class="c-class">ProfileTissue</span>, <span class="c-class">ActivityTissue</span><span class="c-paren">]</span>
-  <span class="c-attr">signals</span>: <span class="c-paren">[</span><span class="c-class">UserCreated</span>, <span class="c-class">UserBanned</span>, <span class="c-class">SessionExpired</span><span class="c-paren">]</span>
+  <span class="c-attr">tissues</span> <span class="c-paren">{</span>
+    AuthTissue
+    ProfileTissue
+    ActivityTissue
+  <span class="c-paren">}</span>
+  <span class="c-keyword">exports</span> <span class="c-paren">{</span>
+    UserRegistered
+    UserLoggedIn
+    UserDeleted
+  <span class="c-paren">}</span>
 <span class="c-paren">}</span>
 
 <span class="c-comment">// ── 유기체: 전체 시스템 ──────────────────────────────────</span>
 <span class="c-keyword">organism</span> <span class="c-class">AppOrganism</span> <span class="c-paren">{</span>
-  <span class="c-attr">organs</span>  : <span class="c-paren">[</span><span class="c-class">UserOrgan</span>, <span class="c-class">PaymentOrgan</span>, <span class="c-class">NotifyOrgan</span><span class="c-paren">]</span>
-  <span class="c-attr">nervous </span>: <span class="c-class">EventBus</span>   <span class="c-comment">// 신경계 — 기관 간 신호 중계</span>
-  <span class="c-attr">immune  </span>: <span class="c-class">ErrorHandler</span> <span class="c-comment">// 면역계 — 오류 격리 및 복구</span>
+  <span class="c-attr">organs</span> <span class="c-paren">{</span>
+    UserOrgan
+    PaymentOrgan
+    NotifyOrgan
+  <span class="c-paren">}</span>
+  <span class="c-keyword">nervous</span> EventBus <span class="c-paren">{</span>
+    UserOrgan.UserRegistered <span class="c-val">-></span> NotifyOrgan
+  <span class="c-paren">}</span>
+  <span class="c-keyword">immune</span> ErrorPolicy <span class="c-paren">{</span>
+    <span class="c-fn">on</span> DatabaseError <span class="c-paren">{</span> strategy: retry; retries: 3; <span class="c-paren">}</span>
+  <span class="c-paren">}</span>
 <span class="c-paren">}</span></pre>
         </div>
       </div>

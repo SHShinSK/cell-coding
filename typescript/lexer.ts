@@ -71,8 +71,8 @@ export enum TokenType {
   ASSIGN     = '=',
   EQ         = '==',
   NEQ        = '!=',
-  LT         = '<op_lt>',
-  GT         = '<op_gt>',
+  // 비교 연산 `<` `>` 는 LANGLE/RANGLE 토큰(value='<','>')으로 생성되며
+  // parseBinary()가 문맥 기반으로 처리한다 (제네릭 각괄호와 동일 lexeme).
   LTE        = '<=',
   GTE        = '>=',
   AND        = '&&',

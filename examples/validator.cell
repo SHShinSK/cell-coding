@@ -1,0 +1,28 @@
+signal RawInput {
+  payload: String;
+}
+
+signal ValidSignal {
+  value: String;
+}
+
+signal ErrorSignal {
+  message: String;
+}
+
+cell Validator {
+  role: "입력값 유효성 검사";
+
+  membrane {
+    accepts: RawInput;
+    emits: ValidSignal | ErrorSignal;
+  }
+
+  on(RawInput input) {
+    if (valid(input)) {
+      emit ValidSignal;
+    } else {
+      emit ErrorSignal;
+    }
+  }
+}

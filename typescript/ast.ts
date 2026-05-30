@@ -93,12 +93,13 @@ export interface CellBody {
 
 // ── 막 (Membrane) ──────────────────────────────────────────
 export interface MembraneDecl extends BaseNode {
-  kind:         'MembraneDecl';
-  accepts?:     TypeExpr;
-  emits?:       TypeExpr;
-  rejects?:     TypeExpr;
-  observes?:    TypeExpr;
-  passthrough?: TypeExpr;
+  kind:           'MembraneDecl';
+  accepts?:       TypeExpr;
+  acceptsIsQuery?: boolean;
+  emits?:         TypeExpr;
+  rejects?:       TypeExpr;
+  observes?:      TypeExpr;
+  passthrough?:   TypeExpr;
 }
 
 // ── 핵 (Nucleus) ───────────────────────────────────────────

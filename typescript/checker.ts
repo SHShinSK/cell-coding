@@ -12,8 +12,10 @@ export interface TypeCheckError {
 }
 
 interface SignalInfo {
-  name:   string;
-  fields: Map<string, AST.TypeExpr>;
+  name:    string;
+  extends?: string;
+  fields:  Map<string, AST.TypeExpr>;
+  pos:     AST.Position;
 }
 
 interface CellInfo {
@@ -23,6 +25,9 @@ interface CellInfo {
   emits:   Set<string>;
 }
 
+const PRIORITY_LEVELS = new Set(['critical', 'high', 'normal', 'low']);
+const LIFESPAN_VALUES = new Set(['stateless', 'persistent', 'session']);
+
 export class TypeChecker {
   private errors:  TypeCheckError[] = [];
   private signals: Map<string, SignalInfo> = new Map();
@@ -31,11 +36,10 @@ export class TypeChecker {
   private organs:  Set<string> = new Set();
 
   check(program: AST.Program): TypeCheckError[] {
-    // 1패스: 모든 선언 수집
     for (const decl of program.statements) {
       this.collect(decl);
     }
-    // 2패스: 규칙 검증
+    this.finalizeSignals();
     for (const decl of program.statements) {
       this.validate(decl);
     }
@@ -49,13 +53,18 @@ export class TypeChecker {
       case 'SignalDecl': {
         const fields = new Map<string, AST.TypeExpr>();
         for (const f of decl.fields) fields.set(f.name, f.typeExpr);
-        this.signals.set(decl.name, { name: decl.name, fields });
+        this.signals.set(decl.name, {
+          name: decl.name,
+          extends: decl.extends,
+          fields,
+          pos: decl.pos,
+        });
         break;
       }
       case 'CellDecl': {
         const { membrane } = decl.body;
-        const accepts = new Set<string>(this.extractTypeNames(membrane.accepts));
-        const emits   = new Set<string>(this.extractTypeNames(membrane.emits));
+        const accepts = new Set<string>(this.extractSignalNames(membrane.accepts));
+        const emits   = new Set<string>(this.extractSignalNames(membrane.emits));
         this.cells.set(decl.name, { name: decl.name, role: decl.body.role, accepts, emits });
         break;
       }
@@ -68,10 +77,39 @@ export class TypeChecker {
     }
   }
 
+  /** extends 체인을 따라 부모 필드를 병합하고, unknown extends를 검증한다 */
+  private finalizeSignals(): void {
+    for (const [name, info] of this.signals) {
+      const merged = new Map(info.fields);
+      let parent = info.extends;
+      const visited = new Set<string>([name]);
+
+      while (parent) {
+        if (!this.signals.has(parent)) {
+          this.error(`Signal '${name}' extends unknown signal '${parent}'`, info.pos);
+          break;
+        }
+        if (visited.has(parent)) {
+          this.error(`Signal '${name}' has cyclic extends chain involving '${parent}'`, info.pos);
+          break;
+        }
+        visited.add(parent);
+        const parentInfo = this.signals.get(parent)!;
+        for (const [field, typeExpr] of parentInfo.fields) {
+          if (!merged.has(field)) merged.set(field, typeExpr);
+        }
+        parent = parentInfo.extends;
+      }
+
+      this.signals.set(name, { ...info, fields: merged });
+    }
+  }
+
   // ── 2패스: 검증 ───────────────────────────────────────────
 
   private validate(decl: AST.TopLevelDecl): void {
     switch (decl.kind) {
+      case 'SignalDecl':   this.validateSignal(decl);     break;
       case 'CellDecl':     this.validateCell(decl);     break;
       case 'TissueDecl':   this.validateTissue(decl);   break;
       case 'OrganDecl':    this.validateOrgan(decl);    break;
@@ -80,56 +118,79 @@ export class TypeChecker {
     }
   }
 
+  private validateSignal(decl: AST.SignalDecl): void {
+    if (decl.priority && !PRIORITY_LEVELS.has(decl.priority)) {
+      this.error(
+        `Signal '${decl.name}' has invalid priority '${decl.priority}' (expected critical|high|normal|low)`,
+        decl.pos
+      );
+    }
+  }
+
   // ── Cell 검증 ─────────────────────────────────────────────
 
   private validateCell(decl: AST.CellDecl): void {
     const { body, name } = decl;
 
-    // 규칙 1: role 필수
     if (!body.role || body.role.trim() === '') {
       this.error(`Cell '${name}' must declare a non-empty role`, decl.pos);
     }
 
-    // 규칙 2: membrane 필수 (파서에서 이미 체크하지만 이중 검증)
     if (!body.membrane) {
       this.error(`Cell '${name}' must have a membrane declaration`, decl.pos);
       return;
     }
 
-    // 규칙 3: 핸들러가 최소 1개
-    if (body.handlers.length === 0) {
-      this.warn(`Cell '${name}' has no 'on' handlers — it will never react to signals`, decl.pos);
+    if (body.lifespan && !LIFESPAN_VALUES.has(body.lifespan)) {
+      this.error(
+        `Cell '${name}' has invalid lifespan '${body.lifespan}' (expected stateless|persistent|session)`,
+        decl.pos
+      );
     }
 
-    // 규칙 4: accepts에 선언된 신호를 처리하는 핸들러 존재 여부
+    if (body.handlers.length === 0) {
+      this.error(`Cell '${name}' must declare at least one 'on' handler`, decl.pos);
+    }
+
     const { membrane } = body;
-    if (membrane.accepts) {
-      const acceptedTypes = this.extractTypeNames(membrane.accepts);
-      const handledTypes  = new Set(body.handlers.map(h => h.signalType));
-      for (const sig of acceptedTypes) {
-        if (!handledTypes.has(sig)) {
+
+    if (membrane.acceptsIsQuery) {
+      for (const handler of body.handlers) {
+        if (handler.isQuery) {
           this.warn(
-            `Cell '${name}' accepts '${sig}' but has no 'on(${sig})' handler`,
+            `Cell '${name}': 'query' on handler on(${handler.signalType}) is redundant — use 'accepts: Type query' on membrane (spec §5)`,
+            handler.pos
+          );
+        }
+      }
+    }
+
+    if (membrane.accepts) {
+      const acceptedTypes = this.extractSignalNames(membrane.accepts);
+      for (const sig of acceptedTypes) {
+        const hasHandler = body.handlers.some(h =>
+          this.signalsCompatible(h.signalType, sig)
+        );
+        if (!hasHandler) {
+          this.warn(
+            `Cell '${name}' accepts '${sig}' but has no compatible 'on(...)' handler`,
             membrane.pos
           );
         }
       }
     }
 
-    // 규칙 5: emits에 없는 신호를 emit하면 안 됨
     if (membrane.emits) {
-      const allowedEmits = new Set(this.extractTypeNames(membrane.emits));
+      const allowedEmits = this.extractSignalNames(membrane.emits);
       for (const handler of body.handlers) {
         this.checkHandlerEmits(handler, allowedEmits, name);
       }
     }
 
-    // 규칙 6: genome 존재 여부
     if (decl.fromGenome && !this.genomes.has(decl.fromGenome)) {
       this.error(`Cell '${name}' references unknown genome '${decl.fromGenome}'`, decl.pos);
     }
 
-    // 규칙 7: lifespan=persistent이면 nucleus 필요
     if (body.lifespan === 'persistent' && !body.nucleus) {
       this.warn(
         `Cell '${name}' has lifespan 'persistent' but no nucleus — state won't be preserved`,
@@ -140,14 +201,15 @@ export class TypeChecker {
 
   private checkHandlerEmits(
     handler: AST.HandlerDecl,
-    allowed: Set<string>,
+    allowed: string[],
     cellName: string
   ): void {
     const emitted = this.collectEmits(handler.body);
     for (const sig of emitted) {
-      if (!allowed.has(sig) && sig !== 'NullSignal') {
+      const ok = sig === 'NullSignal' || allowed.some(a => this.signalsCompatible(sig, a));
+      if (!ok) {
         this.error(
-          `Cell '${cellName}' emits '${sig}' in on(${handler.signalType}) but '${sig}' is not declared in membrane.emits`,
+          `Cell '${cellName}' emits '${sig}' in on(${handler.signalType}) but '${sig}' is not compatible with membrane.emits`,
           handler.pos
         );
       }
@@ -181,13 +243,14 @@ export class TypeChecker {
       }
     }
 
-    // 선형 흐름: A의 emit이 B의 accept와 호환되어야 한다
     if (flow.mode === 'linear' && flow.steps.length >= 2) {
       for (let i = 0; i < flow.steps.length - 1; i++) {
         const sender   = this.cells.get(flow.steps[i]);
         const receiver = this.cells.get(flow.steps[i + 1]);
         if (!sender || !receiver) continue;
-        const compatible = [...sender.emits].some(sig => receiver.accepts.has(sig));
+        const compatible = [...sender.emits].some(emitted =>
+          [...receiver.accepts].some(accepted => this.signalsCompatible(emitted, accepted))
+        );
         if (!compatible) {
           this.warn(
             `Tissue '${decl.name}': no signal overlap between '${flow.steps[i]}' (emits: ${[...sender.emits].join(',')}) and '${flow.steps[i + 1]}' (accepts: ${[...receiver.accepts].join(',')})`,
@@ -201,12 +264,13 @@ export class TypeChecker {
   // ── Organ 검증 ────────────────────────────────────────────
 
   private validateOrgan(decl: AST.OrganDecl): void {
-    // exports에 선언된 신호가 내부 세포에서 emit되어야 함
     for (const exp of (decl.exports ?? [])) {
-      const emittedBySome = [...this.cells.values()].some(c => c.emits.has(exp));
+      const emittedBySome = [...this.cells.values()].some(c =>
+        [...c.emits].some(e => this.signalsCompatible(e, exp))
+      );
       if (!emittedBySome) {
         this.warn(
-          `Organ '${decl.name}' exports '${exp}' but no cell emits this signal`,
+          `Organ '${decl.name}' exports '${exp}' but no cell emits a compatible signal`,
           decl.pos
         );
       }
@@ -225,7 +289,6 @@ export class TypeChecker {
       }
     }
 
-    // nervous 라우팅 검증
     if (decl.nervous) {
       for (const route of decl.nervous.routes) {
         if (route.targets.length === 0) {
@@ -247,18 +310,62 @@ export class TypeChecker {
         decl.pos
       );
     }
+    this.validateCellBody(decl.name, decl.body, decl.pos);
+  }
+
+  private validateCellBody(label: string, body: AST.CellBody, pos: AST.Position): void {
+    if (body.handlers.length === 0) {
+      this.error(`${label} must declare at least one 'on' handler`, pos);
+    }
   }
 
   // ── 헬퍼 ──────────────────────────────────────────────────
 
-  private extractTypeNames(type?: AST.TypeExpr): string[] {
+  /** 막/핸들러/emit에서 사용하는 신호 이름 추출 (제네릭·컨테이너 내부 포함) */
+  private extractSignalNames(type?: AST.TypeExpr): string[] {
     if (!type) return [];
     switch (type.kind) {
-      case 'SimpleType':  return [type.name];
-      case 'UnionType':   return type.types.flatMap(t => this.extractTypeNames(t));
-      case 'GenericType': return [type.name];
-      default:            return [];
+      case 'SimpleType':
+        return [type.name];
+      case 'UnionType':
+        return type.types.flatMap(t => this.extractSignalNames(t));
+      case 'GenericType':
+        return [type.name, ...type.params.flatMap(p => this.extractSignalNames(p))];
+      case 'ListType':
+        return this.extractSignalNames(type.item);
+      case 'MapType':
+        return [
+          ...this.extractSignalNames(type.key),
+          ...this.extractSignalNames(type.value),
+        ];
+      case 'OptionType':
+        return this.extractSignalNames(type.inner);
+      case 'ResultType':
+        return [
+          ...this.extractSignalNames(type.ok),
+          ...this.extractSignalNames(type.err),
+        ];
+      default:
+        return [];
     }
+  }
+
+  /** emitted가 accepted 막 계약을 만족하는지 (extends/subtype 포함, spec §11) */
+  private signalsCompatible(emitted: string, accepted: string): boolean {
+    if (emitted === accepted) return true;
+    return this.isSubtypeOf(emitted, accepted);
+  }
+
+  private isSubtypeOf(sub: string, superType: string): boolean {
+    let cur = this.signals.get(sub)?.extends;
+    const visited = new Set<string>();
+    while (cur) {
+      if (cur === superType) return true;
+      if (visited.has(cur)) return false;
+      visited.add(cur);
+      cur = this.signals.get(cur)?.extends;
+    }
+    return false;
   }
 
   private error(message: string, pos: AST.Position): void {

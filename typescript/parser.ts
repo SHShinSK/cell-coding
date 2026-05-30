@@ -205,6 +205,7 @@ export class Parser {
     this.expect(TokenType.LBRACE);
 
     let accepts: AST.TypeExpr | undefined;
+    let acceptsIsQuery = false;
     let emits: AST.TypeExpr | undefined;
     let rejects: AST.TypeExpr | undefined;
     let observes: AST.TypeExpr | undefined;
@@ -213,7 +214,10 @@ export class Parser {
     while (!this.check(TokenType.RBRACE) && !this.check(TokenType.EOF)) {
       const t = this.peek();
       if (t.type === TokenType.ACCEPTS) {
-        this.advance(); this.expect(TokenType.COLON); accepts = this.parseTypeExpr();
+        this.advance();
+        this.expect(TokenType.COLON);
+        accepts = this.parseTypeExpr();
+        acceptsIsQuery = this.match(TokenType.QUERY);
       } else if (t.type === TokenType.EMITS) {
         this.advance(); this.expect(TokenType.COLON); emits = this.parseTypeExpr();
       } else if (t.type === TokenType.REJECTS) {
@@ -229,7 +233,7 @@ export class Parser {
     }
 
     this.expect(TokenType.RBRACE);
-    return { kind: 'MembraneDecl', pos, accepts, emits, rejects, observes, passthrough };
+    return { kind: 'MembraneDecl', pos, accepts, acceptsIsQuery, emits, rejects, observes, passthrough };
   }
 
   // ── Nucleus ───────────────────────────────────────────────
@@ -652,14 +656,33 @@ export class Parser {
     const pos = this.pos2();
     const name = this.expect(TokenType.IDENTIFIER, 'Expected type name').value;
 
-    if (this.check(TokenType.LANGLE)) {
-      this.advance();
-      const params: AST.TypeExpr[] = [this.parseTypeExpr()];
-      while (this.match(TokenType.COMMA)) params.push(this.parseTypeExpr());
-      this.expect(TokenType.RANGLE);
-      return { kind: 'GenericType', pos, name, params };
+    if (!this.check(TokenType.LANGLE)) {
+      return { kind: 'SimpleType', pos, name };
     }
-    return { kind: 'SimpleType', pos, name };
+
+    this.advance();
+    const first = this.parseTypeExpr();
+
+    if (this.match(TokenType.COMMA)) {
+      const second = this.parseTypeExpr();
+      this.expect(TokenType.RANGLE);
+      if (name === 'Map') {
+        return { kind: 'MapType', pos, key: first, value: second };
+      }
+      if (name === 'Result') {
+        return { kind: 'ResultType', pos, ok: first, err: second };
+      }
+      return { kind: 'GenericType', pos, name, params: [first, second] };
+    }
+
+    this.expect(TokenType.RANGLE);
+    if (name === 'List') {
+      return { kind: 'ListType', pos, item: first };
+    }
+    if (name === 'Option') {
+      return { kind: 'OptionType', pos, inner: first };
+    }
+    return { kind: 'GenericType', pos, name, params: [first] };
   }
 
   private parseStmtList(): AST.Stmt[] {

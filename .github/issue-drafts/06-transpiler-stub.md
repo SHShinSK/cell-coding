@@ -4,6 +4,12 @@
 
 ---
 
+## Status · 현황 (2026-05 code review)
+
+- ✅ `typescript/compile.ts` — `compile(source)` entry (lexer → parser → checker)
+- ✅ `npm test` smoke tests for parser/checker
+- ⏳ `transpiler.ts` not yet implemented
+
 ## Goal · 목표
 
 Add `transpiler.ts` stub that converts `.cell` AST to minimal TypeScript output.
@@ -20,6 +26,7 @@ export class Validator extends BaseCell { ... }
 ## Tasks · 작업
 
 - [ ] `typescript/transpiler.ts` — handle `CellDecl` only · CellDecl만 처리
+- [ ] Wire into `compile()` or CLI · `compile()` 또는 CLI 연동
 - [ ] CLI: `examples/validator.cell` → stdout or `generated/` · CLI 출력 옵션
 
 ## Definition of done · 완료 기준

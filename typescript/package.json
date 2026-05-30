@@ -6,9 +6,12 @@
   "description": "Cell Coding DSL compiler draft (lexer, parser, checker)",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "node --import tsx --test compile.test.ts"
   },
   "devDependencies": {
+    "@types/node": "^22.15.21",
+    "tsx": "^4.19.4",
     "typescript": "^5.7.3"
   }
 }

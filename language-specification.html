@@ -1321,12 +1321,20 @@ code {
     <span class="t">PaymentOrgan</span><span class="p">.</span><span class="t">PaymentFailed</span>    <span class="op">→</span> <span class="p">[</span><span class="t">OrderOrgan</span><span class="p">,</span> <span class="t">NotificationOrgan</span><span class="p">]</span>
   <span class="p">}</span>
 
-  <span class="c">// ③ immune — error-handling strategy · 면역계</span>
+  <span class="c">// ③ immune — error-handling strategy (block form, canonical EBNF) · 면역계</span>
   <span class="k">immune</span> <span class="t">ErrorPolicy</span> <span class="p">{</span>
-    <span class="k">on</span> <span class="t">DatabaseError</span>   <span class="op">→</span> <span class="fn">retry</span><span class="p">(</span><span class="n">3</span><span class="p">)</span> <span class="k">then</span> <span class="fn">quarantine</span>
-    <span class="k">on</span> <span class="t">NetworkTimeout</span>  <span class="op">→</span> <span class="fn">retry</span><span class="p">(</span><span class="n">2</span><span class="p">)</span> <span class="k">then</span> <span class="fn">fallback</span>
-    <span class="k">on</span> <span class="t">UnknownError</span>    <span class="op">→</span> <span class="fn">isolate</span> <span class="op">&amp;</span> <span class="fn">alert</span>
-    <span class="a">escalate</span>           <span class="op">:</span> <span class="t">CriticalAlertOrgan</span>
+    <span class="k">on</span> <span class="t">DatabaseError</span> <span class="p">{</span>
+      <span class="a">strategy</span><span class="p">:</span> <span class="fn">retry</span>
+      <span class="a">retries</span> <span class="p">:</span> <span class="n">3</span>
+      <span class="a">backoff</span> <span class="p">:</span> <span class="k">exponential</span>
+    <span class="p">}</span>
+    <span class="k">on</span> <span class="t">NetworkTimeout</span> <span class="p">{</span>
+      <span class="a">strategy</span><span class="p">:</span> <span class="fn">fallback</span>
+    <span class="p">}</span>
+    <span class="k">on</span> <span class="t">UnknownError</span> <span class="p">{</span>
+      <span class="a">strategy</span><span class="p">:</span> <span class="fn">isolate</span>
+      <span class="a">escalate</span><span class="p">:</span> <span class="k">true</span>
+    <span class="p">}</span>
   <span class="p">}</span>
 
   <span class="c">// ④ environment configuration · 환경 설정</span>
@@ -1648,10 +1656,11 @@ code {
                   <span class="rule-opt">mutateDecl</span>
 
 <span class="rule-name">membraneDecl</span>  <span class="rule-op">::=</span> <span class="rule-str">"membrane"</span> <span class="rule-str">"{"</span>
-                  <span class="rule-opt">"accepts" ":" signalType</span>
+                  <span class="rule-opt">"accepts" ":" signalType ["query"]</span>
                   <span class="rule-opt">"emits"   ":" signalType ("|" signalType)*</span>
                   <span class="rule-opt">"rejects" ":" signalType</span>
                   <span class="rule-opt">"observes" ":" signalType</span>
+                  <span class="rule-opt">"passthrough" ":" signalType</span>
                   <span class="rule-str">"}"</span>
 
 <span class="rule-name">handlerDecl</span>   <span class="rule-op">::=</span> <span class="rule-str">"on"</span> <span class="rule-str">"("</span> <span class="rule-term">TypeName</span> <span class="rule-term">identifier</span> <span class="rule-str">")"</span> <span class="rule-str">"{"</span> <span class="rule-term">stmtList</span> <span class="rule-str">"}"</span>

@@ -4,23 +4,29 @@
 
 ---
 
-## Goal · 목표
+## Status · 현황 (2026-05 code review)
 
-Add signal `extends` chain support to membrane compatibility checks in `checker.ts`.
+Implemented in `checker.ts`:
 
-`checker.ts`에 signal `extends` 관계를 반영한 막 호환 검사를 추가합니다.
+- `finalizeSignals()` — merge parent fields, detect unknown/cyclic `extends`
+- `signalsCompatible()` / `isSubtypeOf()` — tissue flow, membrane emits, handler matching (spec §11)
+- `extractSignalNames()` — Generic/List/Map/Option/Result recursive extraction
 
-## Tasks · 작업
+`checker.ts` 에 extends 체인·subtype 호환·타입 이름 추출이 구현되었습니다.
 
-- [ ] Build `extends` chain when collecting `SignalDecl` · SignalDecl 수집 시 `extends` 체인 구축
-- [ ] Verify membrane `accepts` accepts supertype signals (spec §11) · membrane accepts 상위 타입 수용 검증
+See `typescript/compile.test.ts` — "validates signal extends for membrane compatibility".
+
+## Remaining tasks · 남은 작업
+
+- [ ] Structural field compatibility (not just signal name subtyping) · 필드 구조 호환 검사
+- [ ] `priority` inheritance from parent signals · 부모 signal priority 상속
 
 ## References · 참고
 
-- `language-specification.html` — signal extends, structural typing
+- `typescript/checker.ts`, `language-specification.html` §11 signal extends
 
 ## Definition of done · 완료 기준
 
-Checker recognizes subtype signals for `accepts` validation per spec §11.
+Checker recognizes subtype signals for accepts/emits/flow validation per spec §11 with full test coverage.
 
-하위 신호가 상위를 accepts하는 막에 전달 가능함을 checker가 인지.
+하위 신호가 accepts/emits/flow 검증에서 인식되며 테스트로 보장됨.

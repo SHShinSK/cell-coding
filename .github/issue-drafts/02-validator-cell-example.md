@@ -4,24 +4,23 @@
 
 ---
 
-## Goal · 목표
+## Status · 현황 (2026-05 code review)
 
-Add a minimal `.cell` golden example for Roadmap Phase 1 checkpoint.
+- ✅ `examples/validator.cell` — role, membrane block, `on` handler with `if`/`else`/`emit`
+- ✅ `examples/README.md` updated
+- ✅ Covered by `typescript/compile.test.ts` smoke test via `compile()`
 
-로드맵 Phase 1 체크포인트용 최소 `.cell` 예제 파일을 추가합니다.
+## Remaining tasks · 남은 작업
 
-## Tasks · 작업
-
-- [ ] Create `examples/validator.cell` (role, membrane, on, emit) · `examples/validator.cell` 작성
-- [ ] Document in `examples/README.md` (EN/KR one paragraph each) · examples README에 한/영 설명
+- [ ] Add second example (tissue flow or Physical AI scenario) · tissue/Physical AI 예제 추가
+- [ ] Link from `language-specification.html` §2 to live example · 명세 §2에서 예제 링크
 
 ## References · 참고
 
-- `language-specification.html` §2 cell anatomy · §2 cell 해부 구조
-- Use only syntax the `typescript/` parser can parse · `typescript/` 파서가 파싱 가능한 문법만 사용
+- `examples/validator.cell`, `typescript/compile.ts`, `language-specification.html` §2
 
 ## Definition of done · 완료 기준
 
-Example matches the spec and is linked from `examples/README.md`.
+Example matches spec block syntax and passes `npm test` in `typescript/`.
 
-파일이 명세 예제와 일치하고 examples README에 링크됨.
+명세 블록 문법과 일치하고 `typescript/` 의 `npm test` 를 통과함.

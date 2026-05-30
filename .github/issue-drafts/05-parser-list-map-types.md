@@ -4,23 +4,31 @@
 
 ---
 
-## Problem · 문제
+## Status · 현황 (2026-05 code review)
 
-AST defines `ListType`, `MapType`, etc., but `parseSingleType()` does not parse `List<T>` or `Map<K,V>`.
+`parseSingleType()` now maps built-in containers to dedicated AST nodes:
 
-AST에는 `ListType`, `MapType` 등이 정의되어 있으나 `parseSingleType()`이 `List<T>`, `Map<K,V>`를 파싱하지 않습니다.
+- `List<T>` → `ListType`
+- `Map<K,V>` → `MapType`
+- `Option<T>` → `OptionType`
+- `Result<T,E>` → `ResultType`
+- other `Name<...>` → `GenericType`
 
-## Tasks · 작업
+`parseSingleType()` 이 내장 컨테이너를 전용 AST 노드로 매핑합니다 (위 표 참고).
 
-- [ ] Extend `parseSingleType()` or add post-processing · `parseSingleType()` 확장 또는 후처리
-- [ ] Test: `nucleus { cache: Map<String, Bool> }` · nucleus Map 타입 파싱 테스트
+See `typescript/compile.test.ts` — "parses List and Map type expressions".
+
+## Remaining tasks · 남은 작업
+
+- [ ] Support multi-param generics beyond Map/Result (e.g. `Tuple<A,B,C>`) if added to spec · 다중 파라미터 제네릭
+- [ ] Golden tests from `language-specification.html` §11 examples · 명세 §11 예제 골든 테스트
 
 ## References · 참고
 
-- `typescript/ast.ts`, `typescript/parser.ts`
+- `typescript/ast.ts`, `typescript/parser.ts`, `language-specification.html` §11
 
 ## Definition of done · 완료 기준
 
-Spec examples parse into correct AST nodes.
+All spec §11 container types parse into correct AST nodes with CI tests.
 
-명세 예제의 Map/List 타입이 AST에 반영됨.
+명세 §11 컨테이너 타입이 CI 테스트와 함께 올바른 AST 노드로 파싱됨.
