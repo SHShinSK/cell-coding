@@ -110,7 +110,8 @@ This repository is public, so anyone can read code, discuss ideas, and contribut
    버그·기능·질문
 2. [Discussions](https://github.com/SHShinSK/cell-coding/discussions) — ideas and usage  
    아이디어·사용법
-3. [CONTRIBUTING.md](CONTRIBUTING.md) — contribution process  
+3. [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) or [CONTRIBUTING.md](CONTRIBUTING.md) — contribution process  
+   [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) 또는 [CONTRIBUTING.md](CONTRIBUTING.md) — 기여 절차
    기여 절차
 
 ## Maintainer setup | 유지보수자 설정

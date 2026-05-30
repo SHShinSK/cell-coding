@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contributing to Cell Coding — EN-first, KR-parallel guide">
+  <title>Contributing · Cell Coding</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Pretendard:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0f0d;
+      --green: #2dff8f;
+      --text: #e8f5ee;
+      --dim: rgba(232,245,238,0.62);
+      --border: rgba(45,255,143,0.2);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Pretendard', sans-serif;
+      padding: 48px 24px 56px;
+    }
+    .wrap { max-width: 820px; margin: 0 auto; }
+    .lang-bar {
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+      font-size: 13px; color: var(--dim); margin-bottom: 28px;
+    }
+    .lang-bar a { color: var(--green); text-decoration: none; }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin-bottom: 8px; }
+    .lead { color: var(--dim); line-height: 1.8; margin-bottom: 6px; }
+    h2 {
+      font-size: 18px; color: var(--green); margin: 32px 0 12px;
+      padding-top: 8px; border-top: 1px solid var(--border);
+    }
+    h2:first-of-type { border-top: none; padding-top: 0; }
+    p, li { color: var(--dim); line-height: 1.85; margin-bottom: 8px; }
+    ul, ol { padding-left: 22px; margin-bottom: 12px; }
+    code {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: var(--dim);
+      font-family: 'DM Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="lang-bar">
+      <a href="index.html">← Home</a>
+      <span>|</span>
+      <span>English first · 한국어 병렬</span>
+      <span>|</span>
+      <a href="https://github.com/SHShinSK/cell-coding/blob/main/CONTRIBUTING.md">Markdown (GitHub)</a>
+    </div>
+
+    <h1>Contributing · 기여하기</h1>
+    <p class="lead">Thank you for contributing. This project values <strong>reproducible execution</strong> over abstract philosophy.</p>
+    <p class="lead">기여해 주셔서 감사합니다. 이 프로젝트는 추상적 철학보다 <strong>재현 가능한 실행 결과</strong>를 중요하게 생각합니다.</p>
+
+    <h2>Principles | 기여 원칙</h2>
+    <ul>
+      <li>Contribute in small, frequent increments · 작은 단위로 자주 기여</li>
+      <li>Improve at least one of: behavior, tests, or docs · 동작/테스트/문서 중 최소 1개 이상을 명확히 개선</li>
+      <li>Do not make breaking changes without an RFC · 파괴적 변경은 RFC 없이 진행하지 않음</li>
+    </ul>
+
+    <h2>Getting started | 시작하기</h2>
+    <ol>
+      <li>Pick an issue labeled <code>good first issue</code> or <code>help wanted</code><br>이슈 목록에서 <code>good first issue</code> 또는 <code>help wanted</code> 선택</li>
+      <li>Comment on the issue to share your intent<br>작업 의도를 이슈 코멘트로 먼저 공유</li>
+      <li>Fork, create a branch, and open a PR<br>포크/브랜치 생성 후 PR 제출</li>
+    </ol>
+    <p>Branch examples · 브랜치 예시: <code>feat/runtime-signal-priority</code>, <code>fix/viewer-node-leak</code>, <code>docs/quickstart-en</code></p>
+
+    <h2>Issue types | 이슈 유형</h2>
+    <ul>
+      <li><code>bug</code> — reproducible defect · 재현 가능한 결함</li>
+      <li><code>feature</code> — feature proposal · 기능 제안</li>
+      <li><code>rfc</code> — design or policy change · 설계/정책 변경</li>
+      <li><code>docs</code> — documentation improvement · 문서 개선</li>
+      <li><code>question</code> — usage or design question · 사용/설계 질문</li>
+    </ul>
+
+    <h2>Pull request checklist | PR 기준</h2>
+    <ul>
+      <li>Why the change is needed · 변경 배경</li>
+      <li>What changed · 변경 내용</li>
+      <li>Impact area (runtime / bridge / viewer / DSL / docs) · 영향 범위</li>
+      <li>How to verify (tests or manual steps) · 검증 방법</li>
+      <li>Risks and rollback plan (if needed) · 위험 요소와 롤백 방법</li>
+    </ul>
+    <p>Use the PR template in <code>.github/PULL_REQUEST_TEMPLATE.md</code>.</p>
+
+    <h2>When an RFC is required | RFC가 필요한 경우</h2>
+    <ul>
+      <li>DSL syntax changes · DSL 문법 변경</li>
+      <li>Runtime semantics changes · Runtime 의미론 변경</li>
+      <li>Public API removal or rename · 공용 API 삭제/이름 변경</li>
+      <li>Release or versioning policy changes · 릴리즈/버전 정책 변경</li>
+    </ul>
+    <p>See <a href="https://github.com/SHShinSK/cell-coding/tree/main/rfcs" style="color:var(--green)">rfcs/</a> on GitHub.</p>
+
+    <h2>Code of conduct | 행동 강령</h2>
+    <p>Follow <a href="https://github.com/SHShinSK/cell-coding/blob/main/CODE_OF_CONDUCT.md" style="color:var(--green)">CODE_OF_CONDUCT.md</a>. Report violations to maintainers privately.</p>
+    <p><a href="https://github.com/SHShinSK/cell-coding/blob/main/CODE_OF_CONDUCT.md" style="color:var(--green)">CODE_OF_CONDUCT.md</a>를 준수합니다. 위반 사례는 Maintainer에게 비공개로 신고할 수 있습니다.</p>
+
+    <footer>Apache-2.0 · SHShinSK/cell-coding</footer>
+  </div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 html
 
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -677,8 +677,8 @@ code {
   <nav>
     <div class="nav-section">
       <span class="nav-label">Overview</span>
-      <a class="nav-item active" href="#overview"><span class="nav-dot"></span>개요 및 설계 철학</a>
-      <a class="nav-item" href="#keywords"><span class="nav-dot"></span>키워드 인덱스</a>
+      <a class="nav-item active" href="#overview"><span class="nav-dot"></span>Overview · 개요</a>
+      <a class="nav-item" href="#keywords"><span class="nav-dot"></span>Keywords · 키워드</a>
     </div>
 
     <div class="nav-section">
@@ -721,13 +721,14 @@ code {
 
   <div class="topbar">
     <div class="topbar-path">
-      <span>cell-coding</span>
+      <a href="index.html" style="color:var(--green);text-decoration:none">Home</a>
       <span class="sep">/</span>
       <span>spec</span>
       <span class="sep">/</span>
-      <span class="current">language-specification.md</span>
+      <span class="current">language-specification · 언어 명세</span>
     </div>
     <div class="topbar-meta">
+      <span style="color:var(--text-dim);font-size:12px">English first · 한국어 병렬</span>
       <span><span class="status-dot"></span>draft</span>
       <span>v0.1.0</span>
       <span>2025</span>
@@ -741,10 +742,14 @@ code {
       <div class="section-header">
         <span class="section-num">§ 0</span>
         <div>
-          <div class="section-title">개요 및 설계 철학</div>
-          <div class="section-en">Overview &amp; Design Philosophy</div>
+          <div class="section-title">Overview &amp; Design Philosophy · 개요 및 설계 철학</div>
+          <div class="section-en">English first · Korean parallel in overview; grammar sections use bilingual labels</div>
         </div>
       </div>
+
+      <p class="body-text">Cell Coding is a programming paradigm inspired by cell theory in biology. The unit of every program is the <strong>cell</strong> — each with a distinct role, selective communication through the <strong>membrane</strong>, and organic connection via <strong>signals</strong>.</p>
+
+      <p class="body-text">Cell Coding is designed as a <strong>transpiled DSL</strong> on top of existing languages (Python, TypeScript, Go, etc.). It does not start as a standalone language; it absorbs existing ecosystems and can be adopted incrementally.</p>
 
       <p class="body-text">세포코딩(Cell Coding)은 생물학의 세포 이론에서 영감을 받은 새로운 프로그래밍 패러다임이다. 모든 프로그램의 구성 단위는 <strong>세포(cell)</strong>이며, 세포는 고유한 역할을 가지고, 막(membrane)을 통해 외부와 선택적으로 통신하며, 신호(signal)를 통해 유기적으로 연결된다.</p>
 

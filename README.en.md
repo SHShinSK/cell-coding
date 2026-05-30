@@ -105,17 +105,18 @@ Decompose by **role**, declare boundaries with **membrane**, and connect systems
 3. Start with issues labeled `good first issue`  
    `good first issue` 라벨 작업부터 시작
 
-See [CONTRIBUTING.en.md](CONTRIBUTING.en.md) for details.  
-자세한 절차는 [CONTRIBUTING.en.md](CONTRIBUTING.en.md) 참고.
+See [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) (Pages) or [CONTRIBUTING.en.md](CONTRIBUTING.en.md) for details.  
+자세한 절차는 [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) (Pages) 또는 [CONTRIBUTING.en.md](CONTRIBUTING.en.md) 참고.
 
 ## Documentation | 문서
 
-| Korean | English |
-|--------|---------|
-| [README.md](README.md) | [README.en.md](README.en.md) |
-| [OPEN_SOURCE_CHARTER.md](OPEN_SOURCE_CHARTER.md) | [OPEN_SOURCE_CHARTER.en.md](OPEN_SOURCE_CHARTER.en.md) |
-| [ROADMAP.md](ROADMAP.md) | [ROADMAP.en.md](ROADMAP.en.md) |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | [CONTRIBUTING.en.md](CONTRIBUTING.en.md) |
+| Pages docs (EN/KR) | GitHub Markdown |
+|--------------------|-------------------|
+| [index.html](https://shshinsk.github.io/cell-coding/) | [README.en.md](README.en.md) |
+| [cell-coding.html](https://shshinsk.github.io/cell-coding/cell-coding.html) | — |
+| [개발명세서.html](https://shshinsk.github.io/cell-coding/%EA%B0%9C%EB%B0%9C%EB%AA%85%EC%84%B8%EC%84%9C.html) | — |
+| [roadmap.html](https://shshinsk.github.io/cell-coding/roadmap.html) | [ROADMAP.en.md](ROADMAP.en.md) |
+| [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) | [CONTRIBUTING.en.md](CONTRIBUTING.en.md) |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | (Korean primary; English summary in charter) |
 | [SECURITY.md](SECURITY.md) | (Korean primary) |
 | [ISSUE_LABELS.md](ISSUE_LABELS.md) | (Korean primary) |

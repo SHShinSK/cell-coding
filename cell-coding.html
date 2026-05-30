@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -160,7 +160,26 @@
     line-height: 1.85;
     color: rgba(232,245,238,0.8);
     font-weight: 300;
+    margin-bottom: 12px;
   }
+
+  .doc-lang-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 48px;
+    background: rgba(10,15,13,0.92);
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .doc-lang-bar a { color: var(--cell-green); text-decoration: none; }
+  main { padding-top: 44px; }
 
   .hero-scroll {
     position: absolute;
@@ -628,22 +647,33 @@
 
 <main>
 
+  <nav class="doc-lang-bar">
+    <a href="index.html">← Home</a>
+    <span>|</span>
+    <span>English first · 한국어 병렬</span>
+    <span>|</span>
+    <a href="개발명세서.html">Spec v0.1</a>
+    <span>|</span>
+    <a href="roadmap.html">Roadmap</a>
+  </nav>
+
   <!-- ─── HERO ─── -->
   <section class="hero">
     <div class="container">
       <div class="hero-badge">New Paradigm · v0.1 · 2025</div>
       <h1 class="hero-title">
-        <span class="ko">세포코딩</span>
         <span class="en">Cell Coding</span>
+        <span class="ko">세포코딩</span>
       </h1>
       <p class="hero-sub">
         biological architecture · organic computation<br>
         role-driven · signal-based · self-organizing
       </p>
       <p class="hero-desc">
-        인간의 세포처럼, 코드의 모든 단위는 고유한 역할을 가진다.
-        독립적이면서도 유기적으로 연결된 세포들이
-        모여 살아 숨쉬는 시스템을 만드는 새로운 코딩 철학.
+        Like human cells, every unit of code has a distinct role. Independent yet organically connected cells form systems that live and breathe — a new philosophy of programming.
+      </p>
+      <p class="hero-desc">
+        인간의 세포처럼, 코드의 모든 단위는 고유한 역할을 가진다. 독립적이면서도 유기적으로 연결된 세포들이 모여 살아 숨쉬는 시스템을 만드는 새로운 코딩 철학.
       </p>
     </div>
     <div class="hero-scroll">Scroll to explore</div>
@@ -653,7 +683,7 @@
   <section>
     <div class="container">
       <p class="sec-label fade-in">Why Cell Coding</p>
-      <h2 class="sec-title fade-in">왜 이 개념이 필요한가</h2>
+      <h2 class="sec-title fade-in">Why Cell Coding exists · 왜 이 개념이 필요한가</h2>
       <p class="sec-body fade-in">Classical software assumed a narrower input-process-output frame. Physical AI now requires many sensing channels and many action channels at once, so we need a model of cooperating functional cells rather than a single monolithic pipeline.</p>
       <p class="sec-body fade-in">고전 소프트웨어는 비교적 좁은 입력-처리-출력 프레임을 전제로 했다. Physical AI는 다중 감각 채널과 다중 행동 채널을 동시에 요구하므로, 단일 거대 파이프라인이 아니라 기능 세포의 협업 모델이 필요하다.</p>
 
@@ -698,7 +728,8 @@
   <section>
     <div class="container">
       <p class="sec-label fade-in">Core Principles</p>
-      <h2 class="sec-title fade-in">세포의 3대 법칙</h2>
+      <h2 class="sec-title fade-in">Three laws of cells · 세포의 3대 법칙</h2>
+      <p class="sec-body fade-in">Biology optimized these principles over billions of years. Three simple laws govern everything in Cell Coding.</p>
       <p class="sec-body fade-in">생물의 세포가 수십억 년에 걸쳐 최적화한 원리를 코드에 적용한다. 단순하지만 강력한 세 가지 법칙이 모든 것을 결정한다.</p>
 
       <div class="principles-grid">
@@ -709,8 +740,8 @@
             <circle cx="24" cy="24" r="12" stroke="rgba(45,255,143,0.6)" stroke-width="1" stroke-dasharray="3 3"/>
             <circle cx="24" cy="24" r="4" fill="rgba(45,255,143,0.8)"/>
           </svg>
-          <div class="principle-title">역할 (Role)</div>
-          <div class="principle-body">모든 세포는 단 하나의 명확한 역할을 가진다. 심장세포는 펌핑만 한다. 신경세포는 신호만 전달한다. 코드도 마찬가지다. 하나의 세포, 하나의 책임.</div>
+          <div class="principle-title">Role · 역할</div>
+          <div class="principle-body">Every cell has one clear role. Heart cells pump; nerve cells relay signals. In code: one cell, one responsibility.<br>모든 세포는 단 하나의 명확한 역할을 가진다. 심장세포는 펌핑만 한다. 신경세포는 신호만 전달한다. 코드도 마찬가지다. 하나의 세포, 하나의 책임.</div>
         </div>
 
         <div class="principle-card fade-in" style="transition-delay:0.1s">
@@ -721,8 +752,8 @@
             <line x1="14" y1="24" x2="34" y2="24" stroke="rgba(255,209,102,0.3)" stroke-width="1"/>
             <line x1="14" y1="34" x2="24" y2="34" stroke="rgba(255,209,102,0.3)" stroke-width="1"/>
           </svg>
-          <div class="principle-title">막 (Membrane)</div>
-          <div class="principle-body">세포막은 무엇이 들어오고 나갈지를 결정한다. 코드에서 막은 인터페이스이자 계약이다. 선택적 투과성 — 필요한 신호만 통과시킨다.</div>
+          <div class="principle-title">Membrane · 막</div>
+          <div class="principle-body">The cell membrane decides what enters and exits. In code, the membrane is the interface and contract — selective permeability lets only required signals through.<br>세포막은 무엇이 들어오고 나갈지를 결정한다. 코드에서 막은 인터페이스이자 계약이다. 선택적 투과성 — 필요한 신호만 통과시킨다.</div>
         </div>
 
         <div class="principle-card fade-in" style="transition-delay:0.2s">
@@ -735,8 +766,8 @@
             <path d="M18 27 L30 33" stroke="rgba(116,192,252,0.4)" stroke-width="1"/>
             <defs><marker id="arr" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><circle cx="2" cy="2" r="1.5" fill="rgba(116,192,252,0.6)"/></marker></defs>
           </svg>
-          <div class="principle-title">신호 (Signal)</div>
-          <div class="principle-body">세포는 메서드를 직접 호출하지 않는다. 신호를 보내고, 반응한다. 이 간접성이 시스템을 유연하고 확장 가능하게 만드는 핵심이다.</div>
+          <div class="principle-title">Signal · 신호</div>
+          <div class="principle-body">Cells do not call methods directly. They emit signals and react. This indirection makes systems flexible and scalable.<br>세포는 메서드를 직접 호출하지 않는다. 신호를 보내고, 반응한다. 이 간접성이 시스템을 유연하고 확장 가능하게 만드는 핵심이다.</div>
         </div>
       </div>
     </div>
@@ -748,7 +779,8 @@
   <section class="hierarchy-section">
     <div class="container">
       <p class="sec-label fade-in">Complexity Scale</p>
-      <h2 class="sec-title fade-in">단세포에서 유기체로</h2>
+      <h2 class="sec-title fade-in">From unicellular to organism · 단세포에서 유기체로</h2>
+      <p class="sec-body fade-in">System complexity is determined by cell count and organization level. A small script is unicellular; a large platform is human-scale.</p>
       <p class="sec-body fade-in">세포의 수와 조직화 수준에 따라 시스템의 복잡도가 결정된다. 작은 스크립트는 단세포이고, 대규모 플랫폼은 인간이다.</p>
 
       <div class="hierarchy-wrapper">
@@ -847,7 +879,8 @@
   <section>
     <div class="container">
       <p class="sec-label fade-in">Paradigm Comparison</p>
-      <h2 class="sec-title fade-in">OOP와 무엇이 다른가</h2>
+      <h2 class="sec-title fade-in">How Cell Coding differs from OOP · OOP와 무엇이 다른가</h2>
+      <p class="sec-body fade-in">It may look like OOP, but the starting philosophy differs. OOP encapsulates data; Cell Coding designs for survival and response.</p>
       <p class="sec-body fade-in">얼핏 객체지향처럼 보이지만, 철학의 출발점이 다르다. OOP는 데이터를 캡슐화하고, 세포코딩은 생존과 반응을 설계한다.</p>
 
       <div class="compare-grid fade-in">
@@ -887,7 +920,8 @@
   <section class="code-section">
     <div class="container">
       <p class="sec-label fade-in">Pseudocode Example</p>
-      <h2 class="sec-title fade-in">세포코딩이 생긴 모습</h2>
+      <h2 class="sec-title fade-in">What Cell Coding looks like · 세포코딩이 생긴 모습</h2>
+      <p class="sec-body fade-in">The language spec is not final yet, but the shape is clear. Each cell is declarative, role-specific, and unaware of others.</p>
       <p class="sec-body fade-in">아직 언어 스펙은 확정되지 않았다. 하지만 이런 모습이 될 것이다. 각 세포는 선언적이고, 역할이 명확하며, 서로를 모른다.</p>
       <p class="sec-body fade-in">Embodied systems — spider, humanoid, or PET — can be expressed as sensing, decision, and action cells, where each layer communicates only via signals and membrane contracts.</p>
       <p class="sec-body fade-in">거미·휴머노이드·반려(PET) 로봇 같은 구현체 시스템은 감각 세포·판단 세포·행동 세포로 표현할 수 있고, 각 계층은 신호와 막 계약을 통해서만 통신한다.</p>
@@ -940,7 +974,8 @@
   <section>
     <div class="container">
       <p class="sec-label fade-in">Platform Vision</p>
-      <h2 class="sec-title fade-in">플랫폼이 제공할 세 가지</h2>
+      <h2 class="sec-title fade-in">Three platform pillars · 플랫폼이 제공할 세 가지</h2>
+      <p class="sec-body fade-in">A Cell Coding platform needs three core tools to become real.</p>
       <p class="sec-body fade-in">세포코딩을 현실로 만드는 플랫폼은 세 가지 핵심 도구를 제공해야 한다.</p>
 
       <div class="pillars-grid">
@@ -950,7 +985,7 @@
           </div>
           <div class="pillar-title">Cell DSL</div>
           <div class="pillar-en">LANGUAGE LAYER</div>
-          <div class="pillar-body">Python / TypeScript 위에 @cell, @tissue, @organ 데코레이터로 동작하는 경량 언어 확장. 기존 코드베이스에 점진적으로 도입 가능하다.</div>
+          <div class="pillar-body">Lightweight language extension with @cell, @tissue, @organ on Python/TypeScript — adoptable incrementally in existing codebases.<br>Python / TypeScript 위에 @cell, @tissue, @organ 데코레이터로 동작하는 경량 언어 확장. 기존 코드베이스에 점진적으로 도입 가능하다.</div>
         </div>
 
         <div class="pillar fade-in" style="transition-delay:0.1s">
@@ -959,7 +994,7 @@
           </div>
           <div class="pillar-title">Cell Viewer</div>
           <div class="pillar-en">VISUAL LAYER</div>
-          <div class="pillar-body">실시간으로 세포의 신호 흐름을 시각화하는 IDE 플러그인. 어느 세포가 어떤 신호를 주고받는지 생체 현미경처럼 관찰할 수 있다.</div>
+          <div class="pillar-body">IDE plugin that visualizes live signal flow between cells — like a biological microscope for your system.<br>실시간으로 세포의 신호 흐름을 시각화하는 IDE 플러그인. 어느 세포가 어떤 신호를 주고받는지 생체 현미경처럼 관찰할 수 있다.</div>
         </div>
 
         <div class="pillar fade-in" style="transition-delay:0.2s">
@@ -968,7 +1003,7 @@
           </div>
           <div class="pillar-title">Cell Lab</div>
           <div class="pillar-en">TEST LAYER</div>
-          <div class="pillar-body">각 세포를 격리된 환경에서 테스트하는 실험실. 세포의 독립성이 보장되므로 테스트가 극적으로 단순해진다. 세포 단위 TDD.</div>
+          <div class="pillar-body">Isolated test lab per cell. Independence makes testing dramatically simpler — cell-level TDD.<br>각 세포를 격리된 환경에서 테스트하는 실험실. 세포의 독립성이 보장되므로 테스트가 극적으로 단순해진다. 세포 단위 TDD.</div>
         </div>
       </div>
     </div>
@@ -979,7 +1014,8 @@
   <!-- ─── CTA ─── -->
   <section class="cta-section">
     <div class="container">
-      <h2 class="cta-title fade-in">모든 코드는<br><span>살아있다</span></h2>
+      <h2 class="cta-title fade-in">All code is<br><span>alive</span><br><span style="font-size:0.55em;color:var(--text-dim)">모든 코드는 살아있다</span></h2>
+      <p class="cta-body fade-in">Cell Coding is not just a methodology — it is a new philosophy of programs. Imagine code that grows, differentiates, and adapts.</p>
       <p class="cta-body fade-in">세포코딩은 단순한 방법론이 아니다. 프로그램을 바라보는 새로운 철학이다. 코드가 자라고, 분화하고, 적응하는 것을 상상해보라.</p>
       <p class="cta-version fade-in">세포코딩 (Cell Coding) — Concept Paper v0.1</p>
     </div>

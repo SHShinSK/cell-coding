@@ -1,137 +1,98 @@
-# Cell Coding 실행 로드맵 (90일)
+# Cell Coding 로드맵 (90일)
 
-## 목표
+> [English first · ROADMAP.en.md](ROADMAP.en.md) · 한국어 병렬
 
-새 개념 발표에서 끝나지 않고,  
-외부 개발자가 실제로 설치/실행/기여할 수 있는 오픈소스 프로젝트로 전환한다.
+## Goal | 목표
 
-## 제품 전략
+Turn Cell Coding from a concept presentation into an open-source project that external developers can install, run, and contribute to.  
+Cell Coding을 개념 발표에서 끝내지 않고, 외부 개발자가 설치·실행·기여할 수 있는 오픈소스 프로젝트로 전환한다.
 
-- 1단계: 런타임/브리지/뷰어 기반의 **동작 가능한 기반** 확보
-- 2단계: `.cell` DSL을 **선택적 레이어**로 점진 도입
-- 3단계: 레퍼런스 예제와 커뮤니티 기여 루프 확장
+## Strategy | 전략
 
----
-
-## Day 0~30: MVP 기반 구축
-
-### 기술 산출물
-
-- `cell-runtime` 최소 코어
-  - 신호 발행/구독
-  - membrane 계약 검사 (accepts/emits)
-  - 기본 오류 정책 훅
-- `cell-bridge-python` 기본 어댑터
-  - 입력: 카메라/마이크 이벤트를 표준 Signal로 변환
-  - 출력: 알람/모터 명령 Signal 수신
-- 예제 1개
-  - `MotionDetected -> AlarmActuator`
-
-### 운영 산출물
-
-- README/헌장/기여가이드/행동강령 공개
-- 라벨 체계 정비 (`good first issue`, `help wanted`, `rfc`)
-- 첫 기여자 온보딩 문서 완성
-
-### 완료 기준
-
-- 신규 사용자가 30분 이내 데모 실행 성공
-- 외부인이 첫 PR을 생성할 수 있는 작업이 최소 10개 열려 있음
+1. **Runtime / bridge / viewer** first — something that works  
+   **런타임 / 브리지 / 뷰어** 우선 — 동작하는 것부터
+2. **`.cell` DSL** as an optional layer  
+   **`.cell` DSL**은 선택적 레이어로
+3. Reference examples and community contribution loop  
+   레퍼런스 예제와 커뮤니티 기여 루프
 
 ---
 
-## Day 31~60: 관측/품질 강화
+## Day 0–30: MVP foundation | 0~30일: MVP 기반
 
-### 기술 산출물
+**Deliverables | 산출물**
 
-- `cell-viewer` MVP
-  - 실시간 신호 그래프
-  - 세포 상태 타임라인
-  - 필터(신호 타입/세포/시간)
-- 테스트 파이프라인
-  - 핵심 시나리오 e2e 테스트
-  - 계약 위반 케이스 테스트
+- `cell-runtime` core: emit/subscribe, membrane checks, basic error hooks  
+  `cell-runtime` 코어: emit/subscribe, 막 검증, 기본 오류 훅
+- `cell-bridge-python`: camera/mic → standard signals; alarm/motor commands  
+  `cell-bridge-python`: 카메라/마이크 → 표준 신호; 알람/모터 명령
+- Example: `MotionDetected → AlarmActuator`  
+  예제: `MotionDetected → AlarmActuator`
 
-### 운영 산출물
+**Ops | 운영**
 
-- 월간 공개 데모 세션 1회
-- RFC 템플릿 공개
-- 유지보수 담당 영역(owner map) 공개
+- Publish README, charter, contributing guide, code of conduct  
+  README, 헌장, 기여 가이드, 행동 강령 공개
+- Label setup: `good first issue`, `help wanted`, `rfc`  
+  라벨 설정: `good first issue`, `help wanted`, `rfc`
+- At least 10 starter issues for first-time contributors  
+  첫 기여자용 starter issue 10개 이상
 
-### 완료 기준
+**Done when | 완료 기준**
 
-- 버그 리포트 재현률 80% 이상
-- Viewer로 1개 이상의 시나리오를 라이브 추적 가능
-
----
-
-## Day 61~90: 공개 발표 + 생태계 확장
-
-### 기술 산출물
-
-- `.cell` DSL 최소 subset 공개(실험)
-  - `cell`, `signal`, `membrane`, `on`, `emit`
-- transpile PoC
-  - `.cell -> TypeScript` 최소 변환
-- 예제 추가 3개 이상
-  - 스마트홈 자동화
-  - 로봇 상태 모니터링
-  - 이벤트 기반 운영 알림
-
-### 운영 산출물
-
-- 공개 발표 자료 + 3분 데모 영상
-- 기여 캠페인(`First 20 Contributors`)
-- 월간 릴리즈 노트 정례화
-
-### 완료 기준
-
-- 외부 기여자 10명+
-- 외부 PR 30+
-- 월간 릴리즈 1회 이상 안정 수행
+- New user runs demo in ~30 minutes  
+  신규 사용자가 약 30분 내 데모 실행
+- External contributor can open a first PR from labeled issues  
+  외부 기여자가 라벨 이슈에서 첫 PR 오픈 가능
 
 ---
 
-## 트랙별 백로그
+## Day 31–60: Observability & quality | 31~60일: 관측·품질
 
-## Track A: Runtime
-- 신호 우선순위 큐
-- 재시도/격리/데드레터 정책
-- 운영 메트릭 훅 (OpenTelemetry 연동 준비)
+**Deliverables | 산출물**
 
-## Track B: Python Bridge
-- 장치 어댑터 인터페이스 표준화
-- 샘플 드라이버(카메라/음성/모터)
-- 비동기 스트림 안정화
+- `cell-viewer` MVP: live signal graph, cell timeline, filters  
+  `cell-viewer` MVP: 실시간 신호 그래프, 세포 타임라인, 필터
+- E2E tests for core scenarios and contract violations  
+  핵심 시나리오 및 계약 위반 E2E 테스트
 
-## Track C: Viewer
-- 노드 그래프 성능 최적화
-- 시그널 리플레이
-- 장애 시각화 레이어
+**Done when | 완료 기준**
 
-## Track D: DSL
-- 문법 버전 정책
-- AST/체커/트랜스파일 파이프라인
-- 런타임 모델과 의미론 정합성 검증
+- Bug reports reproducible ≥80%  
+  버그 리포트 재현률 80% 이상
+- At least one scenario traceable live in Viewer  
+  Viewer에서 최소 1개 시나리오 실시간 추적
 
 ---
 
-## KPI
+## Day 61–90: Public launch & ecosystem | 61~90일: 공개 런칭·생태계
 
-- 설치 성공률
-- 데모 재현 시간
-- 외부 PR 병합률
-- 이슈 응답 시간
-- 릴리즈 주기 준수율
+**Deliverables | 산출물**
 
-## 리스크 및 대응
+- Minimal `.cell` DSL subset (experimental): `cell`, `signal`, `membrane`, `on`, `emit`  
+  최소 `.cell` DSL 부분집합(실험): `cell`, `signal`, `membrane`, `on`, `emit`
+- Transpile PoC: `.cell` → TypeScript  
+  트랜스파일 PoC: `.cell` → TypeScript
+- 3+ reference examples (smart home, robot monitoring, ops alerts)  
+  레퍼런스 예제 3개 이상(스마트홈, 로봇 모니터링, 운영 알림)
 
-- 리스크: DSL 범위 과대 설정  
-  대응: 런타임 우선, DSL은 subset만 공개
+**Done when | 완료 기준**
 
-- 리스크: 유지보수 병목  
-  대응: owner map + 리뷰 SLA + 작은 PR 원칙
+- 10+ external contributors  
+  외부 기여자 10명 이상
+- 30+ external PRs  
+  외부 PR 30건 이상
+- Stable monthly release cadence  
+  안정적 월간 릴리즈 주기
 
-- 리스크: 개념만 강조되는 커뮤니케이션  
-  대응: 모든 발표는 “실행 데모”를 필수 포함
+---
 
+## KPIs | 핵심 지표
+
+- Install success rate · 설치 성공률
+- Demo reproduction time · 데모 재현 시간
+- External PR merge rate · 외부 PR 머지율
+- Issue response time · 이슈 응답 시간
+- Release cadence adherence · 릴리즈 주기 준수
+
+**Pages (bilingual HTML):** https://shshinsk.github.io/cell-coding/roadmap.html

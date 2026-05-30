@@ -77,9 +77,12 @@ All three map to cells with **roles, membranes, and signals** — not plain inpu
 | Docs (GitHub Pages) | https://shshinsk.github.io/cell-coding/ |
 | Paradigm | https://shshinsk.github.io/cell-coding/cell-coding.html |
 | Spec v0.1 | https://shshinsk.github.io/cell-coding/%EA%B0%9C%EB%B0%9C%EB%AA%85%EC%84%B8%EC%84%9C.html |
-| Roadmap | https://github.com/SHShinSK/cell-coding/blob/main/ROADMAP.en.md |
-| Contributing | https://github.com/SHShinSK/cell-coding/blob/main/CONTRIBUTING.md |
+| Roadmap | https://shshinsk.github.io/cell-coding/roadmap.html |
+| Contributing | https://shshinsk.github.io/cell-coding/contributing.html |
 | Good first issues | https://github.com/SHShinSK/cell-coding/labels/good%20first%20issue |
+
+All Pages docs use **English first with Korean parallel** in the same view.  
+모든 Pages 문서는 **영어 우선 + 한국어 병렬** 형식입니다.
 
 Current status: **v0.1 concept + compiler draft + community bootstrap**  
 현재 상태: **v0.1 개념·컴파일러 초안·커뮤니티 부트스트랩**

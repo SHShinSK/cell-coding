@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,6 +87,13 @@ body{
 .hero-meta .m2::before{background:var(--p2);}
 .hero-meta .m3::before{background:var(--p3);}
 .hero-meta .m4::before{background:var(--p4);}
+
+.doc-lang-bar{
+  display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);
+  margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border);
+}
+.doc-lang-bar a{color:var(--green);text-decoration:none;}
 
 /* section */
 .section{padding:80px 0;}
@@ -271,22 +278,30 @@ footer{
 
 <div class="wrap">
 
+  <nav class="doc-lang-bar">
+    <a href="index.html">← Home</a>
+    <span>|</span>
+    <span>English first · 한국어 병렬</span>
+    <span>|</span>
+    <a href="https://github.com/SHShinSK/cell-coding/blob/main/ROADMAP.en.md">Markdown (GitHub)</a>
+  </nav>
+
   <!-- ── HERO ── -->
   <section class="hero">
     <div class="hero-eyebrow">Implementation Roadmap</div>
     <h1 class="hero-title">
-      세포코딩<br>
-      <span class="accent">구현 로드맵</span>
+      Cell Coding<br>
+      <span class="accent">Implementation Roadmap · 구현 로드맵</span>
     </h1>
     <p class="hero-sub">
-      언어 스펙에서 플랫폼까지<br>
-      단계별 실전 구현 가이드 · Cell Coding v0.1
+      From language spec to platform — phased practical guide · Cell Coding v0.1<br>
+      언어 스펙에서 플랫폼까지 — 단계별 실전 구현 가이드 · Cell Coding v0.1
     </p>
     <div class="hero-meta">
-      <span class="m1">Phase 1 · 언어 핵심 · 3–6mo</span>
-      <span class="m2">Phase 2 · 런타임 · 4–6mo</span>
-      <span class="m3">Phase 3 · 개발도구 · 4–6mo</span>
-      <span class="m4">Phase 4 · 플랫폼 · 6mo+</span>
+      <span class="m1">Phase 1 · Language core · 언어 핵심 · 3–6mo</span>
+      <span class="m2">Phase 2 · Runtime · 런타임 · 4–6mo</span>
+      <span class="m3">Phase 3 · Dev tools · 개발도구 · 4–6mo</span>
+      <span class="m4">Phase 4 · Platform · 플랫폼 · 6mo+</span>
     </div>
   </section>
 
@@ -294,7 +309,7 @@ footer{
 
   <!-- ── PHASES ── -->
   <section class="section">
-    <div class="section-label">Four Phases</div>
+    <div class="section-label">Four Phases · 4단계</div>
 
     <!-- Phase 1 -->
     <div class="phase ph1 reveal">
@@ -305,7 +320,7 @@ footer{
         </div>
         <div class="phase-info">
           <div>
-            <div class="phase-title">언어 핵심 구현</div>
+            <div class="phase-title">Language Core · 언어 핵심 구현</div>
             <div class="phase-title-en">Lexer · Parser · AST · Transpiler</div>
           </div>
           <div class="phase-toggle">↓</div>
@@ -349,7 +364,7 @@ footer{
             </div>
           </div>
           <div class="phase-checkpoint">
-            <span class="checkpoint-label">체크포인트</span>
+            <span class="checkpoint-label">Checkpoint · 체크포인트</span>
             <span><code>cell Validator { role: "...", membrane { accepts: X, emits: Y }, on(X input) { emit Y } }</code> 를 파싱해 TypeScript 클래스로 출력할 수 있으면 완료</span>
           </div>
         </div>
@@ -365,7 +380,7 @@ footer{
         </div>
         <div class="phase-info">
           <div>
-            <div class="phase-title">런타임 & 신호 버스</div>
+            <div class="phase-title">Runtime &amp; Signal Bus · 런타임 &amp; 신호 버스</div>
             <div class="phase-title-en">Cell Runtime · Signal Bus · Immune System</div>
           </div>
           <div class="phase-toggle">↓</div>
@@ -409,7 +424,7 @@ footer{
             </div>
           </div>
           <div class="phase-checkpoint">
-            <span class="checkpoint-label">체크포인트</span>
+            <span class="checkpoint-label">Checkpoint · 체크포인트</span>
             <span>세포 A의 emit 신호를 세포 B, C 가 동시에 받아 각자 처리하고, 세포 D 가 오류를 격리하는 예제가 실행되면 완료</span>
           </div>
         </div>
@@ -425,7 +440,7 @@ footer{
         </div>
         <div class="phase-info">
           <div>
-            <div class="phase-title">개발자 도구</div>
+            <div class="phase-title">Developer Tools · 개발자 도구</div>
             <div class="phase-title-en">CLI · Cell Viewer · Cell Lab</div>
           </div>
           <div class="phase-toggle">↓</div>
@@ -469,7 +484,7 @@ footer{
             </div>
           </div>
           <div class="phase-checkpoint">
-            <span class="checkpoint-label">체크포인트</span>
+            <span class="checkpoint-label">Checkpoint · 체크포인트</span>
             <span><code>cell test auth-tissue</code> 명령 하나로 AuthTissue 내 모든 세포가 격리 테스트되고, VS Code에서 신호 흐름이 실시간으로 보이면 완료</span>
           </div>
         </div>
@@ -485,7 +500,7 @@ footer{
         </div>
         <div class="phase-info">
           <div>
-            <div class="phase-title">플랫폼 & 생태계</div>
+            <div class="phase-title">Platform &amp; Ecosystem · 플랫폼 &amp; 생태계</div>
             <div class="phase-title-en">Registry · Cloud Runtime · OSS Community</div>
           </div>
           <div class="phase-toggle">↓</div>
@@ -529,7 +544,7 @@ footer{
             </div>
           </div>
           <div class="phase-checkpoint">
-            <span class="checkpoint-label">체크포인트</span>
+            <span class="checkpoint-label">Checkpoint · 체크포인트</span>
             <span><code>cell install @community/auth-organ</code> 으로 다른 사람이 만든 organ을 내 organism에 붙이고 클라우드에 배포할 수 있으면 완료</span>
           </div>
         </div>
@@ -539,9 +554,11 @@ footer{
     <!-- NOW -->
     <div class="now-section reveal">
       <div>
-        <div class="now-title">지금 바로 시작할 수 있는 것</div>
+        <div class="now-title">Start now · 지금 바로 시작할 수 있는 것</div>
         <p class="now-body">
+          A minimal Phase 1 transpiler is already implemented in TypeScript.<br>
           Phase 1의 최소 트랜스파일러가 이미 TypeScript로 구현되어 있습니다.<br>
+          Run <code>cell-coding-transpiler.ts</code> to parse your first cell.<br>
           <code>cell-coding-transpiler.ts</code> 를 실행해 첫 번째 세포를 파싱해보세요.
         </p>
       </div>
