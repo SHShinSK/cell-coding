@@ -121,12 +121,14 @@ This repository is public, so anyone can read code, discuss ideas, and contribut
 
 ## Documentation | 문서
 
-| 한국어 | English |
-|--------|---------|
-| [README.md](README.md) | [README.en.md](README.en.md) |
-| [OPEN_SOURCE_CHARTER.md](OPEN_SOURCE_CHARTER.md) | [OPEN_SOURCE_CHARTER.en.md](OPEN_SOURCE_CHARTER.en.md) |
-| [ROADMAP.md](ROADMAP.md) | [ROADMAP.en.md](ROADMAP.en.md) |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | [CONTRIBUTING.en.md](CONTRIBUTING.en.md) |
+| Pages docs (EN/KR) | GitHub Markdown (EN/KR parallel) |
+|--------------------|----------------------------------|
+| [index.html](https://shshinsk.github.io/cell-coding/) | [README.md](README.md) / [README.en.md](README.en.md) |
+| [cell-coding.html](https://shshinsk.github.io/cell-coding/cell-coding.html) | — |
+| [개발명세서.html](https://shshinsk.github.io/cell-coding/%EA%B0%9C%EB%B0%9C%EB%AA%85%EC%84%B8%EC%84%9C.html) | — |
+| [roadmap.html](https://shshinsk.github.io/cell-coding/roadmap.html) | [ROADMAP.md](ROADMAP.md) / [ROADMAP.en.md](ROADMAP.en.md) |
+| [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) | [CONTRIBUTING.md](CONTRIBUTING.md) / [CONTRIBUTING.en.md](CONTRIBUTING.en.md) |
+| — | [OPEN_SOURCE_CHARTER.md](OPEN_SOURCE_CHARTER.md) / [OPEN_SOURCE_CHARTER.en.md](OPEN_SOURCE_CHARTER.en.md) |
 | [행동 강령](CODE_OF_CONDUCT.md) | |
 | [보안 정책](SECURITY.md) | |
 | [이슈 라벨 가이드](ISSUE_LABELS.md) | |
@@ -138,6 +140,7 @@ This repository is public, so anyone can read code, discuss ideas, and contribut
 - [cell-coding.html](cell-coding.html) — paradigm overview / 패러다임 소개
 - [개발명세서.html](개발명세서.html) — language specification v0.1 / 언어 명세 v0.1
 - [roadmap.html](roadmap.html) — implementation roadmap / 구현 로드맵
+- [contributing.html](contributing.html) — contributing guide / 기여 가이드
 - [Cell Coding Blueprint.html](Cell%20Coding%20Blueprint.html) — Physical AI blueprint / Physical AI 블루프린트
 
 ## License | 라이선스

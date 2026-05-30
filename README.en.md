@@ -117,7 +117,7 @@ See [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html
 | [개발명세서.html](https://shshinsk.github.io/cell-coding/%EA%B0%9C%EB%B0%9C%EB%AA%85%EC%84%B8%EC%84%9C.html) | — |
 | [roadmap.html](https://shshinsk.github.io/cell-coding/roadmap.html) | [ROADMAP.en.md](ROADMAP.en.md) |
 | [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) | [CONTRIBUTING.en.md](CONTRIBUTING.en.md) |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | (Korean primary; English summary in charter) |
+| — | [OPEN_SOURCE_CHARTER.en.md](OPEN_SOURCE_CHARTER.en.md) |
 | [SECURITY.md](SECURITY.md) | (Korean primary) |
 | [ISSUE_LABELS.md](ISSUE_LABELS.md) | (Korean primary) |
 | [rfcs/README.md](rfcs/README.md) | RFC process (Korean) |
@@ -128,6 +128,7 @@ See [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html
 - [cell-coding.html](cell-coding.html) — paradigm overview
 - [개발명세서.html](개발명세서.html) — language specification v0.1
 - [roadmap.html](roadmap.html) — implementation roadmap
+- [contributing.html](contributing.html) — contributing guide
 - [Cell Coding Blueprint.html](Cell%20Coding%20Blueprint.html) — Physical AI blueprint
 
 ## License | 라이선스
