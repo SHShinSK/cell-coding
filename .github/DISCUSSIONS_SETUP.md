@@ -19,6 +19,21 @@
 
 ## 2) About (저장소 설명)
 
+### 자동 (Actions)
+
+**Community bootstrap** 워크플로의 `update_about` 옵션.
+
+403 `Resource not accessible by integration` 오류가 나면:
+
+1. **Settings** → **Actions** → **General**
+2. **Workflow permissions** → **Read and write permissions** 선택 → Save
+3. 워크플로 **Re-run**  
+   또는 `update_about`만 false로 두고 이슈만 생성
+
+조직(Organization) 저장소는 관리자 정책으로 API 수정이 막힐 수 있습니다 → 아래 수동 설정.
+
+### 수동 (권장 백업)
+
 저장소 메인 페이지 **About** 톱니 → Edit:
 
 **Description (한/영):**

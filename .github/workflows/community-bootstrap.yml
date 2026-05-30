@@ -1,7 +1,11 @@
 # Community bootstrap — starter issues + repository About
 #
 # 실행: GitHub → Actions → "Community bootstrap" → Run workflow
-# 최초 1회만 실행 권장 (이슈 중복 방지 옵션 포함)
+#
+# About 403 오류 시:
+#   Settings → Actions → General → Workflow permissions →
+#   "Read and write permissions" 선택 후 재실행.
+#   그래도 실패하면 About/Topics는 DISCUSSIONS_SETUP.md 수동 설정.
 
 name: Community bootstrap
 
@@ -9,47 +13,64 @@ on:
   workflow_dispatch:
     inputs:
       create_issues:
-        description: "Create 10 starter issues"
+        description: "Create starter issues (9 items, #1 excluded)"
         type: boolean
         default: true
       update_about:
-        description: "Update repo description & homepage"
+        description: "Update repo description, homepage, topics"
         type: boolean
         default: true
 
-permissions:
-  contents: write
-  issues: write
-  discussions: write
-
 jobs:
-  bootstrap:
+  update-about:
+    if: inputs.update_about
     runs-on: ubuntu-latest
+    permissions:
+      administration: write
+      contents: read
+    steps:
+      - name: Update repository About
+        id: about
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          echo "Patching repository metadata..."
+          gh api --method PATCH "repos/${{ github.repository }}" \
+            -f description='Physical AI를 위한 이벤트 기반 세포코딩 | Event-driven biological programming for Physical AI' \
+            -f homepage='https://shshinsk.github.io/cell-coding/'
+
+          echo "Setting topics..."
+          gh api --method PUT "repos/${{ github.repository }}/topics" \
+            -H "Accept: application/vnd.github+json" \
+            -f 'names[]=physical-ai' \
+            -f 'names[]=event-driven-architecture' \
+            -f 'names[]=typescript' \
+            -f 'names[]=python' \
+            -f 'names[]=open-source' \
+            -f 'names[]=dsl' \
+            -f 'names[]=robotics'
+
+      - name: About update failed — manual fallback
+        if: steps.about.outcome == 'failure'
+        run: |
+          echo "::warning::About/Topics API failed (403 = Workflow permissions or org policy)."
+          echo "Manual setup: .github/DISCUSSIONS_SETUP.md sections 2–3"
+          echo "Description: Physical AI를 위한 이벤트 기반 세포코딩 | Event-driven biological programming for Physical AI"
+          echo "Website: https://shshinsk.github.io/cell-coding/"
+
+  bootstrap-issues:
+    if: inputs.create_issues
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Update repository About
-        if: inputs.update_about
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api --method PATCH repos/${{ github.repository }} \
-            -f description='Physical AI를 위한 이벤트 기반 세포코딩 | Event-driven biological programming for Physical AI' \
-            -f homepage='https://shshinsk.github.io/cell-coding/' \
-            -f has_discussions=true
-
-          gh api --method PUT repos/${{ github.repository }}/topics \
-            -f names[]='physical-ai' \
-            -f names[]='event-driven-architecture' \
-            -f names[]='typescript' \
-            -f names[]='python' \
-            -f names[]='open-source' \
-            -f names[]='dsl' \
-            -f names[]='robotics'
-
       - name: Ensure labels exist
-        if: inputs.create_issues
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -77,11 +98,11 @@ jobs:
           done
 
       - name: Create starter issues
-        if: inputs.create_issues
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           shopt -s nullglob
+          created=0
           for file in .github/issue-drafts/[0-9][0-9]-*.md; do
             base=$(basename "$file")
             if [ "$base" = "01-readme-badges.md" ]; then
@@ -89,7 +110,6 @@ jobs:
               continue
             fi
             title=$(head -n1 "$file" | sed 's/^# \[good-first-issue\] //')
-            # Skip if issue with same title already open
             existing=$(gh issue list --repo "${{ github.repository }}" --search "in:title \"$title\"" --state open --json number --jq 'length')
             if [ "$existing" != "0" ]; then
               echo "Skip (exists): $title"
@@ -102,10 +122,12 @@ jobs:
               --body-file "$file" \
               --label "good first issue" \
               --label "help wanted"
+            created=$((created + 1))
             sleep 2
           done
+          echo "Created $created new issue(s)."
 
       - name: Summary
         run: |
-          echo "Done. Issues: https://github.com/${{ github.repository }}/issues"
-          echo "About: https://github.com/${{ github.repository }}"
+          echo "Issues: https://github.com/${{ github.repository }}/issues"
+          echo "Labels: https://github.com/${{ github.repository }}/labels"
