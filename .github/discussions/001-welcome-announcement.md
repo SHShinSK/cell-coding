@@ -75,6 +75,7 @@ All three map to cells with **roles, membranes, and signals** — not plain inpu
 | Resource | Link |
 |----------|------|
 | Docs (GitHub Pages) | https://shshinsk.github.io/cell-coding/ |
+| Concept Overview | https://shshinsk.github.io/cell-coding/concept-overview.html |
 | Paradigm | https://shshinsk.github.io/cell-coding/cell-coding.html |
 | Spec v0.1 | https://shshinsk.github.io/cell-coding/%EA%B0%9C%EB%B0%9C%EB%AA%85%EC%84%B8%EC%84%9C.html |
 | Roadmap | https://shshinsk.github.io/cell-coding/roadmap.html |

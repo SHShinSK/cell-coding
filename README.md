@@ -124,6 +124,7 @@ This repository is public, so anyone can read code, discuss ideas, and contribut
 | Pages docs (EN/KR) | GitHub Markdown (EN/KR parallel) |
 |--------------------|----------------------------------|
 | [index.html](https://shshinsk.github.io/cell-coding/) | [README.md](README.md) / [README.en.md](README.en.md) |
+| [concept-overview.html](https://shshinsk.github.io/cell-coding/concept-overview.html) | — |
 | [cell-coding.html](https://shshinsk.github.io/cell-coding/cell-coding.html) | — |
 | [개발명세서.html](https://shshinsk.github.io/cell-coding/%EA%B0%9C%EB%B0%9C%EB%AA%85%EC%84%B8%EC%84%9C.html) | — |
 | [roadmap.html](https://shshinsk.github.io/cell-coding/roadmap.html) | [ROADMAP.md](ROADMAP.md) / [ROADMAP.en.md](ROADMAP.en.md) |
@@ -137,6 +138,7 @@ This repository is public, so anyone can read code, discuss ideas, and contribut
 
 ### Concept & specification (HTML) | 개념·명세 (HTML)
 
+- [concept-overview.html](concept-overview.html) — integrated process diagram / 통합 프로세스 다이어그램
 - [cell-coding.html](cell-coding.html) — paradigm overview / 패러다임 소개
 - [개발명세서.html](개발명세서.html) — language specification v0.1 / 언어 명세 v0.1
 - [roadmap.html](roadmap.html) — implementation roadmap / 구현 로드맵

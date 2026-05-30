@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cell Coding concept overview — integrated process architecture (EN/KR)">
+  <title>Concept Overview · Cell Coding</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Pretendard:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0f0d;
+      --green: #2dff8f;
+      --purple: rgba(167,139,250,0.35);
+      --amber: rgba(251,191,36,0.35);
+      --coral: rgba(251,113,133,0.35);
+      --text: #e8f5ee;
+      --dim: rgba(232,245,238,0.62);
+      --border: rgba(45,255,143,0.2);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Pretendard', sans-serif;
+      padding: 48px 24px 56px;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; }
+    .lang-bar {
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+      font-family: 'DM Mono', monospace; font-size: 11px; color: var(--dim);
+      margin-bottom: 28px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+    }
+    .lang-bar a { color: var(--green); text-decoration: none; }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); margin-bottom: 8px; }
+    .lead { color: var(--dim); line-height: 1.85; margin-bottom: 6px; }
+    .bridge {
+      border: 1px solid var(--border);
+      padding: 18px 20px;
+      margin: 24px 0 32px;
+      background: rgba(45,255,143,0.04);
+    }
+    .bridge strong { color: var(--green); }
+    .diagram { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .arrow-down {
+      width: 2px; height: 28px;
+      background: rgba(232,245,238,0.25);
+      position: relative;
+    }
+    .arrow-down::after {
+      content: '';
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: rgba(232,245,238,0.35);
+    }
+    .level-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--dim);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .level-box {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px;
+      margin-bottom: 4px;
+    }
+    .level0 { text-align: center; }
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--green);
+      border-radius: 999px;
+      padding: 12px 24px;
+      background: rgba(45,255,143,0.08);
+    }
+    .pill .en { font-weight: 600; font-size: 15px; display: block; }
+    .pill .kr { font-size: 13px; color: var(--dim); margin-top: 4px; }
+    .pill .map {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--green);
+      margin-top: 8px;
+      opacity: 0.85;
+    }
+    .lanes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 700px) { .lanes { grid-template-columns: 1fr; } }
+    .lane {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px;
+      background: rgba(45,255,143,0.03);
+    }
+    .lane.sense { border-color: rgba(45,255,143,0.35); }
+    .lane.decide { border-color: var(--purple); background: rgba(167,139,250,0.04); }
+    .lane.act { border-color: var(--coral); background: rgba(251,113,133,0.04); }
+    .lane-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; color: var(--green); }
+    .lane.decide .lane-title { color: #a78bfa; }
+    .lane.act .lane-title { color: #fb7185; }
+    .lane-sub { font-size: 12px; color: var(--dim); margin-bottom: 10px; line-height: 1.5; }
+    .lane-map {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--dim);
+      margin-bottom: 12px;
+    }
+    .pair-row, .cell-row {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    }
+    .chip {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      text-align: center;
+      min-width: 72px;
+    }
+    .chip .en { display: block; font-weight: 500; }
+    .chip .kr { display: block; font-size: 11px; color: var(--dim); margin-top: 3px; }
+    .chip.small { font-size: 11px; padding: 6px 10px; min-width: 64px; }
+    .lane-arrows {
+      display: flex; justify-content: space-between; align-items: center;
+      margin: 8px 0; padding: 0 8%;
+      font-family: 'DM Mono', monospace; font-size: 18px; color: var(--dim);
+    }
+    .footer-note {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--dim);
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+    }
+    .scenarios {
+      margin-top: 32px;
+      border: 1px solid var(--border);
+      padding: 20px;
+    }
+    .scenarios h2 { font-size: 16px; color: var(--green); margin-bottom: 12px; }
+    .scenarios ul { list-style: none; }
+    .scenarios li {
+      font-size: 14px; line-height: 1.75; color: var(--dim);
+      margin-bottom: 8px; padding-left: 14px; position: relative;
+    }
+    .scenarios li::before {
+      content: '›'; position: absolute; left: 0; color: var(--green);
+    }
+    .mapping-table {
+      width: 100%; border-collapse: collapse; margin-top: 32px; font-size: 13px;
+    }
+    .mapping-table th, .mapping-table td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .mapping-table th { color: var(--green); font-weight: 600; }
+    .mapping-table td { color: var(--dim); line-height: 1.6; }
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: var(--dim);
+      font-family: 'DM Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="lang-bar">
+      <a href="index.html">← Home</a>
+      <span>|</span>
+      <span>English first · 한국어 병렬</span>
+      <span>|</span>
+      <a href="cell-coding.html">Paradigm</a>
+    </nav>
+
+    <h1>Concept Overview · 개념 구조</h1>
+    <p class="lead">Integrated process architecture for Cell Coding — merging process layers and sequence lanes into functional cells.</p>
+    <p class="lead">Cell Coding을 위한 통합 프로세스 구조 — 프로세스 레이어와 시퀀스 레인을 기능 세포로 통합합니다.</p>
+
+    <div class="bridge">
+      <p class="lead">Classical I/O hides complexity in three boxes. Cell Coding <strong>decomposes each box into cells</strong> and connects them by <strong>signals</strong>, not direct calls.</p>
+      <p class="lead">고전 I/O는 복잡도를 세 개 상자에 숨깁니다. Cell Coding은 <strong>각 상자를 세포로 분해</strong>하고, 직접 호출이 아닌 <strong>신호</strong>로 연결합니다.</p>
+    </div>
+
+    <div class="diagram">
+
+      <!-- Level 0 -->
+      <div class="level-label">Level 0 · Overall System · 전체 시스템</div>
+      <div class="level-box level0">
+        <div class="pill">
+          <span class="en">Modeling · Coding · Interworking</span>
+          <span class="kr">모델링 · 코딩 · 연동</span>
+          <span class="map">Genome → Cell → Nervous</span>
+        </div>
+        <p class="lead" style="margin-top:14px;font-size:13px;">Relationships between components · 구성 요소 간 관계</p>
+      </div>
+
+      <div class="arrow-down"></div>
+
+      <!-- Level 1 -->
+      <div class="level-label">Level 1 · Flow Lanes · 흐름 레인</div>
+      <div class="level-box" style="width:100%">
+        <div class="lanes">
+          <div class="lane sense">
+            <div class="lane-title">Input Sequence/Part</div>
+            <div class="lane-sub">입력 시퀀스/파트</div>
+            <div class="lane-map">Sense tissue</div>
+          </div>
+          <div class="lane decide">
+            <div class="lane-title">Processing Sequence/Part</div>
+            <div class="lane-sub">처리 시퀀스/파트</div>
+            <div class="lane-map">Decide tissue</div>
+          </div>
+          <div class="lane act">
+            <div class="lane-title">Output Sequence/Part</div>
+            <div class="lane-sub">출력 시퀀스/파트</div>
+            <div class="lane-map">Act tissue</div>
+          </div>
+        </div>
+        <div class="lane-arrows"><span>→</span><span>→</span></div>
+      </div>
+
+      <div class="arrow-down"></div>
+
+      <!-- Level 2 -->
+      <div class="level-label">Level 2 · Functional Pairs · 기능 쌍</div>
+      <div class="level-box" style="width:100%">
+        <div class="lanes">
+          <div class="lane sense">
+            <div class="pair-row">
+              <div class="chip"><span class="en">Detection</span><span class="kr">감지</span></div>
+              <div class="chip"><span class="en">Recognition</span><span class="kr">인식</span></div>
+            </div>
+          </div>
+          <div class="lane decide">
+            <div class="pair-row">
+              <div class="chip"><span class="en">Judgment</span><span class="kr">판단</span></div>
+              <div class="chip"><span class="en">Design</span><span class="kr">설계</span></div>
+              <div class="chip"><span class="en">Calculation</span><span class="kr">계산</span></div>
+            </div>
+          </div>
+          <div class="lane act">
+            <div class="pair-row">
+              <div class="chip"><span class="en">Expression</span><span class="kr">표현</span></div>
+              <div class="chip"><span class="en">Transmission</span><span class="kr">전달</span></div>
+              <div class="chip"><span class="en">Reaction</span><span class="kr">반응</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow-down"></div>
+
+      <!-- Level 3 -->
+      <div class="level-label">Level 3 · Component Cells · 구성 세포</div>
+      <div class="level-box" style="width:100%">
+        <div class="lanes">
+          <div class="lane sense">
+            <div class="cell-row">
+              <div class="chip small"><span class="en">Data</span><span class="kr">데이터</span></div>
+              <div class="chip small"><span class="en">Signal</span><span class="kr">신호</span></div>
+              <div class="chip small"><span class="en">Collection</span><span class="kr">수집/수신</span></div>
+            </div>
+            <p class="lane-sub" style="margin-top:10px;text-align:center">Sensor · Camera · User input · 센서 · 카메라 · 사용자 입력</p>
+          </div>
+          <div class="lane decide">
+            <div class="cell-row">
+              <div class="chip small"><span class="en">Algorithm</span><span class="kr">알고리즘</span></div>
+              <div class="chip small"><span class="en">Data Processing</span><span class="kr">데이터 가공</span></div>
+              <div class="chip small"><span class="en">Event Trigger</span><span class="kr">이벤트 트리거</span></div>
+            </div>
+            <p class="lane-sub" style="margin-top:10px;text-align:center">Data model · Event bus · 데이터 모델 · 이벤트 버스</p>
+          </div>
+          <div class="lane act">
+            <div class="cell-row">
+              <div class="chip small"><span class="en">Content</span><span class="kr">콘텐츠</span></div>
+              <div class="chip small"><span class="en">Action</span><span class="kr">액션</span></div>
+              <div class="chip small"><span class="en">Micro-motion</span><span class="kr">마이크로모션</span></div>
+            </div>
+            <p class="lane-sub" style="margin-top:10px;text-align:center">Actuator · Communication · 액추에이터 · 통신</p>
+          </div>
+        </div>
+        <p class="lead" style="margin-top:16px;text-align:center;font-size:12px;font-family:'DM Mono',monospace">
+          Signal via Membrane · 막을 통한 신호 연결 (not direct calls · 직접 호출 아님)
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <p><strong style="color:var(--green)">Flow:</strong> Sense → Decide → Act (not flat input/output)</p>
+      <p><strong style="color:var(--green)">흐름:</strong> 감지 → 판단 → 행동 (평면 I/O가 아님)</p>
+      <p style="margin-top:12px">Each unit is an independent <strong>cell</strong> with <strong>role</strong>, <strong>membrane</strong>, and <strong>signal</strong> contracts.</p>
+      <p>각 단위는 <strong>역할·막·신호</strong> 계약을 가진 독립 <strong>세포</strong>입니다.</p>
+      <p style="margin-top:8px;font-size:12px">Cell = Function = Logical component = Hardware component · 세포 = 함수 = 논리적 구성 요소 = 하드웨어적 구성 요소</p>
+    </div>
+
+    <div class="scenarios">
+      <h2>Physical AI scenarios · Physical AI 시나리오</h2>
+      <ul>
+        <li><strong>Spider robot</strong> — terrain-adaptive Sense/Act cells · 거미 로봇 — 지형 적응형 감각/행동 세포</li>
+        <li><strong>Humanoid robot</strong> — multi-organ Decide/Act coordination · 휴머노이드 — 다기관 판단/행동 협업</li>
+        <li><strong>PET robot</strong> — continuous Affect/Safety cells · 반려(PET) 로봇 — 정서/안전 세포 지속 상호작용</li>
+      </ul>
+    </div>
+
+    <table class="mapping-table">
+      <thead>
+        <tr>
+          <th>Diagram level · 다이어그램 단계</th>
+          <th>Cell Coding · 세포코딩</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Level 0: Modeling · Coding · Interworking<br>모델링 · 코딩 · 연동</td>
+          <td><code>genome</code> (design) → <code>cell</code> (implementation) → <code>nervous</code> (interworking)</td>
+        </tr>
+        <tr>
+          <td>Level 1: Input / Process / Output lanes<br>입력 / 처리 / 출력 레인</td>
+          <td><code>tissue</code>: Sense · Decide · Act (not monolithic I/O)</td>
+        </tr>
+        <tr>
+          <td>Level 2: Functional pairs<br>기능 쌍</td>
+          <td>Specialized <code>cell</code> roles within each tissue</td>
+        </tr>
+        <tr>
+          <td>Level 3: Component cells<br>구성 세포</td>
+          <td>Concrete cells with <code>membrane</code> contracts and <code>signal</code> types</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <footer>Apache-2.0 · SHShinSK/cell-coding · Concept Overview v0.1</footer>
+  </div>
+</body>
+</html>

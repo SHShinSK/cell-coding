@@ -181,6 +181,43 @@
   .doc-lang-bar a { color: var(--cell-green); text-decoration: none; }
   main { padding-top: 44px; }
 
+  .overview-embed {
+    margin-top: 48px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .overview-embed-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  .overview-embed-header a {
+    color: var(--cell-green);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    text-decoration: none;
+  }
+  .overview-embed iframe {
+    width: 100%;
+    height: 920px;
+    border: none;
+    background: var(--bg);
+  }
+
+  .complexity-diagram {
+    margin-top: 40px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    background: rgba(45,255,143,0.03);
+    text-align: center;
+  }
+  .complexity-diagram img {
+    max-width: 680px;
+    width: 100%;
+    height: auto;
+  }
+
   .hero-scroll {
     position: absolute;
     bottom: 40px;
@@ -652,6 +689,8 @@
     <span>|</span>
     <span>English first · 한국어 병렬</span>
     <span>|</span>
+    <a href="concept-overview.html">Concept Overview</a>
+    <span>|</span>
     <a href="개발명세서.html">Spec v0.1</a>
     <span>|</span>
     <a href="roadmap.html">Roadmap</a>
@@ -724,6 +763,27 @@
 
   <hr class="divider">
 
+  <!-- ─── PROCESS ARCHITECTURE ─── -->
+  <section>
+    <div class="container">
+      <p class="sec-label fade-in">Process Architecture</p>
+      <h2 class="sec-title fade-in">From I/O lanes to functional cells · I/O 레인에서 기능 세포로</h2>
+      <p class="sec-body fade-in">Classical I/O hides complexity in three boxes. Cell Coding decomposes each box into cells and connects them by signals, not direct calls.</p>
+      <p class="sec-body fade-in">고전 I/O는 복잡도를 세 개 상자에 숨깁니다. Cell Coding은 각 상자를 세포로 분해하고, 직접 호출이 아닌 신호로 연결합니다.</p>
+      <p class="sec-body fade-in">Four levels — Overall (Modeling/Coding/Interworking) → Flow lanes (Sense/Decide/Act) → Functional pairs → Component cells — map to genome, tissue, cell, and membrane/signal contracts.</p>
+      <p class="sec-body fade-in">4단계 — 전체(모델링/코딩/연동) → 흐름 레인(감각/판단/행동) → 기능 쌍 → 구성 세포 — 는 genome, tissue, cell, 막/신호 계약에 대응합니다.</p>
+
+      <div class="overview-embed fade-in">
+        <div class="overview-embed-header">
+          <a href="concept-overview.html">Open full diagram · 전체 다이어그램 보기 →</a>
+        </div>
+        <iframe src="concept-overview.html" title="Cell Coding Concept Overview"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
   <!-- ─── PRINCIPLES ─── -->
   <section>
     <div class="container">
@@ -782,6 +842,12 @@
       <h2 class="sec-title fade-in">From unicellular to organism · 단세포에서 유기체로</h2>
       <p class="sec-body fade-in">System complexity is determined by cell count and organization level. A small script is unicellular; a large platform is human-scale.</p>
       <p class="sec-body fade-in">세포의 수와 조직화 수준에 따라 시스템의 복잡도가 결정된다. 작은 스크립트는 단세포이고, 대규모 플랫폼은 인간이다.</p>
+
+      <div class="complexity-diagram fade-in">
+        <p class="sec-body" style="margin-bottom:16px">Complexity scale diagram · 복잡도 계층 다이어그램</p>
+        <img src="cell_coding_complexity_scale.svg" alt="Cell Coding complexity scale from unicellular to organism">
+        <p class="sec-body" style="margin-top:16px;font-size:13px">See also: <a href="concept-overview.html" style="color:var(--cell-green)">Concept Overview · 개념 구조</a> (process architecture)</p>
+      </div>
 
       <div class="hierarchy-wrapper">
 
