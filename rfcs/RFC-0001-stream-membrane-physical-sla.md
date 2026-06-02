@@ -3,7 +3,7 @@
 - 상태: Review (Phase 2 parser + runtime enforcement landed)
 - 작성일: 2026-06-02
 - 작성자: @SHShinSK
-- 관련 이슈: (TBD — Physical AI Phase 1)
+- 관련 이슈: register [21-rfc-0001-phase3-tracking.md](../.github/issue-drafts/21-rfc-0001-phase3-tracking.md) on GitHub · GitHub 이슈 등록 후 링크
 
 ## 1. 요약
 

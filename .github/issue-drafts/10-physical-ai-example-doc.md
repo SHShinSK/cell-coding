@@ -10,6 +10,12 @@ Document the Physical AI PoC scenario in `examples/`.
 
 Physical AI PoC 시나리오를 `examples/` 문서로 정리합니다.
 
+## Status · 현황 (2026-06)
+
+- ✅ [`examples/physical-ai-motion-alarm.md`](../../examples/physical-ai-motion-alarm.md) — EN/KR, mermaid, bridge + cloud
+- ✅ Close GitHub **#28** — see [close-issue-comments.md](../maintainer/close-issue-comments.md)
+- **Follow-up:** broader sim-real track → [19-physical-ai-sim-real-track.md](19-physical-ai-sim-real-track.md)
+
 ## Tasks · 작업
 
 - [ ] `examples/physical-ai-motion-alarm.md` (EN/KR) · 한/영 문서
