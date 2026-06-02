@@ -137,6 +137,8 @@ From source: `cd typescript && npm install && npm test` — see [examples/README
 See [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) (Pages) or [CONTRIBUTING.en.md](CONTRIBUTING.en.md) for details.  
 자세한 절차는 [contributing.html](https://shshinsk.github.io/cell-coding/contributing.html) (Pages) 또는 [CONTRIBUTING.en.md](CONTRIBUTING.en.md) 참고.
 
+For security-sensitive findings, use [SECURITY.md](SECURITY.md) and report them privately instead of opening a public issue. The English summary there covers the reporting path, response targets, and severity guidance.
+
 ## Documentation | 문서
 
 | Pages docs (EN/KR) | GitHub Markdown |
