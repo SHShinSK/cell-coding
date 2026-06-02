@@ -24,6 +24,7 @@ export interface Program extends BaseNode {
 
 export type TopLevelDecl =
   | SignalDecl
+  | StreamDecl
   | CellDecl
   | TissueDecl
   | OrganDecl
@@ -40,6 +41,14 @@ export interface SignalDecl extends BaseNode {
   extends?: string;
   priority?: 'critical' | 'high' | 'normal' | 'low';
   fields:   FieldDecl[];
+}
+
+export interface StreamDecl extends BaseNode {
+  kind:         'StreamDecl';
+  name:         string;
+  rateHz?:      number;
+  sampleType:   string;
+  sampleFields?: FieldDecl[];
 }
 
 export interface FieldDecl extends BaseNode {
@@ -101,6 +110,14 @@ export interface MembraneDecl extends BaseNode {
   rejects?:       TypeExpr;
   observes?:      TypeExpr;
   passthrough?:   TypeExpr;
+  physicalSla?:   MembranePhysicalSla;
+}
+
+export interface MembranePhysicalSla {
+  latencyBudgetMs?:   number;
+  rateMaxHz?:         number;
+  stalenessRejectMs?: number;
+  onViolation?:       'holdLastSafe' | 'drop' | 'emitFault';
 }
 
 // ── Nucleus · 핵 ───────────────────────────────────────────
@@ -115,6 +132,7 @@ export interface HandlerDecl extends BaseNode {
   signalType: string;
   paramName:  string;
   isQuery?:   boolean;
+  isSample?:  boolean;
   body:       Stmt[];
 }
 

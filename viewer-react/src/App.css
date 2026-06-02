@@ -229,6 +229,11 @@ main {
 
 .step-from.external { color: var(--blue); }
 .step-from.immune { color: var(--amber); }
+.step-from.sla { color: #f97316; }
+
+.step-signal.sla-violation {
+  color: #f97316;
+}
 
 .step-signal {
   font-family: ui-monospace, monospace;

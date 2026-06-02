@@ -8,6 +8,7 @@ export enum TokenType {
   // Keywords · 키워드
   CELL       = 'cell',
   SIGNAL     = 'signal',
+  STREAM     = 'stream',
   MEMBRANE   = 'membrane',
   TISSUE     = 'tissue',
   ORGAN      = 'organ',
@@ -16,6 +17,7 @@ export enum TokenType {
   NERVOUS    = 'nervous',
   IMMUNE     = 'immune',
   ON         = 'on',
+  ON_SAMPLE  = 'onSample',
   EMIT       = 'emit',
   ABSORB     = 'absorb',
   DIVIDE     = 'divide',
@@ -90,6 +92,7 @@ export enum TokenType {
 const KEYWORDS: Record<string, TokenType> = {
   cell:       TokenType.CELL,
   signal:     TokenType.SIGNAL,
+  stream:     TokenType.STREAM,
   membrane:   TokenType.MEMBRANE,
   tissue:     TokenType.TISSUE,
   organ:      TokenType.ORGAN,
@@ -98,6 +101,7 @@ const KEYWORDS: Record<string, TokenType> = {
   nervous:    TokenType.NERVOUS,
   immune:     TokenType.IMMUNE,
   on:         TokenType.ON,
+  onSample:   TokenType.ON_SAMPLE,
   emit:       TokenType.EMIT,
   absorb:     TokenType.ABSORB,
   divide:     TokenType.DIVIDE,

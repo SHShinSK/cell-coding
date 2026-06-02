@@ -19,6 +19,16 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+camera = ["opencv-python-headless>=4.8.0"]
+ros2 = [
+  "rclpy",
+  "sensor-msgs-py",
+]
+hardware = [
+  "opencv-python-headless>=4.8.0",
+]
+
 [project.urls]
 Homepage = "https://shshinsk.github.io/cell-coding/"
 Repository = "https://github.com/SHShinSK/cell-coding"

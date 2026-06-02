@@ -1,0 +1,173 @@
+// Spiderling Sim — A2-S Physical AI (IMU bridge → locomotion)
+// 거미 새끼 시뮬 — A2-S Physical AI (IMU 브리지 → 보행)
+//
+// RFC-0001 Phase 2: stream + membrane physical SLA
+// Bridge: bridge-python/demo_spiderling_sim.py
+
+stream ImuStream {
+  rate: 100Hz;
+  sample: ImuSample;
+}
+
+signal ImuSample {
+  timestamp: Number;
+  accelX: Number;
+  accelY: Number;
+  accelZ: Number;
+  gyroX: Number;
+  gyroY: Number;
+  gyroZ: Number;
+}
+
+signal ContactEvent {
+  pressure: Number;
+  zone: String;
+}
+
+signal TactilePing {
+  contact: Boolean;
+  intensity: Number;
+}
+
+signal TerrainScan {
+  slope: Number;
+  friction: Number;
+}
+
+signal PathCommand {
+  direction: String;
+  speed: Number;
+}
+
+signal GaitStep {
+  pattern: String;
+  legs: Number;
+}
+
+signal StanceHold {
+  stable: Boolean;
+}
+
+signal LegFault {
+  message: String;
+}
+
+cell ImuStreamGateCell {
+  role: "IMU stream to contact pulse gateway · IMU 스트림→접촉 펄스 게이트";
+
+  membrane {
+    accepts: ImuSample;
+    emits: ContactEvent;
+    latency: budget 10ms;
+    rate: max 100Hz;
+    onViolation: holdLastSafe;
+  }
+
+  onSample(ImuSample sample) {
+    if (sample.accelZ > 10.5) {
+      emit ContactEvent(pressure: 0.75, zone: "foot-front");
+    } else {
+      if (sample.accelZ > 9.2) {
+        emit ContactEvent(pressure: 0.45, zone: "foot-front");
+      } else {
+        emit ContactEvent(pressure: 0.15, zone: "foot-rear");
+      }
+    }
+  }
+}
+
+cell TactileSenseCell {
+  role: "Tactile contact sensing · 촉각 접촉 감지";
+
+  membrane {
+    accepts: ContactEvent;
+    emits: TactilePing | LegFault;
+  }
+
+  on(ContactEvent evt) {
+    if (evt.pressure > 0.95) {
+      emit LegFault;
+    } else {
+      emit TactilePing;
+    }
+  }
+}
+
+cell TerrainSenseCell {
+  role: "Terrain slope and friction scan · 지형 경사·마찰 스캔";
+
+  membrane {
+    accepts: TactilePing;
+    emits: TerrainScan;
+  }
+
+  on(TactilePing ping) {
+    emit TerrainScan;
+  }
+}
+
+cell PathDecideCell {
+  role: "Path and gait routing · 경로·보행 라우팅";
+
+  membrane {
+    accepts: TerrainScan;
+    emits: PathCommand;
+  }
+
+  on(TerrainScan scan) {
+    if (scan.slope > 0.5) {
+      emit PathCommand(direction: "turn", speed: 0.2);
+    } else {
+      emit PathCommand(direction: "forward", speed: 0.6);
+    }
+  }
+}
+
+cell GaitActCell {
+  role: "Leg gait execution · 다리 보행 실행";
+
+  membrane {
+    accepts: PathCommand;
+    emits: GaitStep;
+  }
+
+  on(PathCommand cmd) {
+    emit GaitStep;
+  }
+}
+
+cell StanceActCell {
+  role: "Posture stabilization · 자세 안정화";
+
+  membrane {
+    accepts: GaitStep;
+    emits: StanceHold;
+  }
+
+  on(GaitStep step) {
+    emit StanceHold;
+  }
+}
+
+tissue LocomotionTissue {
+  flow linear {
+    ImuStreamGateCell -> TactileSenseCell -> TerrainSenseCell -> PathDecideCell -> GaitActCell -> StanceActCell
+  }
+}
+
+organ SpiderThoraxSim {
+  tissues { LocomotionTissue }
+  exports { StanceHold }
+}
+
+organism SpiderlingSimOrganism {
+  organs { SpiderThoraxSim }
+
+  immune LegPolicy {
+    on LegFault {
+      strategy: retry;
+      retries: 2;
+      backoff: linear;
+    }
+  }
+}

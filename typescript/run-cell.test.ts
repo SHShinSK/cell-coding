@@ -155,4 +155,35 @@ describe('cell run CLI', () => {
     const payload = JSON.parse(stdout);
     assert.match(payload.observability.jaegerUrl, /127\.0\.0\.1:16686\/search\?service=cell-motion-alarm/);
   });
+
+  it('runs --stream batch on spiderling-sim', async () => {
+    const jsonArg = JSON.stringify({
+      timestamp: 1,
+      accelX: 0.1,
+      accelY: 0.2,
+      accelZ: 9.81,
+      gyroX: 0,
+      gyroY: 0,
+      gyroZ: 0.05,
+    });
+    const { stdout } = await execFileAsync(
+      process.execPath,
+      [
+        '--import', 'tsx', 'run.ts',
+        '--json',
+        '--stream', 'ImuStream',
+        '--samples', '3',
+        '--interval-ms', '10',
+        '../examples/spiderling-sim/spiderling-sim-organism.cell',
+        'ImuSample',
+        jsonArg,
+      ],
+      { cwd: __dirname, windowsHide: true },
+    );
+    const payload = JSON.parse(stdout);
+    assert.equal(payload.result.ok, true);
+    assert.equal(payload.result.stream.sampleCount, 3);
+    assert.ok(payload.result.trace.some((t: { from: string }) => t.from === 'stream:ImuStream'));
+    assert.ok(payload.result.trace.some((t: { signal: { type: string } }) => t.signal.type === 'StanceHold'));
+  });
 });

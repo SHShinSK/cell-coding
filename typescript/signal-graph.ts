@@ -6,6 +6,7 @@
 
 import type * as AST from './ast.js';
 import type { SignalInstance, TraceEntry } from './runtime.js';
+import type { PhysicalTraceMeta } from './physical-sla.js';
 import type { LifecycleSnapshot } from './lifecycle.js';
 import type { ViewerInspectSnapshot } from './viewer-inspect.js';
 import { buildViewerInspectSnapshot } from './viewer-inspect.js';
@@ -13,7 +14,7 @@ import type { TypeCheckError } from './checker.js';
 
 export type { ViewerInspectSnapshot };
 
-export type FlowActorKind = 'external' | 'cell' | 'immune';
+export type FlowActorKind = 'external' | 'cell' | 'immune' | 'sla';
 
 export interface CellGraphNode {
   name: string;
@@ -46,6 +47,8 @@ export interface FlowStep {
   atMs?: number;
   /** Backoff wait before a scheduled retry · retry 예약 전 대기(ms) */
   backoffMs?: number;
+  /** Physical AI trace metadata · RFC-0001 */
+  physical?: PhysicalTraceMeta;
 }
 
 export interface ViewerScenarioBundle {
@@ -78,6 +81,7 @@ function typeNames(type?: AST.TypeExpr): string[] {
 
 function actorKind(from: string): FlowActorKind {
   if (from === 'external') return 'external';
+  if (from.startsWith('sla:')) return 'sla';
   if (from.startsWith('immune:')) return 'immune';
   return 'cell';
 }
@@ -136,6 +140,7 @@ export function buildFlowSteps(trace: TraceEntry[], graph: ProgramGraph): FlowSt
     consumers: [...(handlerMap.get(entry.signal.type) ?? [])],
     atMs: entry.atMs,
     backoffMs: entry.backoffMs,
+    physical: entry.physical,
   }));
 }
 

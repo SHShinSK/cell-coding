@@ -1,0 +1,326 @@
+// PET Robot Sim — A4-S Physical AI (sim-real parity)
+// 반려(PET) 로봇 시뮬 — A4-S Physical AI (sim-real parity)
+//
+// RFC-0001 Phase 2: owner stream + membrane SLA on sensing entry
+// Same 11 cells / 3 organs / nervous as A4 — bridge injects OwnerPing
+// Bridge: bridge-python/demo_pet.py
+
+stream OwnerStream {
+  rate: 2Hz;
+  sample: OwnerPing;
+}
+
+stream TouchStream {
+  rate: 10Hz;
+  sample: TouchSample;
+}
+
+signal OwnerPing {
+  rssi: Number;
+  timestamp: Number;
+}
+
+signal TouchSample {
+  pressure: Number;
+}
+
+signal OwnerPresence {
+  detected: Boolean;
+  distance: Number;
+}
+
+signal TouchSignal {
+  pressure: Number;
+  duration: Number;
+}
+
+signal VoiceTone {
+  pitch: Number;
+  calm: Boolean;
+}
+
+signal HomeContext {
+  room: String;
+  quiet: Boolean;
+}
+
+signal AffectState {
+  valence: Number;
+  arousal: Number;
+}
+
+signal SocialIntent {
+  mode: String;
+}
+
+signal SafetyClear {
+  approved: Boolean;
+}
+
+signal DistressSignal {
+  reason: String;
+}
+
+signal FollowPulse {
+  pace: Number;
+}
+
+signal VocalCue {
+  phrase: String;
+  volume: Number;
+}
+
+signal ExpressionPulse {
+  tail: Number;
+  led: String;
+}
+
+signal ComfortAction {
+  behavior: String;
+}
+
+cell PresenceSenseCell {
+  role: "Owner presence detection · 주인 존재 감지";
+
+  membrane {
+    accepts: OwnerPing;
+    emits: OwnerPresence | DistressSignal;
+    latency: budget 500ms;
+    rate: max 2Hz;
+    staleness: reject 2000ms;
+    onViolation: holdLastSafe;
+  }
+
+  onSample(OwnerPing ping) {
+    if (ping.rssi < 0.05) {
+      emit DistressSignal(reason: "lost_signal");
+    } else {
+      if (ping.rssi > 0.7) {
+        emit OwnerPresence(detected: true, distance: 0.2);
+      } else {
+        emit OwnerPresence(detected: true, distance: 0.5);
+      }
+    }
+  }
+}
+
+cell TouchSenseCell {
+  role: "Touch and petting sensing · 터치·쓰다듬기 감지";
+
+  membrane {
+    accepts: OwnerPresence;
+    emits: TouchSignal;
+  }
+
+  on(OwnerPresence presence) {
+    if (presence.distance < 0.3) {
+      emit TouchSignal(pressure: 0.8, duration: 0.5);
+    } else {
+      emit TouchSignal(pressure: 0.3, duration: 0.5);
+    }
+  }
+}
+
+cell VoiceSenseCell {
+  role: "Voice tone sensing · 음성 톤 감지";
+
+  membrane {
+    accepts: TouchSignal;
+    emits: VoiceTone;
+  }
+
+  on(TouchSignal touch) {
+    if (touch.pressure > 0.5) {
+      emit VoiceTone(pitch: 220, calm: true);
+    } else {
+      emit VoiceTone(pitch: 440, calm: false);
+    }
+  }
+}
+
+cell HomeContextCell {
+  role: "Home ambient context · 가정 환경 맥락";
+
+  membrane {
+    accepts: VoiceTone;
+    emits: HomeContext;
+  }
+
+  on(VoiceTone tone) {
+    emit HomeContext(room: "living", quiet: tone.calm);
+  }
+}
+
+cell AffectFusionCell {
+  role: "Affect state fusion · 정서 상태 융합";
+
+  membrane {
+    accepts: HomeContext;
+    emits: AffectState;
+  }
+
+  on(HomeContext ctx) {
+    if (ctx.quiet) {
+      emit AffectState(valence: 0.75, arousal: 0.2);
+    } else {
+      emit AffectState(valence: 0.35, arousal: 0.6);
+    }
+  }
+}
+
+cell MoodDecideCell {
+  role: "Social intent from affect · 정서 기반 상호작용 의도";
+
+  membrane {
+    accepts: AffectState;
+    emits: SocialIntent;
+  }
+
+  on(AffectState affect) {
+    if (affect.valence > 0.5) {
+      emit SocialIntent(mode: "comfort");
+    } else {
+      emit SocialIntent(mode: "follow");
+    }
+  }
+}
+
+cell SafetyGuardCell {
+  role: "Home safety guard · 가정 안전 가드";
+
+  membrane {
+    accepts: SocialIntent;
+    emits: SafetyClear | DistressSignal;
+  }
+
+  on(SocialIntent intent) {
+    if (intent.mode == "unsafe") {
+      emit DistressSignal(reason: "unsafe_intent");
+    } else {
+      emit SafetyClear(approved: true);
+    }
+  }
+}
+
+cell FollowActCell {
+  role: "Owner following locomotion · 주인 따라가기 보행";
+
+  membrane {
+    accepts: SocialIntent;
+    emits: FollowPulse;
+  }
+
+  on(SocialIntent intent) {
+    if (intent.mode == "follow") {
+      emit FollowPulse(pace: 0.5);
+    }
+  }
+}
+
+cell VocalizeActCell {
+  role: "Responsive vocalization · 반응형 발성";
+
+  membrane {
+    accepts: SocialIntent;
+    emits: VocalCue;
+  }
+
+  on(SocialIntent intent) {
+    if (intent.mode == "comfort") {
+      emit VocalCue(phrase: "purr", volume: 0.3);
+    } else {
+      emit VocalCue(phrase: "woof", volume: 0.6);
+    }
+  }
+}
+
+cell ExpressionActCell {
+  role: "Tail and LED expression · 꼬리·LED 표현";
+
+  membrane {
+    accepts: SocialIntent;
+    emits: ExpressionPulse;
+  }
+
+  on(SocialIntent intent) {
+    if (intent.mode == "comfort") {
+      emit ExpressionPulse(tail: 0.2, led: "warm");
+    } else {
+      emit ExpressionPulse(tail: 0.8, led: "alert");
+    }
+  }
+}
+
+cell ComfortActCell {
+  role: "Comfort and soothing behavior · 위로·안정 행동";
+
+  membrane {
+    accepts: SocialIntent;
+    emits: ComfortAction;
+  }
+
+  on(SocialIntent intent) {
+    if (intent.mode == "comfort") {
+      emit ComfortAction(behavior: "nuzzle");
+    }
+  }
+}
+
+tissue PerceptionTissue {
+  flow linear {
+    PresenceSenseCell -> TouchSenseCell -> VoiceSenseCell -> HomeContextCell -> AffectFusionCell
+  }
+}
+
+tissue AffectTissue {
+  flow linear {
+    MoodDecideCell -> SafetyGuardCell
+  }
+}
+
+tissue InteractionTissue {
+  flow parallel {
+    FollowActCell
+    VocalizeActCell
+    ExpressionActCell
+    ComfortActCell
+  }
+}
+
+organ PerceptionOrgan {
+  tissues { PerceptionTissue }
+  exports { AffectState }
+}
+
+organ AffectOrgan {
+  tissues { AffectTissue }
+  exports { SocialIntent, SafetyClear }
+}
+
+organ InteractionOrgan {
+  tissues { InteractionTissue }
+  exports { FollowPulse, VocalCue, ExpressionPulse, ComfortAction }
+}
+
+organism PetSimOrganism {
+  organs {
+    PerceptionOrgan
+    AffectOrgan
+    InteractionOrgan
+  }
+
+  nervous AffectBus {
+    PerceptionOrgan.AffectState -> AffectOrgan
+    AffectOrgan.SocialIntent -> InteractionOrgan
+    AffectOrgan.SafetyClear -> InteractionOrgan
+  }
+
+  immune SafetyPolicy {
+    on DistressSignal {
+      strategy: fallback;
+      retries: 2;
+      backoff: linear;
+      fallback: ComfortAction;
+    }
+  }
+}

@@ -1,0 +1,297 @@
+// Spider Robot Sim — A3-S Physical AI (sim-real parity)
+// 거미 로봇 시뮬 — A3-S Physical AI (sim-real parity)
+//
+// RFC-0001 Phase 2: multimodal streams + membrane SLA on sensing entry
+// Same 10 cells / 3 organs / nervous as A3 — bridge injects VisionFrame
+// Bridge: bridge-python/demo_spider_sim.py
+
+stream VisionStream {
+  rate: 30Hz;
+  sample: VisionFrame;
+}
+
+stream ContactStream {
+  rate: 100Hz;
+  sample: ContactEvent;
+}
+
+signal VisionFrame {
+  contrast: Number;
+  motion: Number;
+}
+
+signal VisualCue {
+  obstacle: Boolean;
+  range: Number;
+}
+
+signal ContactEvent {
+  pressure: Number;
+  zone: String;
+}
+
+signal TactilePing {
+  contact: Boolean;
+  intensity: Number;
+}
+
+signal AudioSample {
+  amplitude: Number;
+  frequency: Number;
+}
+
+signal AudioCue {
+  vibration: Boolean;
+  threat: Number;
+}
+
+signal ScentSample {
+  compound: String;
+  strength: Number;
+}
+
+signal ChemicalCue {
+  hazard: Boolean;
+  edible: Boolean;
+}
+
+signal ThreatAssessment {
+  level: Number;
+  source: String;
+}
+
+signal PathCommand {
+  direction: String;
+  speed: Number;
+}
+
+signal GaitStep {
+  pattern: String;
+  legs: Number;
+}
+
+signal StanceHold {
+  stable: Boolean;
+}
+
+signal WebSpan {
+  attached: Boolean;
+  tension: Number;
+}
+
+signal ChemicalPulse {
+  dose: Number;
+}
+
+signal SensorFault {
+  message: String;
+}
+
+cell VisionSenseCell {
+  role: "Vision frame sensing · 시각 프레임 감지";
+
+  membrane {
+    accepts: VisionFrame;
+    emits: VisualCue | SensorFault;
+    latency: budget 33ms;
+    rate: max 30Hz;
+    staleness: reject 100ms;
+    onViolation: holdLastSafe;
+  }
+
+  onSample(VisionFrame frame) {
+    if (frame.contrast < 0.1) {
+      emit SensorFault;
+    } else {
+      emit VisualCue(obstacle: frame.contrast > 0.5, range: frame.motion);
+    }
+  }
+}
+
+cell TactileSenseCell {
+  role: "Tactile contact sensing · 촉각 접촉 감지";
+
+  membrane {
+    accepts: VisualCue;
+    emits: TactilePing;
+  }
+
+  on(VisualCue cue) {
+    emit TactilePing(contact: cue.obstacle, intensity: cue.range);
+  }
+}
+
+cell HearingSenseCell {
+  role: "Vibration and audio sensing · 진동·청각 감지";
+
+  membrane {
+    accepts: TactilePing;
+    emits: AudioCue;
+  }
+
+  on(TactilePing ping) {
+    emit AudioCue(vibration: ping.contact, threat: ping.intensity);
+  }
+}
+
+cell ChemicalSenseCell {
+  role: "Chemical scent sensing · 화학 후각 감지";
+
+  membrane {
+    accepts: AudioCue;
+    emits: ChemicalCue;
+  }
+
+  on(AudioCue cue) {
+    if (cue.threat > 0.5) {
+      emit ChemicalCue(hazard: true, edible: false);
+    } else {
+      emit ChemicalCue(hazard: false, edible: true);
+    }
+  }
+}
+
+cell FuseDecideCell {
+  role: "Multi-sense threat fusion · 다감각 위협 융합";
+
+  membrane {
+    accepts: ChemicalCue;
+    emits: ThreatAssessment;
+  }
+
+  on(ChemicalCue cue) {
+    if (cue.hazard) {
+      emit ThreatAssessment(level: 0.8, source: "chemical");
+    } else {
+      emit ThreatAssessment(level: 0.35, source: "ambient");
+    }
+  }
+}
+
+cell PathDecideCell {
+  role: "Terrain-adaptive path routing · 지형 적응 경로 판단";
+
+  membrane {
+    accepts: ThreatAssessment;
+    emits: PathCommand;
+  }
+
+  on(ThreatAssessment threat) {
+    if (threat.level > 0.6) {
+      emit PathCommand(direction: "retreat", speed: 0.4);
+    } else {
+      emit PathCommand(direction: "forward", speed: 0.7);
+    }
+  }
+}
+
+cell GaitActCell {
+  role: "Leg gait execution · 다리 보행 실행";
+
+  membrane {
+    accepts: PathCommand;
+    emits: GaitStep;
+  }
+
+  on(PathCommand cmd) {
+    emit GaitStep;
+  }
+}
+
+cell StanceActCell {
+  role: "Posture stabilization · 자세 안정화";
+
+  membrane {
+    accepts: GaitStep;
+    emits: StanceHold;
+  }
+
+  on(GaitStep step) {
+    emit StanceHold;
+  }
+}
+
+cell WebActCell {
+  role: "Web generation and anchoring · 거미줄 생성·고정";
+
+  membrane {
+    accepts: ThreatAssessment;
+    emits: WebSpan;
+  }
+
+  on(ThreatAssessment threat) {
+    if (threat.level > 0.5) {
+      emit WebSpan;
+    }
+  }
+}
+
+cell ChemicalActCell {
+  role: "Chemical spray action · 화학 분사 행동";
+
+  membrane {
+    accepts: ThreatAssessment;
+    emits: ChemicalPulse;
+  }
+
+  on(ThreatAssessment threat) {
+    if (threat.level < 0.4) {
+      emit ChemicalPulse;
+    }
+  }
+}
+
+tissue SensingTissue {
+  flow linear {
+    VisionSenseCell -> TactileSenseCell -> HearingSenseCell -> ChemicalSenseCell -> FuseDecideCell
+  }
+}
+
+tissue LocomotionTissue {
+  flow linear {
+    PathDecideCell -> GaitActCell -> StanceActCell
+  }
+}
+
+tissue ActionTissue {
+  flow parallel {
+    WebActCell
+    ChemicalActCell
+  }
+}
+
+organ SensingOrgan {
+  tissues { SensingTissue }
+  exports { ThreatAssessment }
+}
+
+organ LocomotionOrgan {
+  tissues { LocomotionTissue }
+  exports { StanceHold }
+}
+
+organ ActionOrgan {
+  tissues { ActionTissue }
+  exports { WebSpan, ChemicalPulse }
+}
+
+organism SpiderSimOrganism {
+  organs {
+    SensingOrgan
+    LocomotionOrgan
+    ActionOrgan
+  }
+
+  nervous EventBus {
+    SensingOrgan.ThreatAssessment -> LocomotionOrgan
+    SensingOrgan.ThreatAssessment -> ActionOrgan
+  }
+
+  immune SensorPolicy {
+    on SensorFault {
+      strategy: retry;
+      retries: 3;
+      backoff: exponential;
+    }
+  }
+}

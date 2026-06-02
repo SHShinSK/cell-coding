@@ -1,0 +1,25 @@
+{
+  "name": "@signals/robotics-base",
+  "version": "0.1.0",
+  "kind": "signals",
+  "description": "Physical AI robotics base signal types · Physical AI 로보틱스 기본 신호 타입",
+  "files": ["base.cell"],
+  "exports": [
+    "WorldFrame",
+    "ImuSample",
+    "JointState",
+    "TwistCommand",
+    "BatteryLevel",
+    "EstopPulse",
+    "HardwareFault"
+  ],
+  "ros2Mapping": {
+    "ImuSample": "sensor_msgs/Imu",
+    "VisionFrame": "sensor_msgs/Image",
+    "JointState": "sensor_msgs/JointState",
+    "TwistCommand": "geometry_msgs/Twist",
+    "OwnerPing": "std_msgs/Float32 (normalized owner RSSI)",
+    "BatteryLevel": "sensor_msgs/BatteryState",
+    "EstopPulse": "(vendor-specific safety IO)"
+  }
+}

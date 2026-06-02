@@ -63,11 +63,14 @@ describe('signal graph', () => {
     assert.equal(bundle.inspect.ok, true);
   });
 
-  it('generates five reference viewer scenarios with inspect', () => {
+  it('generates reference viewer scenarios with inspect', () => {
     const payload = generateViewerTraces();
-    assert.equal(payload.scenarios.length, 5);
+    assert.equal(payload.scenarios.length, 7);
     assert.ok(payload.scenarios.every(s => s.inspect?.ok !== undefined));
     assert.ok(payload.scenarios.some(s => s.id === 'porifera-clean'));
     assert.ok(payload.scenarios.some(s => s.id === 'spider-stance'));
+    assert.ok(payload.scenarios.some(s => s.id === 'spider-sim-sla-stale'));
+    const stale = payload.scenarios.find(s => s.id === 'spider-sim-sla-stale');
+    assert.ok(stale?.trace.some(t => t.from.startsWith('sla:')));
   });
 });

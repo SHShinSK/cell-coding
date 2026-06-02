@@ -6,7 +6,7 @@ Home companion PET robot: **owner presence, touch, voice tone, home context** �
 
 가정용 반려(PET) 로봇: **주인 존재·터치·음성 톤·가정 맥락** → **따라가기·발성·꼬리/LED·위로** — 이산 I/O가 아닌 **정서·안전 세포 네트워크**.
 
-**Learning path · 학습 경로:** [A1 Porifera](../porifera-filter/SCENARIO.md) → [A2 Spiderling](../spiderling/SCENARIO.md) → [A3 Spider](../spider-robot/SCENARIO.md) → **A4 PET (this)**
+**Learning path · 학습 경로:** [A1 Porifera](../porifera-filter/SCENARIO.md) → [A2 Spiderling](../spiderling/SCENARIO.md) → [A3 Spider](../spider-robot/SCENARIO.md) → **A4 PET (this)** → **[A4-S Sim](../pet-robot-sim/SCENARIO.md)** / **[A4-H](../pet-robot-sim/A4-H.md)**
 
 ---
 
@@ -76,10 +76,26 @@ nervous AffectBus {
 
 ### Immune · 면역
 
-`PresenceSenseCell` emits `DistressSignal` when owner signal is lost (`rssi` too low).  
+`PresenceSenseCell` emits `DistressSignal(reason: "lost_signal")` when owner RSSI is too low.  
 `PetOrganism.immune SafetyPolicy` uses **fallback** to `ComfortAction` with linear backoff.
 
 주인 신호 소실 시 `DistressSignal` → immune **fallback** → `ComfortAction` (위로 행동).
+
+---
+
+## Signal chain · 신호 연쇄
+
+`OwnerPing.rssi`가 perception chain을 타고 `SocialIntent.mode`까지 전달됩니다.
+
+| Stage | Signal | Teaching rule |
+|-------|--------|---------------|
+| L0 inject | `OwnerPing.rssi` | BLE / owner tag strength |
+| Sense | `OwnerPresence.distance` | close if rssi > 0.7 |
+| Sense | `TouchSignal.pressure` | high if close |
+| Sense | `VoiceTone.calm` | calm if pressure > 0.5 |
+| Context | `HomeContext.quiet` | mirrors voice calm |
+| Affect | `AffectState.valence` | 0.75 if quiet, else 0.35 |
+| Decide | `SocialIntent.mode` | comfort if valence > 0.5, else follow |
 
 ---
 
@@ -109,23 +125,83 @@ nervous AffectBus {
 | Web + chemical act | Follow + vocal + expression + comfort |
 | `ThreatAssessment` | `AffectState` + `SocialIntent` |
 | Sensor immune retry | Safety fallback to comfort |
+| VisionFrame inject | OwnerPing inject |
 
 ---
 
 ## Growth path · 확장 경로
 
-**A5 Humanoid:** [Humanoid reference (14 cells, 4 organs)](../humanoid-robot/SCENARIO.md) — completes Physical AI reference series A1–A5.
+**A4-S Sim:** [PET Sim (stream + SLA + bridge)](../pet-robot-sim/SCENARIO.md)
 
-**A5 Humanoid:** [휴머노이드 레퍼런스 (14세포, 4기관)](../humanoid-robot/SCENARIO.md) — Physical AI 레퍼런스 A1–A5 완료.
+**A4-H Hardware:** [BLE/RSSI bridge](../pet-robot-sim/A4-H.md)
+
+**A5 Humanoid:** [Humanoid reference (14 cells, 4 organs)](../humanoid-robot/SCENARIO.md)
+
+---
+
+## Trace labs · trace 실험 (A4)
+
+Golden file: [`pet-organism.cell`](pet-organism.cell)
+
+### Lab 1 — close owner (comfort)
+
+```bash
+cd typescript
+node --import tsx -e "import { runCellFile, formatRunHuman } from './run-cell.js'; const i={type:'OwnerPing',data:{rssi:0.8}}; console.log(formatRunHuman(runCellFile({file:'../examples/pet-robot/pet-organism.cell',input:i}),i));"
+```
+
+기대: `AffectState valence≈0.75` → `SocialIntent comfort` → **ComfortAction** + VocalCue/ExpressionPulse (FollowPulse 없음)
+
+### Lab 2 — moderate signal (follow)
+
+`rssi: 0.6` → `valence≈0.35` → `SocialIntent follow` → **FollowPulse**
+
+```bash
+cd bridge-python
+python demo_pet.py --cell ../examples/pet-robot/pet-organism.cell --source sim --rssi 0.6
+```
+
+### Lab 3 — lost owner (immune fallback)
+
+`rssi: 0.01` → `DistressSignal(reason: lost_signal)` → immune **ComfortAction** fallback
+
+```bash
+cd typescript
+npm run cell:run -- ../examples/pet-robot/pet-organism.cell OwnerPing '{"rssi":0.01}'
+```
+
+### Lab 4 — A4-S / A4-H bridge (same cascade, L1 only)
+
+```bash
+cd bridge-python
+python demo_pet.py --source ros2-replay
+python demo_pet.py --source sim --rssi 0.6 --publish-twist
+python demo_pet.py --source ros2-replay --samples 3 --interval-ms 500
+```
+
+[`pet-sim-organism.cell`](../pet-robot-sim/pet-sim-organism.cell) + SLA/onSample — cascade shape는 A4와 동일.
+
+### Lab 5 — actuator (FollowPulse → cmd_vel)
+
+L2 trace의 `FollowPulse`를 L1 `PetActuator`가 `geometry_msgs/Twist`로 매핑합니다. `VocalCue` / `ExpressionPulse` / `ComfortAction`는 로그 readback.
+
+```bash
+cd bridge-python
+python demo_pet.py --rssi 0.6 --publish-twist
+python demo_pet.py --rssi 0.8 --publish-twist   # comfort only, no twist
+python demo_pet.py --publish-twist --twist-sink ros2 --cmd-vel-topic /cmd_vel
+```
+
+Mapping · 매핑: `FollowPulse.pace` → `linear.x = pace`.
 
 ---
 
 ## Compile · 컴파일
 
-Golden file: [`pet-organism.cell`](pet-organism.cell)
-
 ```bash
 cd typescript && npm install && npm test
+npm run cell:test -- ../examples/pet-robot/pet-organism.cell
+npm run cell:test -- ../examples/pet-robot-sim/pet-sim-organism.cell
 ```
 
 ---
@@ -135,4 +211,6 @@ cd typescript && npm install && npm test
 | File · 파일 | Purpose · 목적 |
 |------------|---------------|
 | `pet-organism.cell` | Golden `.cell` source (A4) |
+| `pet-organism.celltest.json` | Cell Lab isolation tests |
 | `SCENARIO.md` | This document |
+| [`../pet-robot-s/`](../pet-robot-sim/) | A4-S sim + A4-H hardware bridge |

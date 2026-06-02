@@ -3,6 +3,7 @@
 
 signal OwnerPing {
   rssi: Number;
+  timestamp: Number;
 }
 
 signal OwnerPresence {
@@ -70,9 +71,13 @@ cell PresenceSenseCell {
 
   on(OwnerPing ping) {
     if (ping.rssi < 0.05) {
-      emit DistressSignal;
+      emit DistressSignal(reason: "lost_signal");
     } else {
-      emit OwnerPresence;
+      if (ping.rssi > 0.7) {
+        emit OwnerPresence(detected: true, distance: 0.2);
+      } else {
+        emit OwnerPresence(detected: true, distance: 0.5);
+      }
     }
   }
 }
@@ -86,7 +91,11 @@ cell TouchSenseCell {
   }
 
   on(OwnerPresence presence) {
-    emit TouchSignal;
+    if (presence.distance < 0.3) {
+      emit TouchSignal(pressure: 0.8, duration: 0.5);
+    } else {
+      emit TouchSignal(pressure: 0.3, duration: 0.5);
+    }
   }
 }
 
@@ -99,7 +108,11 @@ cell VoiceSenseCell {
   }
 
   on(TouchSignal touch) {
-    emit VoiceTone;
+    if (touch.pressure > 0.5) {
+      emit VoiceTone(pitch: 220, calm: true);
+    } else {
+      emit VoiceTone(pitch: 440, calm: false);
+    }
   }
 }
 
@@ -112,7 +125,7 @@ cell HomeContextCell {
   }
 
   on(VoiceTone tone) {
-    emit HomeContext;
+    emit HomeContext(room: "living", quiet: tone.calm);
   }
 }
 
@@ -125,7 +138,11 @@ cell AffectFusionCell {
   }
 
   on(HomeContext ctx) {
-    emit AffectState;
+    if (ctx.quiet) {
+      emit AffectState(valence: 0.75, arousal: 0.2);
+    } else {
+      emit AffectState(valence: 0.35, arousal: 0.6);
+    }
   }
 }
 
@@ -156,9 +173,9 @@ cell SafetyGuardCell {
 
   on(SocialIntent intent) {
     if (intent.mode == "unsafe") {
-      emit DistressSignal;
+      emit DistressSignal(reason: "unsafe_intent");
     } else {
-      emit SafetyClear;
+      emit SafetyClear(approved: true);
     }
   }
 }
@@ -173,7 +190,7 @@ cell FollowActCell {
 
   on(SocialIntent intent) {
     if (intent.mode == "follow") {
-      emit FollowPulse;
+      emit FollowPulse(pace: 0.5);
     }
   }
 }
@@ -187,7 +204,11 @@ cell VocalizeActCell {
   }
 
   on(SocialIntent intent) {
-    emit VocalCue;
+    if (intent.mode == "comfort") {
+      emit VocalCue(phrase: "purr", volume: 0.3);
+    } else {
+      emit VocalCue(phrase: "woof", volume: 0.6);
+    }
   }
 }
 
@@ -200,7 +221,11 @@ cell ExpressionActCell {
   }
 
   on(SocialIntent intent) {
-    emit ExpressionPulse;
+    if (intent.mode == "comfort") {
+      emit ExpressionPulse(tail: 0.2, led: "warm");
+    } else {
+      emit ExpressionPulse(tail: 0.8, led: "alert");
+    }
   }
 }
 
@@ -214,7 +239,7 @@ cell ComfortActCell {
 
   on(SocialIntent intent) {
     if (intent.mode == "comfort") {
-      emit ComfortAction;
+      emit ComfortAction(behavior: "nuzzle");
     }
   }
 }

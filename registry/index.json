@@ -8,5 +8,22 @@
       "exports": ["AuthGranted", "AuthDenied"],
       "description": "Token validation organ · 토큰 검증 기관"
     }
+  },
+  "signals": {
+    "@signals/robotics-base": {
+      "version": "0.1.0",
+      "path": "signals/robotics",
+      "file": "base.cell",
+      "exports": [
+        "WorldFrame",
+        "ImuSample",
+        "JointState",
+        "TwistCommand",
+        "BatteryLevel",
+        "EstopPulse",
+        "HardwareFault"
+      ],
+      "description": "Physical AI robotics base signal types · 로보틱스 기본 신호"
+    }
   }
 }

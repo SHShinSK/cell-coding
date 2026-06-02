@@ -15,6 +15,22 @@ import type { SignalInstance, TraceEntry } from './runtime.js';
 import type { LifecycleSnapshot } from './lifecycle.js';
 import type { ViewerScenarioBundle } from './signal-graph.js';
 import type { TypeCheckError } from './checker.js';
+import {
+  resolveStream,
+  parseStreamSamplePayload,
+  type StreamRunMeta,
+} from './stream-run.js';
+
+export type { StreamRunMeta };
+
+export interface StreamRunOptions {
+  /** Stream decl name (optional if program has one) · stream 선언 이름 */
+  name?: string;
+  /** Sample payloads · 샘플 데이터 */
+  samples: Record<string, unknown>[];
+  /** Virtual ms between samples · 샘플 간 가상 간격(ms) */
+  intervalMs?: number;
+}
 
 export interface TranspiledRunOptions {
   /** Pre-built generated dir · cell build --out 경로 */
@@ -39,6 +55,8 @@ export interface RunCellOptions {
   runtime?: RuntimeOptions;
   /** Explicit functions sidecar · cell run --functions */
   functionsPath?: string;
+  /** Periodic stream inject · cell run --stream */
+  stream?: StreamRunOptions;
   /** Jaeger UI base URL for viewer link · JAEGER_UI_URL */
   jaegerUiUrl?: string;
 }
@@ -50,6 +68,8 @@ export interface RunCellResult {
   trace: TraceEntry[];
   lifecycle: LifecycleSnapshot;
   bundle?: ViewerScenarioBundle;
+  /** Stream batch metadata when --stream · stream 실행 메타 */
+  stream?: StreamRunMeta;
 }
 
 function scenarioIdFromFile(file: string): string {
@@ -96,9 +116,14 @@ function finishRun(
   program: ReturnType<typeof compile>['program'],
   diagnostics: TypeCheckError[],
   runtime: CellRuntime,
+  streamMeta?: StreamRunMeta,
 ): RunCellResult {
-  const trace = runtime.send(opts.input.type, opts.input.data);
-  const lifecycle = runtime.getLifecycleSnapshot();
+  const input = opts.stream
+    ? {
+        type: streamMeta?.sampleType ?? opts.input.type,
+        data: opts.stream.samples[opts.stream.samples.length - 1] ?? opts.input.data,
+      }
+    : opts.input;
 
   const relFile = file.replace(/\\/g, '/');
   const id = opts.id ?? scenarioIdFromFile(file);
@@ -111,13 +136,60 @@ function finishRun(
     titleKo,
     relFile.includes('/examples/') ? relFile.slice(relFile.indexOf('examples/')) : relFile,
     program,
-    trace,
-    opts.input,
-    lifecycle,
+    runtime.getTrace(),
+    input,
+    runtime.getLifecycleSnapshot(),
     diagnostics,
   );
 
-  return { ok: true, file, errors: [], trace, lifecycle, bundle };
+  return {
+    ok: true,
+    file,
+    errors: [],
+    trace: runtime.getTrace(),
+    lifecycle: runtime.getLifecycleSnapshot(),
+    bundle,
+    stream: streamMeta,
+  };
+}
+
+function executeRuntime(
+  opts: RunCellOptions,
+  program: ReturnType<typeof compile>['program'],
+  runtime: CellRuntime,
+): { streamMeta?: StreamRunMeta } {
+  if (!opts.stream) {
+    runtime.send(opts.input.type, opts.input.data);
+    return {};
+  }
+
+  const resolved = resolveStream(program, opts.stream.name);
+  if ('error' in resolved) {
+    throw new Error(resolved.error);
+  }
+
+  const sampleType = opts.input.type || resolved.sampleType;
+  if (sampleType !== resolved.sampleType) {
+    throw new Error(
+      `Stream '${resolved.decl.name}' expects sample type '${resolved.sampleType}', got '${sampleType}'`,
+    );
+  }
+
+  const intervalMs = opts.stream.intervalMs ?? resolved.intervalMs;
+  runtime.sendStream(sampleType, opts.stream.samples, {
+    intervalMs,
+    streamName: resolved.decl.name,
+  });
+
+  return {
+    streamMeta: {
+      name: resolved.decl.name,
+      sampleType,
+      sampleCount: opts.stream.samples.length,
+      intervalMs,
+      virtualElapsedMs: runtime.getVirtualElapsedMs(),
+    },
+  };
 }
 
 function normalizeTranspiledOpts(
@@ -154,7 +226,19 @@ export function runCellFile(opts: RunCellOptions): RunCellResult {
   if (!compiled.ok) return compiled;
 
   const runtime = new CellRuntime(compiled.program, opts.runtime ?? {});
-  return finishRun(opts, file, compiled.program, compiled.diagnostics, runtime);
+  let streamMeta: StreamRunMeta | undefined;
+  try {
+    ({ streamMeta } = executeRuntime(opts, compiled.program, runtime));
+  } catch (e) {
+    return {
+      ok: false,
+      file,
+      errors: [e instanceof Error ? e.message : String(e)],
+      trace: [],
+      lifecycle: { states: {}, transitions: [] },
+    };
+  }
+  return finishRun(opts, file, compiled.program, compiled.diagnostics, runtime, streamMeta);
 }
 
 /** transpiled handler 포함 비동기 실행 · cell run --transpiled */
@@ -193,7 +277,20 @@ export async function runCellFileAsync(opts: RunCellOptions): Promise<RunCellRes
     runtime = new CellRuntime(compiled.program, runtimeOpts);
   }
 
-  return finishRun(opts, file, compiled.program, compiled.diagnostics, runtime);
+  let streamMeta: StreamRunMeta | undefined;
+  try {
+    ({ streamMeta } = executeRuntime(opts, compiled.program, runtime));
+  } catch (e) {
+    return {
+      ok: false,
+      file,
+      errors: [e instanceof Error ? e.message : String(e)],
+      trace: [],
+      lifecycle: { states: {}, transitions: [] },
+    };
+  }
+
+  return finishRun(opts, file, compiled.program, compiled.diagnostics, runtime, streamMeta);
 }
 
 /** Human-readable run summary for terminal demo output. */
@@ -204,15 +301,23 @@ export function formatRunHuman(result: RunCellResult, input: SignalInstance): st
     '',
     '  Cell Coding runtime · 신호 런타임',
     `  file   : ${shortFile}`,
-    `  inject : ${input.type} ${JSON.stringify(input.data)}`,
-    '',
-    '  Signal cascade · 신호 연쇄:',
   ];
+
+  if (result.stream) {
+    lines.push(
+      `  stream : ${result.stream.name ?? 'external'} × ${result.stream.sampleCount} @ ${result.stream.intervalMs}ms virtual`,
+      `  sample : ${result.stream.sampleType}`,
+    );
+  } else {
+    lines.push(`  inject : ${input.type} ${JSON.stringify(input.data)}`);
+  }
+
+  lines.push('', '  Signal cascade · 신호 연쇄:');
 
   for (const entry of result.trace) {
     const arrow = entry.from.startsWith('immune:')
       ? '⚕'
-      : entry.from === 'external'
+      : entry.from === 'external' || entry.from.startsWith('stream:')
         ? '⇒'
         : '→';
     const payload = Object.keys(entry.signal.data).length

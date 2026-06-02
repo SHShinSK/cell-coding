@@ -11,8 +11,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const validatorSource = readFileSync(join(__dirname, '../examples/validator.cell'), 'utf-8');
 const spongeSource = readFileSync(join(__dirname, '../examples/porifera-filter/sponge-organism.cell'), 'utf-8');
 const spiderlingSource = readFileSync(join(__dirname, '../examples/spiderling/spiderling-organism.cell'), 'utf-8');
+const spiderlingSimSource = readFileSync(join(__dirname, '../examples/spiderling-sim/spiderling-sim-organism.cell'), 'utf-8');
+const spiderSimSource = readFileSync(join(__dirname, '../examples/spider-robot-sim/spider-sim-organism.cell'), 'utf-8');
+const roboticsBaseSignals = readFileSync(join(__dirname, '../registry/signals/robotics/base.cell'), 'utf-8');
 const spiderSource = readFileSync(join(__dirname, '../examples/spider-robot/spider-organism.cell'), 'utf-8');
 const petSource = readFileSync(join(__dirname, '../examples/pet-robot/pet-organism.cell'), 'utf-8');
+const petSimSource = readFileSync(join(__dirname, '../examples/pet-robot-sim/pet-sim-organism.cell'), 'utf-8');
 const humanoidSource = readFileSync(join(__dirname, '../examples/humanoid-robot/humanoid-organism.cell'), 'utf-8');
 
 describe('Cell Coding compiler smoke', () => {
@@ -80,6 +84,87 @@ describe('Cell Coding compiler smoke', () => {
     assert.equal(errors.length, 0, errors.map(e => e.message).join('; '));
   });
 
+  it('compiles examples/spiderling-sim/spiderling-sim-organism.cell without errors', () => {
+    const { program, diagnostics } = compile(spiderlingSimSource);
+    const cells = program.statements.filter(s => s.kind === 'CellDecl');
+    assert.equal(cells.length, 6);
+    const gate = cells.find(c => c.kind === 'CellDecl' && c.name === 'ImuStreamGateCell');
+    assert.ok(gate);
+    const organism = program.statements.find(s => s.kind === 'OrganismDecl');
+    assert.ok(organism && organism.kind === 'OrganismDecl');
+    assert.equal(organism.organs[0], 'SpiderThoraxSim');
+    const errors = diagnostics.filter(d => d.kind === 'error');
+    assert.equal(errors.length, 0, errors.map(e => e.message).join('; '));
+  });
+
+  it('compiles registry/signals/robotics/base.cell without errors', () => {
+    const { program, diagnostics } = compile(roboticsBaseSignals);
+    const signals = program.statements.filter(s => s.kind === 'SignalDecl');
+    assert.equal(signals.length, 7);
+    const errors = diagnostics.filter(d => d.kind === 'error');
+    assert.equal(errors.length, 0, errors.map(e => e.message).join('; '));
+  });
+
+  it('parses stream declarations and membrane physical SLA (RFC-0001)', () => {
+    const src = [
+      'signal ImuSample { timestamp: Number; accelZ: Number; }',
+      'stream ImuStream { rate: 100Hz; sample: ImuSample; }',
+      'cell Gate {',
+      '  role: "gate";',
+      '  membrane { accepts: ImuSample; emits: ImuSample; latency: budget 10ms; rate: max 100Hz; onViolation: holdLastSafe; }',
+      '  onSample(ImuSample s) { emit ImuSample; }',
+      '}',
+    ].join(' ');
+    const { program, diagnostics } = compile(src);
+    const stream = program.statements.find(s => s.kind === 'StreamDecl');
+    assert.ok(stream && stream.kind === 'StreamDecl');
+    assert.equal(stream.name, 'ImuStream');
+    assert.equal(stream.rateHz, 100);
+    assert.equal(stream.sampleType, 'ImuSample');
+    const cell = program.statements.find(s => s.kind === 'CellDecl');
+    assert.ok(cell && cell.kind === 'CellDecl');
+    assert.equal(cell.body.handlers[0]?.isSample, true);
+    assert.equal(cell.body.membrane.physicalSla?.latencyBudgetMs, 10);
+    assert.equal(cell.body.membrane.physicalSla?.rateMaxHz, 100);
+    assert.equal(cell.body.membrane.physicalSla?.onViolation, 'holdLastSafe');
+    const errors = diagnostics.filter(d => d.kind === 'error');
+    assert.equal(errors.length, 0, errors.map(e => e.message).join('; '));
+    const slaWarnings = diagnostics.filter(d => d.kind === 'warning' && d.message.includes('physical SLA'));
+    assert.ok(slaWarnings.length >= 1);
+  });
+
+  it('warns when stream rate and membrane rate max diverge (RFC-0001 SSOT)', () => {
+    const src = [
+      'signal S { v: Number; }',
+      'stream BadStream { rate: 30Hz; sample: S; }',
+      'cell C { role: "r";',
+      '  membrane { accepts: S; emits: S; rate: max 100Hz; }',
+      '  onSample(S s) { emit S; }',
+      '}',
+    ].join(' ');
+    const { diagnostics } = compile(src);
+    assert.ok(
+      diagnostics.some(d => d.kind === 'warning' && d.message.includes('30Hz') && d.message.includes('100Hz')),
+    );
+  });
+
+  it('compiles examples/spider-robot-sim/spider-sim-organism.cell without errors', () => {
+    const { program, diagnostics } = compile(spiderSimSource);
+    const streams = program.statements.filter(s => s.kind === 'StreamDecl');
+    assert.equal(streams.length, 2);
+    const cells = program.statements.filter(s => s.kind === 'CellDecl');
+    assert.equal(cells.length, 10);
+    const vision = cells.find(c => c.kind === 'CellDecl' && c.name === 'VisionSenseCell');
+    assert.ok(vision && vision.kind === 'CellDecl');
+    assert.equal(vision.body.handlers[0]?.isSample, true);
+    assert.ok(vision.body.membrane.physicalSla);
+    const organism = program.statements.find(s => s.kind === 'OrganismDecl');
+    assert.ok(organism && organism.kind === 'OrganismDecl');
+    assert.equal(organism.name, 'SpiderSimOrganism');
+    const errors = diagnostics.filter(d => d.kind === 'error');
+    assert.equal(errors.length, 0, errors.map(e => e.message).join('; '));
+  });
+
   it('compiles examples/spider-robot/spider-organism.cell without errors', () => {
     const { program, diagnostics } = compile(spiderSource);
     const cells = program.statements.filter(s => s.kind === 'CellDecl');
@@ -105,6 +190,23 @@ describe('Cell Coding compiler smoke', () => {
     assert.ok(organism && organism.kind === 'OrganismDecl');
     assert.equal(organism.nervous!.routes.length, 3);
     assert.ok(organism.immune);
+    const errors = diagnostics.filter(d => d.kind === 'error');
+    assert.equal(errors.length, 0, errors.map(e => e.message).join('; '));
+  });
+
+  it('compiles examples/pet-robot-sim/pet-sim-organism.cell without errors', () => {
+    const { program, diagnostics } = compile(petSimSource);
+    const streams = program.statements.filter(s => s.kind === 'StreamDecl');
+    assert.equal(streams.length, 2);
+    const cells = program.statements.filter(s => s.kind === 'CellDecl');
+    assert.equal(cells.length, 11);
+    const presence = cells.find(c => c.kind === 'CellDecl' && c.name === 'PresenceSenseCell');
+    assert.ok(presence && presence.kind === 'CellDecl');
+    assert.equal(presence.body.handlers[0]?.isSample, true);
+    assert.ok(presence.body.membrane.physicalSla);
+    const organism = program.statements.find(s => s.kind === 'OrganismDecl');
+    assert.ok(organism && organism.kind === 'OrganismDecl');
+    assert.equal(organism.name, 'PetSimOrganism');
     const errors = diagnostics.filter(d => d.kind === 'error');
     assert.equal(errors.length, 0, errors.map(e => e.message).join('; '));
   });

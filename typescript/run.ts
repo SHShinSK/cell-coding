@@ -10,11 +10,15 @@ import { dirname, resolve, basename } from 'node:path';
 import { runCellFileAsync, formatRunHuman } from './run-cell.js';
 import { buildLiveRunPayload } from './run-payload.js';
 import { DEFAULT_WATCH_OUT, DEFAULT_WATCH_POLL_MS, startCellWatch } from './run-watch.js';
+import { parseStreamSamplePayload } from './stream-run.js';
 
 interface ParsedArgs {
   json: boolean;
   watch: boolean;
   transpiled: boolean;
+  stream?: string;
+  streamSamples: number;
+  streamIntervalMs?: number;
   generatedDir?: string;
   functionsPath?: string;
   jaegerUiUrl?: string;
@@ -30,6 +34,9 @@ function parseArgs(argv: string[]): ParsedArgs {
   let json = false;
   let watch = false;
   let transpiled = false;
+  let stream: string | undefined;
+  let streamSamples = 5;
+  let streamIntervalMs: number | undefined;
   let out: string | undefined;
   let generatedDir: string | undefined;
   let functionsPath: string | undefined;
@@ -44,6 +51,27 @@ function parseArgs(argv: string[]): ParsedArgs {
       watch = true;
     } else if (arg === '--transpiled') {
       transpiled = true;
+    } else if (arg === '--stream') {
+      const next = argv[i + 1];
+      if (next && !next.startsWith('-') && !next.endsWith('.cell')) {
+        stream = argv[++i];
+      } else {
+        stream = '';
+      }
+    } else if (arg === '--samples') {
+      const parsed = Number(argv[++i]);
+      if (!Number.isFinite(parsed) || parsed < 1) {
+        console.error('--samples must be >= 1 · --samples는 1 이상');
+        process.exit(1);
+      }
+      streamSamples = parsed;
+    } else if (arg === '--interval-ms') {
+      const parsed = Number(argv[++i]);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        console.error('--interval-ms must be >= 0 · --interval-ms는 0 이상');
+        process.exit(1);
+      }
+      streamIntervalMs = parsed;
     } else if (arg === '--generated') {
       generatedDir = argv[++i];
     } else if (arg === '--functions') {
@@ -66,7 +94,22 @@ function parseArgs(argv: string[]): ParsedArgs {
   }
 
   const [file, signalType, signalJson] = rest;
-  return { json, watch, transpiled, generatedDir, functionsPath, jaegerUiUrl, out, intervalMs, file, signalType, signalJson };
+  return {
+    json,
+    watch,
+    transpiled,
+    stream,
+    streamSamples,
+    streamIntervalMs,
+    generatedDir,
+    functionsPath,
+    jaegerUiUrl,
+    out,
+    intervalMs,
+    file,
+    signalType,
+    signalJson,
+  };
 }
 
 function parseSignalData(signalJson: string | undefined): Record<string, unknown> {
@@ -89,15 +132,13 @@ async function mainAsync(): Promise<void> {
 
   if (!args.file) {
     console.error(`Usage · 사용법:
-  npm run cell:run -- [--json] [--transpiled] [--generated dir] [--functions path] [--jaeger url] [--watch] [--out path] [--interval ms] <file.cell> <SignalType> '<json>'
+  npm run cell:run -- [--json] [--transpiled] [--stream [StreamName]] [--samples N] [--interval-ms ms] [--generated dir] [--functions path] [--jaeger url] [--watch] [--out path] [--interval ms] <file.cell> <SignalType> '<json>'
 
 Examples · 예:
   npm run cell:run -- ../examples/porifera-filter/sponge-organism.cell WaterSample '{"turbidity":0.2}'
+  npm run cell:run -- --stream --samples 5 --interval-ms 50 ../examples/spiderling-sim/spiderling-sim-organism.cell ImuSample '{"timestamp":1,"accelX":0.1,"accelY":0.2,"accelZ":9.81,"gyroX":0,"gyroY":0,"gyroZ":0.05}'
+  npm run cell:run -- --stream ImuStream --samples 3 ../examples/spiderling-sim/spiderling-sim-organism.cell ImuSample '{"timestamp":1,"accelX":0.1,"accelY":0.2,"accelZ":9.81,"gyroX":0,"gyroY":0,"gyroZ":0.05}'
   npm run cell:run -- --transpiled ../examples/motion-alarm/motion-alarm.cell MotionDetected '{"x":1,"y":2,"confidence":0.9}'
-  npm run cell:run -- --transpiled ../examples/validator.cell RawInput '{"payload":"hello"}'
-  npm run cell:run -- --transpiled --functions ../examples/validator.functions.json ../examples/validator.cell RawInput '{"payload":""}'
-  npm run cell:run -- --json --jaeger http://127.0.0.1:16686 --out ../viewer/live-run.json ../examples/motion-alarm/motion-alarm.cell MotionDetected '{"x":1,"y":2,"confidence":0.9}'
-  npm run cell:run -- --json --out ../viewer/live-run.json ../examples/pet-robot/pet-organism.cell OwnerPing '{"rssi":0.01}'
   npm run cell:run -- --json --watch --out ../viewer/live-run.json ../examples/porifera-filter/sponge-organism.cell WaterSample '{"turbidity":0.95}'`);
     process.exit(1);
   }
@@ -112,6 +153,25 @@ Examples · 예:
   }
 
   const input = { type: inputType, data: inputData };
+
+  let streamOpts: { name?: string; samples: Record<string, unknown>[]; intervalMs?: number } | undefined;
+  if (args.stream !== undefined) {
+    const samplesResult = parseStreamSamplePayload(
+      args.signalJson,
+      inputData,
+      args.streamSamples,
+      args.streamIntervalMs ?? 50,
+    );
+    if ('error' in samplesResult) {
+      console.error(samplesResult.error);
+      process.exit(1);
+    }
+    streamOpts = {
+      name: args.stream || undefined,
+      samples: samplesResult,
+      intervalMs: args.streamIntervalMs,
+    };
+  }
 
   if (args.watch) {
     if (!args.json) {
@@ -158,6 +218,7 @@ Examples · 예:
   const runOpts = {
     file: resolve(process.cwd(), args.file),
     input,
+    stream: streamOpts,
     transpiled: args.transpiled
       ? { generatedDir: args.generatedDir ? resolve(process.cwd(), args.generatedDir) : undefined }
       : undefined,

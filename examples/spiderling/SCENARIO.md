@@ -89,6 +89,8 @@ LocomotionTissue (linear)
 
 ## Growth path · 확장 경로
 
+**A2-S Sim:** [Spiderling Sim (IMU bridge, RFC-0001 PoC)](../spiderling-sim/SCENARIO.md)
+
 **A3 Spider:** [Spider Robot reference (10 cells, 3 organs, nervous)](../spider-robot/SCENARIO.md)
 
 **A3 거미:** [거미 로봇 레퍼런스 (10세포, 3기관, nervous)](../spider-robot/SCENARIO.md)

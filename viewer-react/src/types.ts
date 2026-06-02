@@ -8,16 +8,29 @@ export interface TraceEntry {
   signal: SignalInstance;
   atMs?: number;
   backoffMs?: number;
+  physical?: {
+    latencyMs?: number;
+    sensorAgeMs?: number;
+    streamSeq?: number;
+    slaViolations?: Array<{
+      kind: 'staleness' | 'rate' | 'latency';
+      cell: string;
+      limit: number;
+      actual: number;
+      policy: 'drop' | 'holdLastSafe' | 'emitFault';
+    }>;
+  };
 }
 
 export interface FlowStep {
   index: number;
   from: string;
-  fromKind: 'external' | 'cell' | 'immune';
+  fromKind: 'external' | 'cell' | 'immune' | 'sla';
   signal: SignalInstance;
   consumers: string[];
   atMs?: number;
   backoffMs?: number;
+  physical?: TraceEntry['physical'];
 }
 
 export type CellLifecyclePhase =
@@ -136,7 +149,7 @@ export interface TracesPayload {
   scenarios: ViewerScenario[];
 }
 
-export type NodeKind = 'cell' | 'external' | 'immune';
+export type NodeKind = 'cell' | 'external' | 'immune' | 'sla';
 
 export interface NodePosition {
   x: number;

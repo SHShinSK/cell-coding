@@ -47,7 +47,7 @@
     "cell:deploy": "node --import tsx deploy.ts",
     "cell:install": "node --import tsx install.ts",
     "cell:compose": "node --import tsx compose.ts",
-    "test": "node --import tsx --test compile.test.ts runtime.test.ts nervous-routing.test.ts circuit-breaker.test.ts signal-graph.test.ts lifecycle.test.ts run-cell.test.ts run-watch.test.ts backoff.test.ts cell-lab.test.ts signal-bus.test.ts phase3.test.ts transpile-handler.test.ts transpiled-runtime.test.ts transpiled-parity.test.ts cell-functions.test.ts viewer-inspect.test.ts phase4.test.ts phase4-cloud.test.ts phase4-divide.test.ts phase4-divide-scale.test.ts phase4-metrics.test.ts phase4-nervous-distributed.test.ts phase4-k8s-hpa.test.ts",
+    "test": "node --import tsx --test compile.test.ts physical-sla.test.ts runtime.test.ts stream-run.test.ts nervous-routing.test.ts circuit-breaker.test.ts signal-graph.test.ts lifecycle.test.ts run-cell.test.ts run-watch.test.ts backoff.test.ts cell-lab.test.ts signal-bus.test.ts phase3.test.ts transpiler.test.ts transpile-handler.test.ts transpiled-runtime.test.ts transpiled-parity.test.ts cell-functions.test.ts viewer-inspect.test.ts phase4.test.ts phase4-cloud.test.ts phase4-divide.test.ts phase4-divide-scale.test.ts phase4-metrics.test.ts phase4-nervous-distributed.test.ts phase4-k8s-hpa.test.ts",
     "test:integration": "node --import tsx --test redis-streams.integration.test.ts",
     "cell:serve": "node --import tsx serve.ts",
     "demo": "node --import tsx demo.ts",
@@ -57,6 +57,7 @@
     "cell:inspect": "node --import tsx inspect.ts",
     "cell:test": "node --import tsx test.ts",
     "viewer:traces": "node --import tsx viewer-traces.ts",
+    "viewer:serve": "npx --yes serve ../viewer -p 5173",
     "pack:smoke": "npm pack --dry-run"
   },
   "dependencies": {

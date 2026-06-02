@@ -10,11 +10,19 @@ Each draft uses **English first · Korean parallel** (same structure as site doc
 | 3 | [03-typescript-package-json.md](03-typescript-package-json.md) | dsl-compiler |
 | 4 | [04-lexer-generic-disambiguation.md](04-lexer-generic-disambiguation.md) | dsl-compiler |
 | 5 | [05-parser-list-map-types.md](05-parser-list-map-types.md) | dsl-compiler |
-| 6 | [06-transpiler-stub.md](06-transpiler-stub.md) | dsl-compiler |
+| 6 | [06-transpiler-stub.md](06-transpiler-stub.md) | dsl-compiler | ✅ #24 closed — see 14–18 for follow-ups |
 | 7 | [07-security-en-summary.md](07-security-en-summary.md) | docs |
 | 8 | [08-paradigm-page-cta.md](08-paradigm-page-cta.md) | docs |
 | 9 | [09-checker-signal-extends.md](09-checker-signal-extends.md) | dsl-compiler |
 | 10 | [10-physical-ai-example-doc.md](10-physical-ai-example-doc.md) | runtime/docs |
+| 11 | [11-grammar-drift-spec-alignment.md](11-grammar-drift-spec-alignment.md) | dsl-compiler |
+| 12 | [12-query-membrane-unification.md](12-query-membrane-unification.md) | dsl-compiler |
+| 13 | [13-checker-validation-strictness.md](13-checker-validation-strictness.md) | dsl-compiler |
+| 14 | [14-transpiler-error-diagnostics.md](14-transpiler-error-diagnostics.md) | dsl-compiler · #24 follow-up |
+| 15 | [15-cell-build-watch.md](15-cell-build-watch.md) | dsl-compiler · #24 follow-up |
+| 16 | [16-transpiler-unsupported-stmts.md](16-transpiler-unsupported-stmts.md) | dsl-compiler · #24 follow-up |
+| 17 | [17-transpiler-standalone-docs.md](17-transpiler-standalone-docs.md) | docs · #24 follow-up |
+| 18 | [18-transpiler-cell-decorator.md](18-transpiler-cell-decorator.md) | dsl-compiler · #24 follow-up (enhancement) |
 
 ## Draft format · 초안 형식
 

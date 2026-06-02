@@ -19,6 +19,20 @@ function filteredItems(steps: FlowStep[], filter: string) {
     );
 }
 
+function formatPhysical(physical?: FlowStep['physical']): string {
+  if (!physical) return '';
+  const parts: string[] = [];
+  if (physical.latencyMs != null) parts.push(`latency ${physical.latencyMs}ms`);
+  if (physical.sensorAgeMs != null) parts.push(`age ${physical.sensorAgeMs}ms`);
+  if (physical.streamSeq != null) parts.push(`seq ${physical.streamSeq}`);
+  if (physical.slaViolations?.length) {
+    for (const v of physical.slaViolations) {
+      parts.push(`SLA ${v.kind} ${v.actual}/${v.limit}`);
+    }
+  }
+  return parts.length ? ` · ${parts.join(' · ')}` : '';
+}
+
 /** 타임라인 패널 */
 export default function Timeline({ steps, activeStep, filter, onSelect }: Props) {
   const items = filteredItems(steps, filter);
@@ -40,6 +54,7 @@ export default function Timeline({ steps, activeStep, filter, onSelect }: Props)
           : step.atMs != null && step.atMs > 0
             ? `⏱ t=${step.atMs}ms`
             : '';
+        const physical = formatPhysical(step.physical);
 
         return (
           <article
@@ -50,10 +65,14 @@ export default function Timeline({ steps, activeStep, filter, onSelect }: Props)
             <div className="step-num">{index + 1}</div>
             <div>
               <div className={`step-from ${step.fromKind}`}>{step.from}</div>
-              <div className="step-signal">{step.signal.type}{data}</div>
+              <div className={`step-signal${step.signal.type === 'SlaViolation' ? ' sla-violation' : ''}`}>
+                {step.signal.type}{data}
+              </div>
               <div className="step-meta">
                 {consumers}
-                {timing && <span>{consumers ? ' · ' : ''}{timing}</span>}
+                {(timing || physical) && (
+                  <span>{consumers ? ' · ' : ''}{timing}{physical}</span>
+                )}
               </div>
             </div>
           </article>
