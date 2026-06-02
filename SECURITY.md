@@ -66,3 +66,48 @@ Cell Coding 프로젝트의 보안 취약점 제보 및 대응 원칙을 안내�
 - 외부 입력은 항상 검증/정규화하세요.
 - 예제 코드에도 최소한의 안전 기본값을 유지하세요.
 
+## English Summary
+
+For security reports, please **do not open a public GitHub issue**. Use a private reporting channel instead:
+
+- GitHub Security Advisories (preferred)
+- A maintainer-managed security contact channel for the repository
+
+When you report a vulnerability, include:
+
+- A short summary of the issue and the affected area
+- Reproduction steps, ideally with a minimal proof of concept
+- The affected versions, environments, or deployment assumptions
+- The expected attack scenario or impact
+- Suggested mitigations, if you already have them
+
+### Response targets
+
+- Initial acknowledgment: within 72 hours
+- First triage and severity assessment: within 7 days
+- Shared remediation timeline: within 14 days, adjusted if the issue is complex
+
+### Disclosure policy
+
+- Detailed vulnerability information stays private until a fix is prepared.
+- After a fix is released, the project follows responsible disclosure.
+- Contributors should not publish zero-day details without maintainer agreement.
+
+### Severity guide
+
+- **Critical**: remote code execution, auth bypass, or broad data exposure
+- **High**: privilege escalation or loss of major service capabilities
+- **Medium**: limited information exposure or meaningful stability degradation
+- **Low**: low-impact issues or cases with very narrow preconditions
+
+### Typical in-scope examples
+
+- Bypassing runtime signal validation
+- Arbitrary execution risks caused by missing bridge input validation
+- Auth, permission, or secret-handling vulnerabilities
+
+### Typical out-of-scope examples
+
+- Dependency warnings without a realistic exploit path
+- Non-security code style issues
+- Claims that cannot be reproduced
