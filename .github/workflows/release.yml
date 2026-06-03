@@ -177,7 +177,7 @@ jobs:
       - run: npm ci
       - run: |
           cd ../../viewer-react && npm ci && npm run build
-          npm run vscode:prepublish
+          cd "$GITHUB_WORKSPACE/extensions/cell-viewer" && npm run vscode:prepublish
 
       - name: Publish to Open VSX / Marketplace
         run: npx @vscode/vsce publish --skip-duplicate
