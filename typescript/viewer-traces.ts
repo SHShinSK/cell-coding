@@ -56,6 +56,23 @@ const SCENARIOS: ScenarioDef[] = [
     file: 'examples/spider-robot/spider-organism.cell',
     input: { type: 'VisionFrame', data: { contrast: 0.6, motion: 0.3 } },
   },
+  {
+    id: 'spider-sim-sla-stale',
+    title: 'Spider Sim — stale vision SLA violation',
+    titleKo: 'Spider Sim — stale vision SLA 위반',
+    file: 'examples/spider-robot-sim/spider-sim-organism.cell',
+    input: {
+      type: 'VisionFrame',
+      data: { contrast: 0.6, motion: 0.3, timestamp: Date.now() - 5000 },
+    },
+  },
+  {
+    id: 'spider-sim-clean',
+    title: 'Spider Sim — vision stream (SLA annotated)',
+    titleKo: 'Spider Sim — vision stream (SLA 메타)',
+    file: 'examples/spider-robot-sim/spider-sim-organism.cell',
+    input: { type: 'VisionFrame', data: { contrast: 0.6, motion: 0.3, timestamp: Date.now() } },
+  },
 ];
 
 function runScenario(def: ScenarioDef) {

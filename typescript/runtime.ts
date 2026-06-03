@@ -26,6 +26,16 @@ import {
   priorityForType,
   type SignalPriority,
 } from './signal-priority.js';
+import type { MembranePhysicalSla } from './ast.js';
+import {
+  PhysicalSlaGuard,
+  SLA_FAULT_TYPE,
+  sensorAgeMs,
+  type PhysicalTraceMeta,
+  type SlaViolationRecord,
+} from './physical-sla.js';
+
+export type { PhysicalTraceMeta, SlaViolationRecord };
 
 export type { SignalInstance };
 
@@ -37,6 +47,8 @@ export interface TraceEntry {
   atMs?: number;
   /** Backoff wait before a scheduled retry · retry 예약 전 대기(ms) */
   backoffMs?: number;
+  /** Physical AI metadata · RFC-0001 physical trace */
+  physical?: PhysicalTraceMeta;
 }
 
 export interface RuntimeOptions {
@@ -54,6 +66,10 @@ export interface RuntimeOptions {
   nervousFabric?: NervousFabric;
   /** Local organ name (validates fabric scope) · 로컬 organ */
   localOrgan?: string;
+  /** Artificial handler delay for SLA tests · SLA 테스트용 지연(ms) */
+  slaSimulateLatencyMs?: Record<string, number>;
+  /** Staleness age source · staleness age 기준 (default ingest) */
+  stalenessMode?: 'ingest' | 'sensor';
 }
 
 export type { CellLifecyclePhase, LifecycleTransition, LifecycleSnapshot } from './lifecycle.js';
@@ -67,6 +83,8 @@ interface RegisteredHandler {
   paramName: string;
   body: AST.Stmt[];
   emits: Set<string>;
+  /** stream sample handler · onSample */
+  isSample?: boolean;
   /** transpiled TS handler · wire-up 시 AST body 대체 */
   invoke?: (signal: SignalInstance) => void;
 }
@@ -109,6 +127,11 @@ export class CellRuntime {
   private busSeq = 0;
   private nervousFabric: NervousFabric | null = null;
   private suppressNervousPublish = false;
+  private cellSla = new Map<string, MembranePhysicalSla>();
+  private slaGuard = new PhysicalSlaGuard();
+  private slaSimulateLatencyMs: Record<string, number> = {};
+  private stalenessMode: 'ingest' | 'sensor' = 'ingest';
+  private pendingPhysicalMeta: PhysicalTraceMeta | undefined;
 
   constructor(program: AST.Program, opts: RuntimeOptions = {}) {
     this.functions = opts.functions ?? {};
@@ -119,6 +142,8 @@ export class CellRuntime {
     this.signalPriorities = buildSignalPriorityMap(program);
     this.bus = opts.signalBus ?? new InMemorySignalBus();
     this.nervousFabric = opts.nervousFabric ?? null;
+    this.slaSimulateLatencyMs = opts.slaSimulateLatencyMs ?? {};
+    this.stalenessMode = opts.stalenessMode ?? 'ingest';
     if (opts.localOrgan && opts.nervousFabric && opts.localOrgan !== opts.nervousFabric.localOrgan) {
       throw new Error(
         `localOrgan mismatch · localOrgan 불일치: ${opts.localOrgan} vs ${opts.nervousFabric.localOrgan}`,
@@ -143,6 +168,9 @@ export class CellRuntime {
       }
       if (decl.kind !== 'CellDecl') continue;
 
+      if (decl.body.membrane.physicalSla) {
+        this.cellSla.set(decl.name, decl.body.membrane.physicalSla);
+      }
       cells.push({ name: decl.name, apoptosis: decl.body.apoptosis });
       const emits = new Set(this.typeNames(decl.body.membrane.emits));
       for (const handler of decl.body.handlers) {
@@ -152,6 +180,7 @@ export class CellRuntime {
           paramName: handler.paramName,
           body: handler.body,
           emits,
+          isSample: handler.isSample,
         });
       }
     }
@@ -253,6 +282,35 @@ export class CellRuntime {
   /** Inject an external signal and run the cascade to completion. */
   /** 외부 신호를 주입하고 연쇄 전파가 끝날 때까지 실행한다. */
   send(type: string, data: Record<string, unknown> = {}): TraceEntry[] {
+    this.resetForRun();
+    this.injectExternal(type, data, 'external');
+    this.drain();
+    return this.trace;
+  }
+
+  /** Inject a periodic stream batch in one runtime session · stream 주기 배치 inject */
+  sendStream(
+    sampleType: string,
+    samples: Record<string, unknown>[],
+    opts: { intervalMs?: number; streamName?: string } = {},
+  ): TraceEntry[] {
+    this.resetForRun();
+    if (samples.length === 0) return this.trace;
+
+    const interval = opts.intervalMs ?? 0;
+    const from = opts.streamName ? `stream:${opts.streamName}` : 'stream:external';
+
+    for (let i = 0; i < samples.length; i++) {
+      if (i > 0 && interval > 0) {
+        this.advanceVirtualTime(this.virtualMs + interval);
+      }
+      this.injectExternal(sampleType, samples[i]!, from);
+      this.drain();
+    }
+    return this.trace;
+  }
+
+  private resetForRun(): void {
     this.trace = [];
     this.processed = 0;
     this.bus.clear();
@@ -263,10 +321,39 @@ export class CellRuntime {
     this.retryCounts.clear();
     this.circuitBreaker?.reset();
     this.lifecycle.resetForRun();
-    this.lastExternal = { type, data };
-    this.enqueue({ type, data }, 'external');
-    this.drain();
-    return this.trace;
+    this.slaGuard.reset();
+  }
+
+  private injectExternal(
+    type: string,
+    data: Record<string, unknown>,
+    from: string,
+  ): void {
+    const payload = this.externalPayload(type, data);
+    this.lastExternal = { type, data: payload.data };
+    this.enqueue(payload, from);
+  }
+
+  /** Stamp ingest time for SLA staleness (skip if sample is intentionally stale). */
+  /** SLA staleness용 ingest 시각 (의도적 stale 샘플은 제외). */
+  private externalPayload(type: string, data: Record<string, unknown>): SignalInstance {
+    const ingestFromData = data.ingestWallMs;
+    const { ingestWallMs: _drop, ...rest } = data;
+    const ts = rest.timestamp;
+    if (typeof ingestFromData === 'number' && Number.isFinite(ingestFromData)) {
+      return { type, data: rest, ingestWallMs: ingestFromData };
+    }
+    if (
+      typeof ts === 'number' &&
+      ts > 1_000_000_000_000 &&
+      Date.now() - ts > 1000
+    ) {
+      return { type, data: rest };
+    }
+    if (this.stalenessMode === 'sensor') {
+      return { type, data: rest };
+    }
+    return { type, data: rest, ingestWallMs: Date.now() };
   }
 
   /** Total virtual elapsed time after last send · 마지막 send 후 가상 경과 시간 */
@@ -296,7 +383,13 @@ export class CellRuntime {
     }
     const frozen = freezeSignal(signal);
     const priority = priorityForType(this.signalPriorities, frozen.type);
-    this.trace.push({ from, signal: frozen, atMs: this.virtualMs });
+    this.trace.push({
+      from,
+      signal: frozen,
+      atMs: this.virtualMs,
+      physical: this.pendingPhysicalMeta,
+    });
+    this.pendingPhysicalMeta = undefined;
     this.bus.enqueue({
       signal: frozen,
       from,
@@ -339,6 +432,26 @@ export class CellRuntime {
     );
     if (this.activeCells) {
       scoped = scoped.filter(({ handler }) => this.activeCells!.has(handler.cell));
+    }
+    scoped = this.filterHandlersByInjectKind(scoped, from);
+    return scoped;
+  }
+
+  /** Prefer onSample for stream inject, on for pulse inject · inject 종류별 핸들러 선택 */
+  private filterHandlersByInjectKind(
+    scoped: Array<{ handler: RegisteredHandler; signal: SignalInstance }>,
+    from: string,
+  ): Array<{ handler: RegisteredHandler; signal: SignalInstance }> {
+    if (scoped.length <= 1) return scoped;
+
+    const isStreamInject = from.startsWith('stream:');
+    if (isStreamInject) {
+      const sampleHandlers = scoped.filter(({ handler }) => handler.isSample);
+      return sampleHandlers.length > 0 ? sampleHandlers : scoped;
+    }
+    if (from === 'external') {
+      const pulseHandlers = scoped.filter(({ handler }) => !handler.isSample);
+      return pulseHandlers.length > 0 ? pulseHandlers : scoped;
     }
     return scoped;
   }
@@ -403,7 +516,7 @@ export class CellRuntime {
 
       for (const { handler, signal: deliverySignal } of scoped) {
         if (!this.lifecycle.canReceive(handler.cell)) continue;
-        this.runHandler(handler, deliverySignal);
+        this.runHandlerWithSla(handler, deliverySignal);
       }
       this.applyImmune(signal);
     }
@@ -585,6 +698,106 @@ export class CellRuntime {
       }
     }
     this.lifecycle.commitApoptosis(cell, reason);
+  }
+
+  private runHandlerWithSla(handler: RegisteredHandler, signal: SignalInstance): void {
+    const sla = this.cellSla.get(handler.cell);
+    const wallNow = Date.now();
+
+    if (sla) {
+      const accept = this.slaGuard.checkAccept(
+        handler.cell,
+        signal,
+        sla,
+        this.virtualMs,
+        wallNow,
+        this.stalenessMode,
+      );
+      if (!accept.allow && accept.violation) {
+        this.recordSlaViolation(accept.violation, accept.sensorAgeMs);
+        this.applySlaViolationPolicy(handler.cell, sla, accept.violation);
+        return;
+      }
+    }
+
+    const traceStart = this.trace.length;
+    const simulated = this.slaSimulateLatencyMs[handler.cell] ?? 0;
+    const t0 = performance.now();
+    if (simulated > 0) {
+      this.spinMs(simulated);
+    }
+    this.runHandler(handler, signal);
+    const latencyMs = simulated > 0 ? simulated : performance.now() - t0;
+
+    const streamSeq = sla ? this.slaGuard.nextStreamSeq(handler.cell) : undefined;
+    const ageMs = sla ? sensorAgeMs(signal, wallNow, this.virtualMs, this.stalenessMode) : undefined;
+
+    let latencyViolation: SlaViolationRecord | undefined;
+    if (sla) {
+      const latency = this.slaGuard.checkLatency(handler.cell, latencyMs, sla);
+      latencyViolation = latency.violation;
+      if (latencyViolation) {
+        this.recordSlaViolation(latencyViolation, ageMs);
+        this.applySlaViolationPolicy(handler.cell, sla, latencyViolation);
+      }
+    }
+
+    const physical: PhysicalTraceMeta = {
+      latencyMs: Math.round(latencyMs * 100) / 100,
+      sensorAgeMs: ageMs,
+      streamSeq,
+      slaViolations: latencyViolation ? [latencyViolation] : undefined,
+    };
+
+    for (let i = traceStart; i < this.trace.length; i++) {
+      const entry = this.trace[i];
+      if (entry.from !== handler.cell) continue;
+      entry.physical = { ...physical, ...(entry.physical ?? {}) };
+      if (!latencyViolation) {
+        this.slaGuard.rememberSafeEmit(handler.cell, entry.signal);
+      }
+    }
+  }
+
+  private recordSlaViolation(v: SlaViolationRecord, sensorAgeMs?: number): void {
+    this.trace.push({
+      from: `sla:${v.cell}#${v.kind}`,
+      signal: this.slaGuard.buildViolationSignal(v),
+      atMs: this.virtualMs,
+      physical: {
+        sensorAgeMs,
+        slaViolations: [v],
+      },
+    });
+  }
+
+  private applySlaViolationPolicy(
+    cell: string,
+    sla: MembranePhysicalSla,
+    violation: SlaViolationRecord,
+  ): void {
+    const policy = sla.onViolation ?? violation.policy;
+    // latency is observability-only — do not holdLastSafe re-emit after handler ran
+    if (policy === 'holdLastSafe' && violation.kind !== 'latency') {
+      const last = this.slaGuard.getLastSafeEmit(cell);
+      if (last) {
+        this.pendingPhysicalMeta = {
+          slaViolations: [{ ...violation, policy: 'holdLastSafe' }],
+        };
+        this.enqueue(last, `sla:${cell}#holdLastSafe`);
+      }
+      return;
+    }
+    if (policy === 'emitFault') {
+      this.enqueue(this.slaGuard.buildFaultSignal(cell, violation), `sla:${cell}#fault`);
+    }
+  }
+
+  private spinMs(ms: number): void {
+    const end = performance.now() + ms;
+    while (performance.now() < end) {
+      /* SLA test spin · SLA 테스트 대기 */
+    }
   }
 
   private runHandler(handler: RegisteredHandler, signal: SignalInstance): void {

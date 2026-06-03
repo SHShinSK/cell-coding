@@ -19,6 +19,13 @@ interface SignalInfo {
   pos:     AST.Position;
 }
 
+interface StreamInfo {
+  name:       string;
+  sampleType: string;
+  rateHz?:    number;
+  pos:        AST.Position;
+}
+
 interface CellInfo {
   name:    string;
   role:    string;
@@ -32,6 +39,7 @@ const LIFESPAN_VALUES = new Set(['stateless', 'persistent', 'session']);
 export class TypeChecker {
   private errors:  TypeCheckError[] = [];
   private signals: Map<string, SignalInfo> = new Map();
+  private streams: Map<string, StreamInfo> = new Map();
   private cells:   Map<string, CellInfo>   = new Map();
   private genomes: Map<string, AST.GenomeDecl> = new Map();
   private organs:  Set<string> = new Set();
@@ -44,6 +52,7 @@ export class TypeChecker {
     for (const decl of program.statements) {
       this.validate(decl);
     }
+    this.validateStreamMembraneRateAlignment(program);
     return this.errors;
   }
 
@@ -58,6 +67,24 @@ export class TypeChecker {
           name: decl.name,
           extends: decl.extends,
           fields,
+          pos: decl.pos,
+        });
+        break;
+      }
+      case 'StreamDecl': {
+        if (decl.sampleFields?.length) {
+          const fields = new Map<string, AST.TypeExpr>();
+          for (const f of decl.sampleFields) fields.set(f.name, f.typeExpr);
+          this.signals.set(decl.sampleType, {
+            name: decl.sampleType,
+            fields,
+            pos: decl.pos,
+          });
+        }
+        this.streams.set(decl.name, {
+          name: decl.name,
+          sampleType: decl.sampleType,
+          rateHz: decl.rateHz,
           pos: decl.pos,
         });
         break;
@@ -112,6 +139,7 @@ export class TypeChecker {
   private validate(decl: AST.TopLevelDecl): void {
     switch (decl.kind) {
       case 'SignalDecl':   this.validateSignal(decl);     break;
+      case 'StreamDecl':   this.validateStream(decl);     break;
       case 'CellDecl':     this.validateCell(decl);     break;
       case 'TissueDecl':   this.validateTissue(decl);   break;
       case 'OrganDecl':    this.validateOrgan(decl);    break;
@@ -126,6 +154,27 @@ export class TypeChecker {
         `Signal '${decl.name}' has invalid priority '${decl.priority}' (expected critical|high|normal|low)`,
         decl.pos
       );
+    }
+  }
+
+  private validateStream(decl: AST.StreamDecl): void {
+    if (decl.sampleFields?.length && this.signals.has(decl.sampleType)) {
+      const existing = this.signals.get(decl.sampleType)!;
+      if (existing.pos.line !== decl.pos.line || existing.pos.col !== decl.pos.col) {
+        this.warn(
+          `Stream '${decl.name}' redefines sample signal '${decl.sampleType}' inline (experimental)`,
+          decl.pos,
+        );
+      }
+    }
+    if (!decl.sampleFields?.length && !this.signals.has(decl.sampleType)) {
+      this.error(
+        `Stream '${decl.name}' references unknown sample type '${decl.sampleType}'`,
+        decl.pos,
+      );
+    }
+    if (decl.rateHz !== undefined && decl.rateHz <= 0) {
+      this.error(`Stream '${decl.name}' rate must be positive Hz`, decl.pos);
     }
   }
 
@@ -151,10 +200,24 @@ export class TypeChecker {
     }
 
     if (body.handlers.length === 0) {
-      this.error(`Cell '${name}' must declare at least one 'on' handler`, decl.pos);
+      this.error(`Cell '${name}' must declare at least one 'on' or 'onSample' handler`, decl.pos);
     }
 
     const { membrane } = body;
+
+    if (membrane.physicalSla) {
+      this.warn(
+        `Cell '${name}' uses membrane physical SLA (RFC-0001) — runtime enforces staleness/rate/latency`,
+        membrane.pos,
+      );
+      const sla = membrane.physicalSla;
+      if (sla.onViolation && !['holdLastSafe', 'drop', 'emitFault'].includes(sla.onViolation)) {
+        this.error(
+          `Cell '${name}' has invalid onViolation policy '${sla.onViolation}'`,
+          membrane.pos,
+        );
+      }
+    }
 
     if (membrane.acceptsIsQuery) {
       for (const handler of body.handlers) {
@@ -175,7 +238,7 @@ export class TypeChecker {
         );
         if (!hasHandler) {
           this.warn(
-            `Cell '${name}' accepts '${sig}' but has no compatible 'on(...)' handler`,
+            `Cell '${name}' accepts '${sig}' but has no compatible 'on(...)' or 'onSample(...)' handler`,
             membrane.pos
           );
         }
@@ -370,6 +433,32 @@ export class TypeChecker {
       cur = this.signals.get(cur)?.extends;
     }
     return false;
+  }
+
+  /** Warn when stream.rateHz and membrane rateMaxHz diverge (RFC-0001 SSOT). */
+  /** stream.rateHz vs membrane rateMaxHz 불일치 경고 */
+  private validateStreamMembraneRateAlignment(program: AST.Program): void {
+    if (this.streams.size === 0) return;
+
+    for (const decl of program.statements) {
+      if (decl.kind !== 'CellDecl') continue;
+      const sla = decl.body.membrane?.physicalSla;
+      if (sla?.rateMaxHz == null) continue;
+
+      for (const handler of decl.body.handlers) {
+        if (!handler.isSample) continue;
+        for (const stream of this.streams.values()) {
+          if (stream.sampleType !== handler.signalType) continue;
+          if (stream.rateHz == null) continue;
+          if (stream.rateHz !== sla.rateMaxHz) {
+            this.warn(
+              `Stream '${stream.name}' declares ${stream.rateHz}Hz but cell '${decl.name}' membrane rate max is ${sla.rateMaxHz}Hz — align or document intent`,
+              stream.pos,
+            );
+          }
+        }
+      }
+    }
   }
 
   private error(message: string, pos: AST.Position): void {

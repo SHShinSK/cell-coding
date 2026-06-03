@@ -42,8 +42,8 @@ Cell Coding은 그 단위를 `role`, `membrane`, `signal` 계약을 가진 `Cell
 Cell Coding maps embodied systems into functional cell networks, not one monolithic controller.  
 Cell Coding은 구현체 시스템을 단일 거대 컨트롤러가 아니라 기능 세포 네트워크로 매핑합니다.
 
-**시작점:** [A1](examples/porifera-filter/SCENARIO.md) → [A2](examples/spiderling/SCENARIO.md) → [A3](examples/spider-robot/SCENARIO.md) → [A4 PET](examples/pet-robot/SCENARIO.md) → [A5 Humanoid](examples/humanoid-robot/SCENARIO.md).  
-**Start here:** [A1](examples/porifera-filter/SCENARIO.md) → [A2](examples/spiderling/SCENARIO.md) → [A3](examples/spider-robot/SCENARIO.md) → [A4 PET](examples/pet-robot/SCENARIO.md) → [A5 Humanoid](examples/humanoid-robot/SCENARIO.md).
+**시작점:** [A1](examples/porifera-filter/SCENARIO.md) → [A2](examples/spiderling/SCENARIO.md) → **[A2-S](examples/spiderling-sim/SCENARIO.md)** → [A3](examples/spider-robot/SCENARIO.md) → **[A3-S](examples/spider-robot-sim/SCENARIO.md)** / **[A3-H](examples/spider-robot-sim/A3-H.md)** → [A4 PET](examples/pet-robot/SCENARIO.md) → **[A4-S](examples/pet-robot-sim/SCENARIO.md)** / **[A4-H](examples/pet-robot-sim/A4-H.md)** → [A5 Humanoid](examples/humanoid-robot/SCENARIO.md).  
+**Start here:** [A1](examples/porifera-filter/SCENARIO.md) → [A2](examples/spiderling/SCENARIO.md) → **[A2-S](examples/spiderling-sim/SCENARIO.md)** → [A3](examples/spider-robot/SCENARIO.md) → **[A3-S](examples/spider-robot-sim/SCENARIO.md)** / **[A3-H](examples/spider-robot-sim/A3-H.md)** → [A4 PET](examples/pet-robot/SCENARIO.md) → **[A4-S](examples/pet-robot-sim/SCENARIO.md)** / **[A4-H](examples/pet-robot-sim/A4-H.md)** → [A5 Humanoid](examples/humanoid-robot/SCENARIO.md).
 
 ### Spider robot | 거미 로봇
 
@@ -64,7 +64,7 @@ A humanoid ingests vision, proprioception, balance, hand tactile, and speech con
 A companion PET robot reads owner presence, touch, voice tone, and ambient home context continuously.  
 반려(PET) 로봇은 주인 존재, 터치, 음성 톤, 가정 환경 맥락을 연속적으로 읽습니다.
 
-**레퍼런스:** [`examples/pet-robot/`](examples/pet-robot/) — 11세포, 정서·안전·상호작용 ([SCENARIO.md](examples/pet-robot/SCENARIO.md)).
+**레퍼런스:** [`examples/pet-robot/`](examples/pet-robot/) — 11세포, 정서·안전·상호작용 ([SCENARIO.md](examples/pet-robot/SCENARIO.md)). Sim-real: **[A4-S](examples/pet-robot-sim/SCENARIO.md)** / **[A4-H](examples/pet-robot-sim/A4-H.md)**.
 
 ## One-liner | 한 줄 정의
 
@@ -156,6 +156,9 @@ This repository is public, so anyone can read code, discuss ideas, and contribut
 
 ## Maintainer setup | 유지보수자 설정
 
+- [Launch checklist · 런칭 체크리스트](.github/LAUNCH_CHECKLIST.md)
+- [Issue cleanup · 이슈 중복 정리안](.github/ISSUE_CLEANUP.md)
+- [Show HN draft · 홍보 글 초안](.github/SHOW_HN.md)
 - [Discussions · About · Topics](.github/DISCUSSIONS_SETUP.md)
 - [Pages workflow](.github/workflows/pages.yml) — Settings → Pages → **GitHub Actions**
 

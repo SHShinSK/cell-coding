@@ -65,6 +65,7 @@ export class Parser {
     const t = this.peek();
     switch (t.type) {
       case TokenType.SIGNAL:   return this.parseSignalDecl();
+      case TokenType.STREAM:   return this.parseStreamDecl();
       case TokenType.CELL:     return this.parseCellDecl();
       case TokenType.TISSUE:   return this.parseTissueDecl();
       case TokenType.ORGAN:    return this.parseOrganDecl();
@@ -105,6 +106,76 @@ export class Parser {
     }
 
     return { kind: 'SignalDecl', pos, name, extends: extendsName, priority, fields };
+  }
+
+  private parseStreamDecl(): AST.StreamDecl {
+    const pos = this.pos2();
+    this.expect(TokenType.STREAM);
+    const name = this.expect(TokenType.IDENTIFIER, 'Expected stream name').value;
+    this.expect(TokenType.LBRACE);
+
+    let rateHz: number | undefined;
+    let sampleType = '';
+    let sampleFields: AST.FieldDecl[] | undefined;
+
+    while (!this.check(TokenType.RBRACE) && !this.check(TokenType.EOF)) {
+      const t = this.peek();
+      if (t.value === 'rate') {
+        this.advance();
+        this.expect(TokenType.COLON);
+        rateHz = this.parseHzLiteral();
+      } else if (t.value === 'sample') {
+        this.advance();
+        if (this.match(TokenType.COLON)) {
+          sampleType = this.expect(TokenType.IDENTIFIER, 'Expected stream sample type').value;
+        } else {
+          sampleType = this.expect(TokenType.IDENTIFIER, 'Expected stream sample type').value;
+          if (this.check(TokenType.LBRACE)) {
+            this.advance();
+            sampleFields = [];
+            while (!this.check(TokenType.RBRACE) && !this.check(TokenType.EOF)) {
+              sampleFields.push(this.parseFieldDecl());
+            }
+            this.expect(TokenType.RBRACE);
+          }
+        }
+      } else {
+        this.advance();
+      }
+      this.match(TokenType.SEMICOLON);
+    }
+
+    this.expect(TokenType.RBRACE);
+    if (!sampleType) {
+      throw new ParseError('Stream must declare sample type · stream은 sample 타입 선언 필요', this.peek());
+    }
+    return { kind: 'StreamDecl', pos, name, rateHz, sampleType, sampleFields };
+  }
+
+  private parseHzLiteral(): number {
+    const t = this.peek();
+    if (t.type === TokenType.NUMBER) {
+      this.advance();
+      if (this.check(TokenType.IDENTIFIER) && this.peek().value.toLowerCase() === 'hz') {
+        this.advance();
+      }
+      return parseFloat(t.value);
+    }
+    if (t.type === TokenType.IDENTIFIER) {
+      const raw = this.advance().value;
+      const m = /^(\d+(?:\.\d+)?)\s*Hz$/i.exec(raw);
+      if (m) return parseFloat(m[1]);
+      throw new ParseError(`Expected rate in Hz (e.g. 200Hz) · rate는 Hz 단위 필요`, t);
+    }
+    throw new ParseError('Expected rate value · rate 값 필요', t);
+  }
+
+  private parseMsLiteral(): number {
+    const t = this.expect(TokenType.NUMBER, 'Expected duration number');
+    if (this.check(TokenType.IDENTIFIER) && this.peek().value.toLowerCase() === 'ms') {
+      this.advance();
+    }
+    return parseFloat(t.value);
   }
 
   // ══════════════════════════════════════════════════════════
@@ -174,6 +245,9 @@ export class Parser {
       } else if (t.type === TokenType.ON) {
         handlers.push(this.parseHandlerDecl());
 
+      } else if (t.type === TokenType.ON_SAMPLE) {
+        handlers.push(this.parseSampleHandlerDecl());
+
       } else if (t.type === TokenType.APOPTOSIS) {
         apoptosis = this.parseApoptosisDecl();
 
@@ -211,6 +285,7 @@ export class Parser {
     let rejects: AST.TypeExpr | undefined;
     let observes: AST.TypeExpr | undefined;
     let passthrough: AST.TypeExpr | undefined;
+    let physicalSla: AST.MembranePhysicalSla | undefined;
 
     while (!this.check(TokenType.RBRACE) && !this.check(TokenType.EOF)) {
       const t = this.peek();
@@ -227,6 +302,42 @@ export class Parser {
         this.advance(); this.expect(TokenType.COLON); observes = this.parseTypeExpr();
       } else if (t.value === 'passthrough') {
         this.advance(); this.expect(TokenType.COLON); passthrough = this.parseTypeExpr();
+      } else if (t.value === 'latency') {
+        this.advance();
+        this.expect(TokenType.COLON);
+        const mode = this.expect(TokenType.IDENTIFIER).value;
+        if (mode === 'budget') {
+          physicalSla = { ...(physicalSla ?? {}), latencyBudgetMs: this.parseMsLiteral() };
+        } else {
+          this.skipUntilSemicolonOrBrace();
+        }
+      } else if (t.value === 'rate') {
+        this.advance();
+        this.expect(TokenType.COLON);
+        const mode = this.expect(TokenType.IDENTIFIER).value;
+        if (mode === 'max') {
+          physicalSla = { ...(physicalSla ?? {}), rateMaxHz: this.parseHzLiteral() };
+        } else {
+          this.skipUntilSemicolonOrBrace();
+        }
+      } else if (t.value === 'staleness') {
+        this.advance();
+        this.expect(TokenType.COLON);
+        const mode = this.expect(TokenType.IDENTIFIER).value;
+        if (mode === 'reject') {
+          physicalSla = { ...(physicalSla ?? {}), stalenessRejectMs: this.parseMsLiteral() };
+        } else {
+          this.skipUntilSemicolonOrBrace();
+        }
+      } else if (t.value === 'onViolation') {
+        this.advance();
+        this.expect(TokenType.COLON);
+        const policy = this.expect(TokenType.IDENTIFIER).value;
+        if (policy === 'holdLastSafe' || policy === 'drop' || policy === 'emitFault') {
+          physicalSla = { ...(physicalSla ?? {}), onViolation: policy };
+        } else {
+          this.skipUntilSemicolonOrBrace();
+        }
       } else {
         this.advance();
       }
@@ -234,7 +345,24 @@ export class Parser {
     }
 
     this.expect(TokenType.RBRACE);
-    return { kind: 'MembraneDecl', pos, accepts, acceptsIsQuery, emits, rejects, observes, passthrough };
+    return {
+      kind: 'MembraneDecl',
+      pos,
+      accepts,
+      acceptsIsQuery,
+      emits,
+      rejects,
+      observes,
+      passthrough,
+      physicalSla,
+    };
+  }
+
+  private skipUntilSemicolonOrBrace(): void {
+    while (!this.check(TokenType.RBRACE) && !this.check(TokenType.EOF)) {
+      if (this.check(TokenType.SEMICOLON)) break;
+      this.advance();
+    }
   }
 
   // ── Nucleus ───────────────────────────────────────────────
@@ -254,8 +382,20 @@ export class Parser {
   // ── Handler ───────────────────────────────────────────────
 
   private parseHandlerDecl(): AST.HandlerDecl {
+    return this.parseHandlerDeclInner(false);
+  }
+
+  private parseSampleHandlerDecl(): AST.HandlerDecl {
+    return this.parseHandlerDeclInner(true);
+  }
+
+  private parseHandlerDeclInner(isSample: boolean): AST.HandlerDecl {
     const pos = this.pos2();
-    this.expect(TokenType.ON);
+    if (isSample) {
+      this.expect(TokenType.ON_SAMPLE);
+    } else {
+      this.expect(TokenType.ON);
+    }
     this.expect(TokenType.LPAREN);
     const signalType = this.expect(TokenType.IDENTIFIER).value;
     const isQuery = this.match(TokenType.QUERY);
@@ -264,7 +404,7 @@ export class Parser {
     this.expect(TokenType.LBRACE);
     const body = this.parseStmtList();
     this.expect(TokenType.RBRACE);
-    return { kind: 'HandlerDecl', pos, signalType, paramName, isQuery, body };
+    return { kind: 'HandlerDecl', pos, signalType, paramName, isQuery, isSample, body };
   }
 
   // ── Apoptosis ─────────────────────────────────────────────

@@ -28,6 +28,10 @@ def _cell_run_cmd(
     transpiled: bool = False,
     functions: str | Path | None = None,
     jaeger_ui_url: str | None = None,
+    stream_name: str | None = None,
+    stream_samples: int | None = None,
+    stream_interval_ms: float | None = None,
+    stream_payload_file: str | Path | None = None,
 ) -> tuple[list[str], str | Path]:
     """Build `cell run --json` argv and working directory."""
     cell_cli = os.environ.get("CELL_CLI", "cell")
@@ -67,7 +71,19 @@ def _cell_run_cmd(
     jaeger = jaeger_ui_url or os.environ.get("JAEGER_UI_URL")
     if jaeger:
         cmd.extend(["--jaeger", jaeger])
-    cmd.extend([cell_arg, signal_type, json.dumps(signal_data)])
+    if stream_name is not None:
+        cmd.append("--stream")
+        if stream_name:
+            cmd.append(stream_name)
+        if stream_samples is not None:
+            cmd.extend(["--samples", str(stream_samples)])
+        if stream_interval_ms is not None:
+            cmd.extend(["--interval-ms", str(stream_interval_ms)])
+    if stream_payload_file:
+        payload_arg = f"@{Path(stream_payload_file).resolve()}"
+    else:
+        payload_arg = json.dumps(signal_data)
+    cmd.extend([cell_arg, signal_type, payload_arg])
     return cmd, cwd
 
 
@@ -105,5 +121,70 @@ def run_cell_file(
 
     if proc.returncode != 0:
         raise RuntimeError(proc.stderr.strip() or proc.stdout.strip() or "cell run failed")
+
+    return json.loads(proc.stdout)
+
+
+def run_cell_stream(
+    cell_file: str | Path,
+    signal_type: str,
+    *,
+    stream_name: str = "",
+    samples: list[dict[str, Any]] | None = None,
+    template: dict[str, Any] | None = None,
+    sample_count: int = 5,
+    interval_ms: float = 50.0,
+    node: str | None = None,
+    transpiled: bool = False,
+    functions: str | Path | None = None,
+    jaeger_ui_url: str | None = None,
+) -> dict[str, Any]:
+    """Execute `cell run --json --stream` with batch samples · stream 주기 inject."""
+    cell_path = Path(cell_file).resolve()
+    payload_file: Path | None = None
+    signal_data = template or {}
+
+    if samples is not None:
+        import tempfile
+
+        payload = [{"data": s} if "type" not in s else s for s in samples]
+        tmp = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
+        json.dump(payload, tmp)
+        tmp.close()
+        payload_file = Path(tmp.name)
+        signal_data = samples[0] if samples else (template or {})
+    elif template is None:
+        signal_data = {}
+
+    cmd, cwd = _cell_run_cmd(
+        cell_path,
+        signal_type,
+        signal_data,
+        node=node,
+        transpiled=transpiled,
+        functions=functions,
+        jaeger_ui_url=jaeger_ui_url,
+        stream_name=stream_name,
+        stream_samples=sample_count if samples is None else len(samples),
+        stream_interval_ms=interval_ms,
+        stream_payload_file=payload_file,
+    )
+
+    try:
+        proc = subprocess.run(
+            cmd,
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+        )
+    finally:
+        if payload_file is not None:
+            payload_file.unlink(missing_ok=True)
+
+    if proc.returncode != 0:
+        raise RuntimeError(proc.stderr.strip() or proc.stdout.strip() or "cell run --stream failed")
 
     return json.loads(proc.stdout)

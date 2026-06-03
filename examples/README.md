@@ -7,8 +7,11 @@
 | ✅ | `validator.cell` — Phase 1 골든 파일 (role + membrane + on) |
 | ✅ | [`porifera-filter/`](porifera-filter/) — Porifera Filter Bot (3 cells, A1 MICROBE) |
 | ✅ | [`spiderling/`](spiderling/) — Spiderling Bot (5 cells, A2 PLANKTON) |
+| ✅ | [`spiderling-sim/`](spiderling-sim/) — Spiderling Sim (6 cells, A2-S, IMU bridge · [BRIDGE](spiderling-sim/BRIDGE.md)) |
 | ✅ | [`spider-robot/`](spider-robot/) — Spider Robot (10 cells, A3 INSECT, nervous) |
+| ✅ | [`spider-robot-sim/`](spider-robot-sim/) — Spider Sim (A3-S, stream + SLA + bridge) · [A3-H hardware](spider-robot-sim/A3-H.md) |
 | ✅ | [`pet-robot/`](pet-robot/) — PET Companion (11 cells, A4, affect + safety) |
+| ✅ | [`pet-robot-sim/`](pet-robot-sim/) — PET Sim (A4-S stream + SLA + bridge) |
 | ✅ | [`humanoid-robot/`](humanoid-robot/) — Humanoid (14 cells, A5, 4 organs) |
 | ✅ | [`motion-alarm/`](motion-alarm/) — Physical AI PoC (MotionDetected → AlarmPulse) |
 | ✅ | [`physical-ai-motion-alarm.md`](physical-ai-motion-alarm.md) — Physical AI E2E 가이드 (센서→세포→액추에이터) |
@@ -105,6 +108,7 @@ Cell Lab sidecar (`.celltest.json`):
 | sponge | `sponge-organism.celltest.json` |
 | spider | `spider-organism.celltest.json` |
 | pet | `pet-organism.celltest.json` |
+| pet-sim | `pet-organism.celltest.json` (same suites; A4-S uses `pet-sim-organism.cell`) |
 | motion-alarm | `motion-alarm.celltest.json` |
 
 Phase 3 CLI (`cell init` · `build` · `inspect`):
@@ -141,6 +145,22 @@ rt.send('RawInput', { payload: 'hello' });
 ```
 
 standalone 배포(단일 파일)가 필요하면 `transpileProgram(program, { standalone: true })`로 inline `BaseCell` preamble을 포함할 수 있습니다.
+
+**Cell DSL → TypeScript 타입 매핑** (`transpiler.ts`):
+
+| Cell DSL | TypeScript |
+|----------|------------|
+| `String` | `string` |
+| `Number` | `number` |
+| `Boolean` / `Bool` | `boolean` |
+| `A \| B` | `A \| B` |
+| `List<T>` | `T[]` |
+| `Map<K, V>` | `Record<K, V>` |
+| `Option<T>` | `T \| undefined` |
+| `Result<Ok, Err>` | `{ ok: Ok; err: Err }` |
+| 기타 식별자 | 그대로 (예: `RawInput`) |
+
+후속 기여 아이디어: `.github/issue-drafts/06-transpiler-stub.md` Follow-up tasks 참고.
 
 ```bash
 # 세포·조직·organism 정적 분석
@@ -236,13 +256,14 @@ npm test -- phase4-nervous-distributed.test.ts
 신호 흐름 시각화 (Cell Viewer MVP):
 
 ```bash
-cd typescript && npm run viewer:traces
-cd .. && npx --yes serve viewer -p 5173
+cd typescript && npm run viewer:traces && npm run viewer:serve
 # → http://localhost:5173 — 타임라인 + 그래프 + lifecycle
 # live run: npm run cell:run -- --json --out ../viewer/live-run.json ... 후
 # watch: npm run cell:run -- --json --watch --out ../viewer/live-run.json ... (터미널 유지)
 # → http://localhost:5173?live=live-run.json
 ```
+
+> `typescript/` 안에서 `npx serve viewer`만 실행하면 **404** — 반드시 `npm run viewer:serve` 또는 저장소 루트에서 `npx serve viewer` 사용.
 
 React viewer (**SVG graph** · static viewer와 동일 수준):
 
@@ -270,8 +291,11 @@ Example `.cell` files and Physical AI scenario docs live here.
 | Done | `validator.cell` — Phase 1 golden file (role + membrane + on) |
 | Done | [`porifera-filter/`](porifera-filter/) — Porifera Filter Bot (3 cells, A1 MICROBE) |
 | Done | [`spiderling/`](spiderling/) — Spiderling Bot (5 cells, A2 PLANKTON) |
+| Done | [`spiderling-sim/`](spiderling-sim/) — Spiderling Sim (6 cells, A2-S, IMU bridge) |
 | Done | [`spider-robot/`](spider-robot/) — Spider Robot (10 cells, A3 INSECT, nervous) |
+| Done | [`spider-robot-sim/`](spider-robot-sim/) — Spider Sim (A3-S) · [A3-H hardware](spider-robot-sim/A3-H.md) |
 | Done | [`pet-robot/`](pet-robot/) — PET Companion (11 cells, A4, affect + safety) |
+| Done | [`pet-robot-sim/`](pet-robot-sim/) — PET Sim (A4-S) · [A4-H hardware](pet-robot-sim/A4-H.md) |
 | Done | [`humanoid-robot/`](humanoid-robot/) — Humanoid (14 cells, A5, 4 organs) |
 | Done | [`motion-alarm/`](motion-alarm/) — Physical AI PoC (MotionDetected → AlarmPulse) |
 | Done | [`physical-ai-motion-alarm.md`](physical-ai-motion-alarm.md) — Physical AI E2E guide |
@@ -301,6 +325,7 @@ Cell Lab isolated tests (`cell test` · sidecar `.celltest.json`):
 npm run cell:test -- ../examples/porifera-filter/sponge-organism.cell
 npm run cell:test -- ../examples/spider-robot/spider-organism.cell
 npm run cell:test -- ../examples/pet-robot/pet-organism.cell
+npm run cell:test -- ../examples/pet-robot-sim/pet-sim-organism.cell
 npm run cell:test -- ../examples/porifera-filter/sponge-organism.cell FilterDecideCell
 ```
 
@@ -322,8 +347,7 @@ The runtime compiles a `.cell` file, executes the `emit`/`on` cascade, applies *
 Signal flow visualization (Cell Viewer MVP):
 
 ```bash
-cd typescript && npm run viewer:traces
-cd .. && npx --yes serve viewer -p 5173
+cd typescript && npm run viewer:traces && npm run viewer:serve
 # → http://localhost:5173 — timeline + graph + lifecycle
 # after live run: http://localhost:5173?live=live-run.json
 ```

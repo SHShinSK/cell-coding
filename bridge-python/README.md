@@ -5,6 +5,14 @@ Python adapters for **sensor inject** and **actuator readback** against the Type
 Physical AI PoC: `MotionDetected` → `AlarmPulse`  
 **Full guide · 전체 가이드:** [`examples/physical-ai-motion-alarm.md`](../examples/physical-ai-motion-alarm.md)
 
+Spiderling sim (IMU → locomotion): [`examples/spiderling-sim/`](../examples/spiderling-sim/SCENARIO.md) · `python demo_spiderling_sim.py`
+
+Spider sim (VisionFrame → nervous cascade): [`examples/spider-robot-sim/`](../examples/spider-robot-sim/SCENARIO.md) · `python demo_spider_sim.py`
+
+**Robotics L1 bridge (registry `@signals/robotics-base`):** [`ROBOTICS.md`](ROBOTICS.md) · IMU / JointState / Vision / Twist
+
+A3-H hardware (camera / ROS2, same `.cell`): [`examples/spider-robot-sim/A3-H.md`](../examples/spider-robot-sim/A3-H.md)
+
 ## Prerequisites · 사전 준비
 
 Node.js 20+ and Python 3.10+. Requires **`@cell-coding/cli`** on PATH (or monorepo clone):
@@ -27,6 +35,15 @@ cd bridge-python
 python demo.py
 python demo.py --transpiled          # transpiled TS handlers
 python demo.py --confidence 0.3      # no alarm · 알람 없음
+python demo_spiderling_sim.py
+python demo_spiderling_sim.py --source ros2-replay
+python demo_spiderling_sim.py --samples 5 --interval-ms 50 --publish-twist
+python demo_spider_sim.py --source ros2-replay --samples 3 --interval-ms 33
+python demo_robotics_bridge.py
+python demo_spider_sim.py --source camera --camera-index 0
+python demo_pet.py --rssi 0.6 --publish-twist
+python test_vision_metrics.py
+python test_ros2_mapping.py
 ```
 
 ## Cloud runtime · cloud runtime
@@ -86,6 +103,18 @@ payload_obs = run_cell_file(
 )
 alarms = extract_alarm_actions(payload)
 
+# stream batch (RFC-0001 · cell run --stream)
+from cell_bridge import run_cell_stream, simulate_imu_sample
+
+payload_stream = run_cell_stream(
+    "../examples/spiderling-sim/spiderling-sim-organism.cell",
+    "ImuSample",
+    stream_name="ImuStream",
+    template=simulate_imu_sample()["data"],
+    sample_count=5,
+    interval_ms=50,
+)
+
 # cloud runtime
 from cell_bridge import post_signal, default_cloud_url
 cloud = post_signal(default_cloud_url(), motion["type"], motion["data"])
@@ -107,4 +136,11 @@ Cloud path · cloud 경로:
 simulate_motion → POST /v1/signals → cloud-serve (AlarmOrgan) → trace → extract_alarm_actions
 ```
 
-Future: camera/mic streams, GPIO alarm hardware.
+Future: GPIO alarm hardware; see [`ROBOTICS.md`](ROBOTICS.md) for IMU/Joint/Vision/Twist adapters.
+
+Optional extras · 선택 의존성:
+
+```bash
+pip install cell-coding-bridge[camera]   # USB camera (A3-H)
+pip install cell-coding-bridge[ros2]     # ROS2 live (requires sourced ROS env)
+```

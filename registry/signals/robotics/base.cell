@@ -1,0 +1,49 @@
+// Robotics base signals — Physical AI standard types (registry v0.1)
+// 로보틱스 기본 신호 — Physical AI 표준 타입 (registry v0.1)
+//
+// Usage · 사용법: copy signal blocks into organism .cell, or reference via cell compose (future).
+// Stream sample types (ImuSample, JointState) pair with `stream` decl + `onSample` handlers in organism.
+
+signal WorldFrame {
+  timestamp: Number;
+  frameId: String;
+}
+
+signal ImuSample {
+  timestamp: Number;
+  accelX: Number;
+  accelY: Number;
+  accelZ: Number;
+  gyroX: Number;
+  gyroY: Number;
+  gyroZ: Number;
+}
+
+signal JointState {
+  jointId: String;
+  angle: Number;
+  velocity: Number;
+  torque: Number;
+}
+
+signal TwistCommand {
+  linearX: Number;
+  angularZ: Number;
+}
+
+signal BatteryLevel {
+  percent: Number;
+  voltage: Number;
+  charging: Boolean;
+}
+
+signal EstopPulse {
+  active: Boolean;
+  source: String;
+}
+
+signal HardwareFault {
+  code: String;
+  message: String;
+  severity: String;
+}

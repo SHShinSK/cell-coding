@@ -85,7 +85,7 @@ cell VisionSenseCell {
     if (frame.contrast < 0.1) {
       emit SensorFault;
     } else {
-      emit VisualCue;
+      emit VisualCue(obstacle: frame.contrast > 0.5, range: frame.motion);
     }
   }
 }
@@ -99,7 +99,7 @@ cell TactileSenseCell {
   }
 
   on(VisualCue cue) {
-    emit TactilePing;
+    emit TactilePing(contact: cue.obstacle, intensity: cue.range);
   }
 }
 
@@ -112,7 +112,7 @@ cell HearingSenseCell {
   }
 
   on(TactilePing ping) {
-    emit AudioCue;
+    emit AudioCue(vibration: ping.contact, threat: ping.intensity);
   }
 }
 
@@ -125,12 +125,16 @@ cell ChemicalSenseCell {
   }
 
   on(AudioCue cue) {
-    emit ChemicalCue;
+    if (cue.threat > 0.5) {
+      emit ChemicalCue(hazard: true, edible: false);
+    } else {
+      emit ChemicalCue(hazard: false, edible: true);
+    }
   }
 }
 
 cell FuseDecideCell {
-  role: "Multi-sense threat fusion · 다중 감각 위협 융합";
+  role: "Multi-sense threat fusion · 다감각 위협 융합";
 
   membrane {
     accepts: ChemicalCue;
@@ -138,7 +142,11 @@ cell FuseDecideCell {
   }
 
   on(ChemicalCue cue) {
-    emit ThreatAssessment;
+    if (cue.hazard) {
+      emit ThreatAssessment(level: 0.8, source: "chemical");
+    } else {
+      emit ThreatAssessment(level: 0.35, source: "ambient");
+    }
   }
 }
 

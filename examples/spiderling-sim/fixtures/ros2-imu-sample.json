@@ -1,0 +1,5 @@
+{
+  "stamp_ms": 1710000000123.0,
+  "linear_acceleration": { "x": 0.12, "y": 0.18, "z": 10.2 },
+  "angular_velocity": { "x": 0.0, "y": 0.0, "z": 0.05 }
+}

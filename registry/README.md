@@ -13,6 +13,18 @@ npm run cell:install -- --list
 |--------|-------|---------|
 | `@community/auth-organ` | AuthOrgan | AuthGranted, AuthDenied |
 
+## Signal packages · 신호 패키지
+
+Physical AI 표준 신호 타입 (organ이 아닌 `signal` 정의 묶음). RFC-0001 참고.
+
+| 패키지 | file | exports |
+|--------|------|---------|
+| `@signals/robotics-base` | `signals/robotics/base.cell` | ImuSample, JointState, BatteryLevel, EstopPulse, … |
+
+`cell.sig.json` manifest · ROS2 매핑 힌트는 `signals/robotics/cell.sig.json` 참고.
+
+PoC 사용 예: [`examples/spiderling-sim/`](../examples/spiderling-sim/SCENARIO.md)
+
 ## 워크플로 (checkpoint)
 
 ```bash

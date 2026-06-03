@@ -111,6 +111,8 @@ nervous EventBus {
 
 ## Growth path · 확장 경로
 
+**A3-S Sim:** [Spider Sim (stream + SLA + bridge)](../spider-robot-sim/SCENARIO.md)
+
 **A4 PET:** [PET Companion reference (11 cells, affect + safety)](../pet-robot/SCENARIO.md)
 
 **A4 PET:** [반려(PET) 레퍼런스 (11세포, 정서·안전)](../pet-robot/SCENARIO.md)
@@ -119,13 +121,63 @@ nervous EventBus {
 
 ---
 
-## Compile · 컴파일
+## Trace labs · trace 실험 (A3)
 
 Golden file: [`spider-organism.cell`](spider-organism.cell)
 
+`VisionFrame.motion`이 sensing chain을 타고 `ThreatAssessment.level`까지 전달됩니다 (vision → cue → threat → hazard → level).
+
+### Lab 1 — calm (forward + chemical)
+
 ```bash
-cd typescript && npm install && npm test
+cd typescript
+node --import tsx -e "import { runCellFile, formatRunHuman } from './run-cell.js'; const i={type:'VisionFrame',data:{contrast:0.6,motion:0.3}}; console.log(formatRunHuman(runCellFile({file:'../examples/spider-robot/spider-organism.cell',input:i}),i));"
 ```
+
+기대: `ThreatAssessment level≈0.35` → `PathCommand forward` + **ActionOrgan `ChemicalPulse`**
+
+### Lab 2 — high motion (retreat + web)
+
+`motion: 0.8` → `ThreatAssessment level≈0.8` → `PathCommand retreat` + **ActionOrgan `WebSpan`**
+
+### Lab 3 — A3-H bridge (same cascade, L1 only)
+
+```bash
+cd bridge-python
+python demo_spider_sim.py --source ros2-replay    # fixture → VisionFrame
+python demo_spider_sim.py --source sim --motion 0.8
+```
+
+[`spider-sim-organism.cell`](../spider-robot-sim/spider-sim-organism.cell) + SLA/onSample — cascade shape는 A3와 동일.
+
+### Lab 4 — dark frame (immune only)
+
+`contrast: 0.05` → `SensorFault` → immune retry/backoff, locomotion 없음.
+
+### Lab 5 — actuator (PathCommand → cmd_vel)
+
+L2 trace의 `PathCommand`를 L1 `TwistActuator`가 `geometry_msgs/Twist`로 매핑합니다. `WebSpan` / `ChemicalPulse` / `StanceHold`는 로그 readback.
+
+```bash
+cd bridge-python
+# calm · forward + chemical
+python demo_spider_sim.py --source sim --motion 0.3 --publish-twist
+
+# high threat · retreat + web
+python demo_spider_sim.py --source sim --motion 0.8 --publish-twist
+
+# A3 golden .cell (same actuator path)
+python demo_spider_sim.py --cell ../examples/spider-robot/spider-organism.cell --source sim --motion 0.8 --publish-twist
+
+# live ROS2 (requires sourced ROS + pip install cell-coding-bridge[ros2])
+python demo_spider_sim.py --publish-twist --twist-sink ros2 --cmd-vel-topic /cmd_vel
+```
+
+Mapping · 매핑: `forward` → `linear.x = +speed`, `retreat` → `linear.x = -speed`, `left`/`right` → `angular.z`.
+
+---
+
+## Compile · 컴파일
 
 ---
 

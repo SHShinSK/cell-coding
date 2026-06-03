@@ -7,10 +7,13 @@
 ### 일괄 trace (레퍼런스 5종)
 
 ```bash
-cd typescript && npm run viewer:traces
-cd .. && npx --yes serve viewer -p 5173
+cd typescript && npm run viewer:traces && npm run viewer:serve
 # → http://localhost:5173
 ```
+
+> **Windows CMD 주의:** `cd d:\Claude`만 하면 **C: 드라이브가 그대로**입니다.  
+> `cd /d d:\Claude` 또는 PowerShell `Set-Location d:\Claude` 를 사용하세요.  
+> `typescript/` 안에서 `npx serve viewer`를 실행하면 `typescript/viewer`(없음)를 찾아 **404**가 납니다.
 
 ### Live run (`cell run`)
 

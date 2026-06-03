@@ -27,6 +27,12 @@ Cell Coding 프로젝트의 중대한 변경은 RFC(Request for Comments)로 관
 
 ## 파일명 규칙
 
-- `RFC-0001-membrane-query-semantics.md`
-- `RFC-0002-runtime-priority-queue.md`
+- `RFC-0001-stream-membrane-physical-sla.md`
+- `RFC-0002-membrane-query-semantics.md`
+
+## Active RFCs · 진행 중 RFC
+
+| RFC | 상태 | 주제 |
+|-----|------|------|
+| [RFC-0001](RFC-0001-stream-membrane-physical-sla.md) | Review | Stream 신호 + Membrane Physical SLA (Phase 2 parser landed) |
 

@@ -9,22 +9,44 @@
           "name": "weak signal emits DistressSignal",
           "inject": { "type": "OwnerPing", "data": { "rssi": 0.01 } },
           "expect": [
-            { "kind": "trace", "from": "PresenceSenseCell", "signal": "DistressSignal" },
+            {
+              "kind": "trace",
+              "from": "PresenceSenseCell",
+              "signal": "DistressSignal",
+              "data": { "reason": "lost_signal" }
+            },
             { "kind": "none", "signal": "OwnerPresence" }
           ]
         },
         {
-          "name": "strong signal emits OwnerPresence",
+          "name": "strong signal emits OwnerPresence close",
           "inject": { "type": "OwnerPing", "data": { "rssi": 0.8 } },
           "expect": [
-            { "kind": "trace", "from": "PresenceSenseCell", "signal": "OwnerPresence" },
+            {
+              "kind": "trace",
+              "from": "PresenceSenseCell",
+              "signal": "OwnerPresence",
+              "data": { "detected": true, "distance": 0.2 }
+            },
             { "kind": "none", "signal": "DistressSignal" }
+          ]
+        },
+        {
+          "name": "moderate signal emits OwnerPresence far",
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.6 } },
+          "expect": [
+            {
+              "kind": "trace",
+              "from": "PresenceSenseCell",
+              "signal": "OwnerPresence",
+              "data": { "detected": true, "distance": 0.5 }
+            }
           ]
         }
       ]
     },
     {
-      "name": "MoodDecideCell comfort branch · comfort 분기",
+      "name": "MoodDecideCell branches · mood 분기",
       "target": "MoodDecideCell",
       "cases": [
         {
@@ -38,6 +60,49 @@
               "data": { "mode": "comfort" }
             }
           ]
+        },
+        {
+          "name": "low valence follow intent",
+          "inject": { "type": "AffectState", "data": { "valence": 0.35, "arousal": 0.6 } },
+          "expect": [
+            {
+              "kind": "trace",
+              "from": "MoodDecideCell",
+              "signal": "SocialIntent",
+              "data": { "mode": "follow" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PetOrganism comfort path · comfort 경로",
+      "target": "PetOrganism",
+      "cases": [
+        {
+          "name": "close owner comfort interaction",
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.8 } },
+          "expect": [
+            { "kind": "trace", "signal": "SocialIntent", "data": { "mode": "comfort" } },
+            { "kind": "trace", "signal": "ComfortAction", "data": { "behavior": "nuzzle" } },
+            { "kind": "trace", "signal": "VocalCue", "data": { "phrase": "purr" } },
+            { "kind": "none", "signal": "FollowPulse" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PetOrganism follow path · follow 경로",
+      "target": "PetOrganism",
+      "cases": [
+        {
+          "name": "moderate owner follow locomotion",
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.6 } },
+          "expect": [
+            { "kind": "trace", "signal": "SocialIntent", "data": { "mode": "follow" } },
+            { "kind": "trace", "signal": "FollowPulse", "data": { "pace": 0.5 } },
+            { "kind": "none", "signal": "ComfortAction", "from": "ComfortActCell" }
+          ]
         }
       ]
     },
@@ -50,7 +115,7 @@
           "name": "distress triggers ComfortAction fallback",
           "inject": { "type": "OwnerPing", "data": { "rssi": 0.01 } },
           "expect": [
-            { "kind": "trace", "signal": "DistressSignal" },
+            { "kind": "trace", "signal": "DistressSignal", "data": { "reason": "lost_signal" } },
             { "kind": "trace", "from": "immune:SafetyPolicy#fallback", "signal": "ComfortAction" }
           ]
         },

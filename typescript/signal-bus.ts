@@ -9,6 +9,8 @@ import { priorityRank } from './signal-priority.js';
 export interface SignalInstance {
   type: string;
   data: Record<string, unknown>;
+  /** Runtime ingest wall clock for SLA staleness · SLA staleness용 ingest 시각 */
+  ingestWallMs?: number;
 }
 
 export interface BusMessage {
@@ -23,7 +25,9 @@ export interface BusMessage {
 export function freezeSignal(signal: SignalInstance): SignalInstance {
   const data = structuredClone(signal.data);
   Object.freeze(data);
-  return Object.freeze({ type: signal.type, data }) as SignalInstance;
+  const frozen: SignalInstance = { type: signal.type, data };
+  if (signal.ingestWallMs != null) frozen.ingestWallMs = signal.ingestWallMs;
+  return Object.freeze(frozen) as SignalInstance;
 }
 
 export interface SignalBusAdapter {
