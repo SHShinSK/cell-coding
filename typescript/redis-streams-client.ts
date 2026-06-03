@@ -3,7 +3,7 @@
 //  CELL_REDIS_URL → Redis Streams XADD/XRANGE
 // ═══════════════════════════════════════════════════════════
 
-import Redis from 'ioredis';
+import { createRedisClient } from './ioredis-client.js';
 import type { RedisStreamsClient, StreamEntry } from './signal-bus-streams.js';
 
 function rowsToEntries(rows: [string, string[]][]): StreamEntry[] {
@@ -18,19 +18,20 @@ function rowsToEntries(rows: [string, string[]][]): StreamEntry[] {
 
 /** ioredis 기반 Streams 클라이언트 생성 */
 export async function createRedisStreamsClient(url: string): Promise<RedisStreamsClient & { close(): Promise<void> }> {
-  const redis = new Redis(url, {
+  const redis = createRedisClient(url, {
     maxRetriesPerRequest: 2,
     lazyConnect: true,
   });
   await redis.connect();
 
   return {
-    xAdd(stream: string, fields: Record<string, string>) {
+    async xAdd(stream: string, fields: Record<string, string>) {
       const args: string[] = [];
       for (const [k, v] of Object.entries(fields)) {
         args.push(k, v);
       }
-      return redis.xadd(stream, '*', ...args);
+      const id = await redis.xadd(stream, '*', ...args);
+      return id ?? '';
     },
     async xRange(stream: string, start = '-', end = '+') {
       const rows = await redis.xrange(stream, start, end);
@@ -43,9 +44,9 @@ export async function createRedisStreamsClient(url: string): Promise<RedisStream
     },
     async xGroupCreate(stream: string, group: string, id = '0', mkStream = false) {
       try {
-        const args: (string | number)[] = ['CREATE', stream, group, id];
+        const args: string[] = ['CREATE', stream, group, id];
         if (mkStream) args.push('MKSTREAM');
-        await redis.xgroup(...args);
+        await redis.call('XGROUP', ...args);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         if (!msg.includes('BUSYGROUP')) throw e;

@@ -76,12 +76,9 @@ function scenarioIdFromFile(file: string): string {
   return basename(file, '.cell').replace(/[^a-zA-Z0-9_-]+/g, '-');
 }
 
-function compileCellSource(file: string, source: string): {
-  ok: true;
-  file: string;
-  program: ReturnType<typeof compile>['program'];
-  diagnostics: TypeCheckError[];
-} | RunCellResult {
+function compileCellSource(file: string, source: string):
+  | { ok: true; file: string; program: ReturnType<typeof compile>['program']; diagnostics: TypeCheckError[] }
+  | { ok: false; file: string; errors: string[]; trace: TraceEntry[]; lifecycle: LifecycleSnapshot } {
   let program;
   let diagnostics: TypeCheckError[];
   try {

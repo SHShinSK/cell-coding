@@ -61,7 +61,7 @@ export function buildTranspiledBindings(
 
     for (const handler of cellDecl.body.handlers) {
       const method = handlerMethodName(handler.signalType);
-      const fn = (instance as Record<string, unknown>)[method];
+      const fn = (instance as unknown as Record<string, unknown>)[method];
       if (typeof fn !== 'function') {
         throw new Error(`Missing ${method} on ${cellName} · 메서드 없음`);
       }
@@ -75,7 +75,7 @@ export function buildTranspiledBindings(
     }
 
     if (cellDecl.body.apoptosis) {
-      const hook = (instance as Record<string, unknown>)[apoptosisMethodName];
+      const hook = (instance as unknown as Record<string, unknown>)[apoptosisMethodName];
       if (typeof hook === 'function') {
         apoptosis.push({
           cell: cellName,

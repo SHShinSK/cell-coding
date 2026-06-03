@@ -107,7 +107,7 @@ export class NervousFabric {
   private groupReady = false;
 
   constructor(private opts: NervousFabricOptions) {
-    this.index = opts.organIndex ?? (opts.program ? buildOrganIndex(opts.program) : buildOrganIndex({ kind: 'Program', statements: [] }));
+    this.index = opts.organIndex ?? (opts.program ? buildOrganIndex(opts.program) : buildOrganIndex({ kind: 'Program', statements: [], pos: { line: 0, col: 0 } }));
     this.prefix = opts.streamPrefix ?? 'cell:nervous';
     this.consumerGroup = opts.consumerGroup ?? process.env.CELL_NERVOUS_GROUP ?? DEFAULT_GROUP;
     this.consumerName = opts.consumerName ?? defaultNervousConsumerName(opts.localOrgan);

@@ -1,0 +1,58 @@
+# Register remaining starter issues from issue-drafts (14–15, 19–21)
+# Trigger: push this file, or Actions → Register starter issues → Run workflow
+
+name: Register starter issues
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/register-starter-issues.yml
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create starter issues (14–15, 19–21)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for file in .github/issue-drafts/{14,15,19,20,21}-*.md; do
+            [ -f "$file" ] || continue
+            title=$(head -n1 "$file" | sed 's/^#[[:space:]]*//')
+            existing=$(gh issue list --repo "${{ github.repository }}" --search "in:title \"$title\"" --state all --json number --jq 'length')
+            if [ "$existing" != "0" ]; then
+              echo "Skip (exists): $title"
+              continue
+            fi
+            label_args=()
+            labels_line=$(grep -m1 '^\*\*Labels:\*\*' "$file" || true)
+            if [ -n "$labels_line" ]; then
+              while IFS= read -r label; do
+                [ -n "$label" ] && label_args+=(--label "$label")
+              done < <(echo "$labels_line" | grep -o '`[^`]*`' | tr -d '`')
+            fi
+            if [ ${#label_args[@]} -eq 0 ]; then
+              label_args=(--label "good first issue" --label "help wanted")
+            fi
+            echo "Create: $title"
+            gh issue create \
+              --repo "${{ github.repository }}" \
+              --title "$title" \
+              --body-file "$file" \
+              "${label_args[@]}"
+            sleep 2
+          done
+
+      - name: Summary
+        run: |
+          echo "Open good first issues: https://github.com/${{ github.repository }}/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22"

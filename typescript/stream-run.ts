@@ -49,7 +49,8 @@ export function resolveStream(
     return { error: `Multiple streams — specify --stream <name> · stream 이름 지정: ${names}` };
   }
 
-  const intervalMs = decl.rateHz > 0 ? Math.max(1, Math.round(1000 / decl.rateHz)) : 50;
+  const rateHz = decl.rateHz ?? 0;
+  const intervalMs = rateHz > 0 ? Math.max(1, Math.round(1000 / rateHz)) : 50;
   return { decl, sampleType: decl.sampleType, intervalMs };
 }
 
@@ -110,7 +111,7 @@ export function parseStreamSamplePayload(
     const samples: Record<string, unknown>[] = [];
     for (let i = 0; i < parsed.length; i++) {
       const item = normalizeSampleItem(parsed[i], i);
-      if ('error' in item) return item;
+      if ('error' in item) return { error: String((item as { error: string }).error) };
       samples.push(item);
     }
     if (samples.length === 0) {

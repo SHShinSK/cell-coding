@@ -3,7 +3,8 @@
 //  멀티 Pod round-robin / least-loaded · Redis 집계 queue depth
 // ═══════════════════════════════════════════════════════════
 
-import Redis from 'ioredis';
+import type { RedisClient } from './ioredis-client.js';
+import { createRedisClient } from './ioredis-client.js';
 import type { DividePolicy } from './cell-divide.js';
 
 let sharedMockCoordinator: import('./in-memory-divide-coordinator.js').InMemoryDivideCoordinator | null = null;
@@ -40,10 +41,10 @@ function queueKey(organ: string): string {
 
 /** Redis coordinator · 멀티 Pod divide 상태 공유 */
 export class RedisDivideCoordinator implements DivideCoordinator {
-  private redis: Redis;
+  private redis: RedisClient;
 
   constructor(url: string) {
-    this.redis = new Redis(url, { maxRetriesPerRequest: 2, lazyConnect: true });
+    this.redis = createRedisClient(url, { maxRetriesPerRequest: 2, lazyConnect: true });
   }
 
   async connect(): Promise<void> {

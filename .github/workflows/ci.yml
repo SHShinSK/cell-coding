@@ -88,8 +88,9 @@ jobs:
       - name: Start observability stack
         working-directory: runtime-docker
         run: |
-          docker compose --profile observability up -d --build --wait \
+          docker compose --profile observability up -d --build \
             redis worker-organ prometheus otel-collector jaeger
+          sleep 20
 
       - name: Verify Prometheus scrape
         env:
