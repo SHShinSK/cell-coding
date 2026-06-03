@@ -3,6 +3,8 @@
 Maintainer: paste into GitHub issue before **Close as completed**.  
 Maintainer: GitHub 이슈에서 **Close as completed** 전에 붙여넣기.
 
+**전체 정리 절차:** [ISSUE_CLEANUP.md](../ISSUE_CLEANUP.md) · **런칭:** [LAUNCH_CHECKLIST.md](../LAUNCH_CHECKLIST.md)
+
 Duplicate pairs: if both old (#2–#10) and bootstrap (#20–#28) exist, close the **older duplicate** with a link to the kept issue.
 
 ---
@@ -149,8 +151,11 @@ Please use #XX for comments and PRs linking to this task. Thanks!
 
 ## Maintainer checklist · 메인테이너 체크리스트
 
+상세 단계: [ISSUE_CLEANUP.md §3](../ISSUE_CLEANUP.md) · 런칭: [LAUNCH_CHECKLIST.md](../LAUNCH_CHECKLIST.md)
+
 - [ ] Post status/close comments above
-- [ ] Close #20, #21, #22, #23, #26, #28 as **completed**
+- [ ] Close #20, #21, #22, #23, #24, #26, #28 as **completed**
+- [ ] Close #2–#19 duplicates per mapping table in ISSUE_CLEANUP.md
 - [ ] Leave #25 open; leave #27 open with updated scope
 - [ ] Register drafts **14–15, 19–21** (see `issue-drafts/README.md`)
 - [ ] Publish Discussion **003** (Physical AI samples feedback)

@@ -156,6 +156,9 @@ This repository is public, so anyone can read code, discuss ideas, and contribut
 
 ## Maintainer setup | 유지보수자 설정
 
+- [Launch checklist · 런칭 체크리스트](.github/LAUNCH_CHECKLIST.md)
+- [Issue cleanup · 이슈 중복 정리안](.github/ISSUE_CLEANUP.md)
+- [Show HN draft · 홍보 글 초안](.github/SHOW_HN.md)
 - [Discussions · About · Topics](.github/DISCUSSIONS_SETUP.md)
 - [Pages workflow](.github/workflows/pages.yml) — Settings → Pages → **GitHub Actions**
 
