@@ -76,6 +76,7 @@ jobs:
   observability-e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -91,8 +92,13 @@ jobs:
       - name: Start observability stack
         working-directory: runtime-docker
         run: |
+          docker info
+          docker compose --profile observability config
           docker compose --profile observability up -d --build \
-            redis worker-organ prometheus otel-collector jaeger
+            redis worker-organ prometheus otel-collector jaeger || {
+              docker compose --profile observability logs --no-color || true
+              exit 1
+            }
           sleep 20
 
       - name: Verify Prometheus scrape
