@@ -1,0 +1,104 @@
+# Launch issue hygiene — close completed starters + duplicate #2–#19
+# Trigger: push this file to main, or Actions → Issue hygiene launch → Run workflow
+
+name: Issue hygiene launch
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/issue-hygiene-launch.yml
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close completed and duplicate starter issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          issue_state() {
+            curl -sS -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/issues/$1" \
+              | jq -r '.state // "missing"'
+          }
+
+          comment() {
+            local num=$1
+            local body=$2
+            curl -sS -X POST \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/issues/${num}/comments" \
+              -d "$(jq -nc --arg b "$body" '{body:$b}')" > /dev/null
+          }
+
+          close_completed() {
+            local num=$1
+            local body=$2
+            if [ "$(issue_state "$num")" != "open" ]; then
+              echo "Skip completed #${num} (not open)"
+              return 0
+            fi
+            comment "$num" "$body"
+            curl -sS -X PATCH \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/issues/${num}" \
+              -d '{"state":"closed","state_reason":"completed"}' > /dev/null
+            echo "Closed completed #${num}"
+            sleep 1
+          }
+
+          close_duplicate() {
+            local num=$1
+            local canon=$2
+            if [ "$(issue_state "$num")" != "open" ]; then
+              echo "Skip duplicate #${num} (not open)"
+              return 0
+            fi
+            comment "$num" "Closing as **duplicate** of #${canon}. Please use #${canon} for comments and PRs. · **중복** — #${canon} 을 사용해 주세요."
+            curl -sS -X PATCH \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${REPO}/issues/${num}" \
+              -d '{"state":"closed","state_reason":"not_planned"}' > /dev/null
+            echo "Closed duplicate #${num} → #${canon}"
+            sleep 1
+          }
+
+          # Completed on main
+          close_completed 20 "Closing as **completed** — \`examples/validator.cell\` already on \`main\`."
+          close_completed 21 "Closing as **completed** — \`typescript/package.json\` and build scripts already on \`main\`."
+          close_completed 22 "Closing as **completed** — Lexer generic/comparison and List/Map parsing on \`main\` with tests."
+          close_completed 23 "Closing as **completed** — List/Map type parsing on \`main\`."
+          close_completed 24 "Closing as **completed** — \`transpiler.ts\` stub on \`main\`. Follow-ups: issue-drafts 14–18."
+          close_completed 26 "Closing as **completed** — GitHub contribution CTA in \`cell-coding.html\` on \`main\`."
+          close_completed 28 "Closing as **completed** — \`examples/physical-ai-motion-alarm.md\` on \`main\`."
+
+          # Status comments (keep open)
+          if [ "$(issue_state 27)" = "open" ]; then
+            comment 27 "**Partially completed** on \`main\`: \`finalizeSignals()\`, \`signalsCompatible()\`, tests in \`compile.test.ts\`. Remaining: structural field compatibility, \`priority\` inheritance. See \`.github/issue-drafts/09-checker-signal-extends.md\`."
+            echo "Posted scope update on #27"
+          fi
+
+          # Duplicates #2–#19
+          for offset in 0 1 2 3 4 5 6 7 8; do
+            canon=$((20 + offset))
+            close_duplicate $((2 + offset)) "$canon"
+            close_duplicate $((11 + offset)) "$canon"
+          done
+
+      - name: Summary
+        run: |
+          echo "Open good first issues: https://github.com/${{ github.repository }}/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22"
+          echo "Launch docs: https://github.com/${{ github.repository }}/blob/main/.github/LAUNCH_CHECKLIST.md"
