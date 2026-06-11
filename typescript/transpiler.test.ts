@@ -101,6 +101,7 @@ describe('transpiler (file-level)', () => {
     const result = transpileCellFile({ file: bad });
     assert.equal(result.ok, false);
     assert.ok(result.errors.length > 0);
+    assert.match(result.errors[0], /^line 1, column 1: Cell 'Broken' must declare/);
   });
 
   it('returns filesystem error for missing file', () => {
