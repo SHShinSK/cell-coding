@@ -27,7 +27,7 @@ Each draft uses **English first · Korean parallel** (same structure as site doc
 | 20 | [20-bridge-daemon-multistream.md](20-bridge-daemon-multistream.md) | bridge-python · daemon / multi-stream |
 | 21 | [21-rfc-0001-phase3-tracking.md](21-rfc-0001-phase3-tracking.md) | rfc · RFC-0001 Phase 3 umbrella |
 
-**Maintainer · 메인테이너:** [close-issue-comments.md](../maintainer/close-issue-comments.md) · [ISSUE_CLEANUP.md](../ISSUE_CLEANUP.md) · [LAUNCH_CHECKLIST.md](../LAUNCH_CHECKLIST.md) · **Discussion · 토론:** [003-physical-ai-samples-feedback.md](../discussions/003-physical-ai-samples-feedback.md)
+**Maintainer · 메인테이너:** [EXECUTION_PLAN.md](../../EXECUTION_PLAN.md) · [close-issue-comments.md](../maintainer/close-issue-comments.md) · [ISSUE_CLEANUP.md](../ISSUE_CLEANUP.md) · [LAUNCH_CHECKLIST.md](../LAUNCH_CHECKLIST.md) · **Discussion · 토론:** [003-physical-ai-samples-feedback.md](../discussions/003-physical-ai-samples-feedback.md)
 
 ## Draft format · 초안 형식
 

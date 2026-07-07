@@ -4,7 +4,7 @@
 > **저장소:** https://github.com/SHShinSK/cell-coding  
 > **문서 사이트:** https://shshinsk.github.io/cell-coding/
 
-관련 문서: [RELEASE.md](RELEASE.md) · [ISSUE_CLEANUP.md](ISSUE_CLEANUP.md) · [SHOW_HN.md](SHOW_HN.md) · [DISCUSSIONS_SETUP.md](DISCUSSIONS_SETUP.md)
+관련 문서: [EXECUTION_PLAN.md](../EXECUTION_PLAN.md) · [RELEASE.md](RELEASE.md) · [ISSUE_CLEANUP.md](ISSUE_CLEANUP.md) · [SHOW_HN.md](SHOW_HN.md) · [DISCUSSIONS_SETUP.md](DISCUSSIONS_SETUP.md)
 
 ---
 
