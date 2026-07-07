@@ -2,6 +2,9 @@
 
 > [English first · ROADMAP.en.md](ROADMAP.en.md) · 한국어 병렬
 
+> **실행 계획 (발전판):** 기술 기반 완료 현황·런칭 게이트·v0.2~v0.4 릴리즈 트레인은 [EXECUTION_PLAN.md](EXECUTION_PLAN.md) 참고.  
+> **Evolved execution plan:** current completion status, launch gate, and v0.2–v0.4 release train → [EXECUTION_PLAN.en.md](EXECUTION_PLAN.en.md).
+
 ## Goal | 목표
 
 Turn Cell Coding from a concept presentation into an open-source project that external developers can install, run, and contribute to.  
