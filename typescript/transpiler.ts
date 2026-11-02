@@ -33,6 +33,11 @@ export interface TranspileResult {
   signals: string[];
 }
 
+function formatDiagnostic(diagnostic: { message: string; pos?: AST.Position }): string {
+  if (!diagnostic.pos) return diagnostic.message;
+  return `line ${diagnostic.pos.line}, column ${diagnostic.pos.col}: ${diagnostic.message}`;
+}
+
 function tsType(type?: AST.TypeExpr): string {
   if (!type) return 'unknown';
   switch (type.kind) {
@@ -229,7 +234,7 @@ export function transpileCellFile(opts: TranspileFileOptions): TranspileResult {
     };
   }
 
-  const errors = diagnostics.filter(d => d.kind === 'error').map(d => d.message);
+  const errors = diagnostics.filter(d => d.kind === 'error').map(formatDiagnostic);
   if (errors.length > 0) {
     return {
       ok: false,
