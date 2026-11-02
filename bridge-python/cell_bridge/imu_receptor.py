@@ -72,7 +72,7 @@ class ImuReceptor:
             from sensor_msgs.msg import Imu  # type: ignore
         except ImportError as exc:
             raise RuntimeError(
-                "ROS2 rclpy required · ROS2 필요: pip install cell-coding-bridge[ros2]"
+                "ROS2 rclpy required · ROS2 필요: pip install ./bridge-python[ros2]"
             ) from exc
 
         holder: dict[str, Any] = {}

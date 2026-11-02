@@ -48,12 +48,12 @@ const CASES: ParityCase[] = [
   {
     name: 'pet distress immune',
     file: 'examples/pet-robot/pet-organism.cell',
-    input: { type: 'OwnerPing', data: { rssi: 0.01 } },
+    input: { type: 'OwnerPing', data: { rssi: 0.01, timestamp: 1 } },
   },
   {
     name: 'pet presence',
     file: 'examples/pet-robot/pet-organism.cell',
-    input: { type: 'OwnerPing', data: { rssi: 0.8 } },
+    input: { type: 'OwnerPing', data: { rssi: 0.8, timestamp: 1 } },
   },
   {
     name: 'spider vision stance',

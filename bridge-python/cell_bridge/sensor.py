@@ -139,8 +139,7 @@ def simulate_owner_ping(
     data: dict[str, Any] = {
         "rssi": rssi if rssi is not None else round(rng.uniform(0.4, 0.95), 2),
     }
-    if timestamp is not None:
-        data["timestamp"] = timestamp
+    data["timestamp"] = timestamp if timestamp is not None else time.time() * 1000
     return {"type": "OwnerPing", "data": data}
 
 

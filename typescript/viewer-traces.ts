@@ -40,14 +40,14 @@ const SCENARIOS: ScenarioDef[] = [
     title: 'PET — distress + immune fallback',
     titleKo: 'PET — distress + immune fallback',
     file: 'examples/pet-robot/pet-organism.cell',
-    input: { type: 'OwnerPing', data: { rssi: 0.01 } },
+    input: { type: 'OwnerPing', data: { rssi: 0.01, timestamp: 1 } },
   },
   {
     id: 'pet-presence',
     title: 'PET — owner presence (no immune)',
     titleKo: 'PET — 주인 감지 (immune 없음)',
     file: 'examples/pet-robot/pet-organism.cell',
-    input: { type: 'OwnerPing', data: { rssi: 0.8 } },
+    input: { type: 'OwnerPing', data: { rssi: 0.8, timestamp: 1 } },
   },
   {
     id: 'spider-stance',

@@ -7,7 +7,7 @@
       "cases": [
         {
           "name": "weak signal emits DistressSignal",
-          "inject": { "type": "OwnerPing", "data": { "rssi": 0.01 } },
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.01, "timestamp": 1 } },
           "expect": [
             {
               "kind": "trace",
@@ -20,7 +20,7 @@
         },
         {
           "name": "strong signal emits OwnerPresence close",
-          "inject": { "type": "OwnerPing", "data": { "rssi": 0.8 } },
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.8, "timestamp": 1 } },
           "expect": [
             {
               "kind": "trace",
@@ -33,7 +33,7 @@
         },
         {
           "name": "moderate signal emits OwnerPresence far",
-          "inject": { "type": "OwnerPing", "data": { "rssi": 0.6 } },
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.6, "timestamp": 1 } },
           "expect": [
             {
               "kind": "trace",
@@ -81,7 +81,7 @@
       "cases": [
         {
           "name": "close owner comfort interaction",
-          "inject": { "type": "OwnerPing", "data": { "rssi": 0.8 } },
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.8, "timestamp": 1 } },
           "expect": [
             { "kind": "trace", "signal": "SocialIntent", "data": { "mode": "comfort" } },
             { "kind": "trace", "signal": "ComfortAction", "data": { "behavior": "nuzzle" } },
@@ -97,7 +97,7 @@
       "cases": [
         {
           "name": "moderate owner follow locomotion",
-          "inject": { "type": "OwnerPing", "data": { "rssi": 0.6 } },
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.6, "timestamp": 1 } },
           "expect": [
             { "kind": "trace", "signal": "SocialIntent", "data": { "mode": "follow" } },
             { "kind": "trace", "signal": "FollowPulse", "data": { "pace": 0.5 } },
@@ -113,7 +113,7 @@
       "cases": [
         {
           "name": "distress triggers ComfortAction fallback",
-          "inject": { "type": "OwnerPing", "data": { "rssi": 0.01 } },
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.01, "timestamp": 1 } },
           "expect": [
             { "kind": "trace", "signal": "DistressSignal", "data": { "reason": "lost_signal" } },
             { "kind": "trace", "from": "immune:SafetyPolicy#fallback", "signal": "ComfortAction" }
@@ -121,7 +121,7 @@
         },
         {
           "name": "healthy ping no immune action",
-          "inject": { "type": "OwnerPing", "data": { "rssi": 0.8 } },
+          "inject": { "type": "OwnerPing", "data": { "rssi": 0.8, "timestamp": 1 } },
           "expect": [
             { "kind": "trace", "signal": "OwnerPresence" },
             { "kind": "none", "from": "immune:", "signal": "ComfortAction" }

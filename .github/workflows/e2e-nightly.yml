@@ -1,9 +1,7 @@
-# K8s prometheus-adapter HPA E2E · nightly / manual
-name: E2E Nightly
+# K8s prometheus-adapter HPA E2E · manual only · 수동 실행 전용
+name: E2E Manual
 
 on:
-  schedule:
-    - cron: "0 4 * * *"
   workflow_dispatch:
 
 permissions:

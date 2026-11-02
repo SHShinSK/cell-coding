@@ -103,7 +103,12 @@ interface PendingDelivery {
 /** Standard escalation signal emitted when escalate:true · escalate 시 방출 신호 */
 export const IMMUNE_ESCALATION_TYPE = 'ImmuneEscalation';
 
+import { buildSignalIndex, payloadProblems, SignalPayloadError } from './signal-payload.js';
+
+export { SignalPayloadError };
+
 export class CellRuntime {
+  private signalIndex: ReturnType<typeof buildSignalIndex>;
   private handlers: RegisteredHandler[] = [];
   private immunePolicies: RegisteredImmunePolicy[] = [];
   private lifecycle = new CellLifecycleManager();
@@ -138,6 +143,7 @@ export class CellRuntime {
     this.maxSignals = opts.maxSignals ?? 1000;
     this.disableImmune = opts.disableImmune ?? false;
     this.activeCells = opts.activeCells?.length ? new Set(opts.activeCells) : null;
+    this.signalIndex = buildSignalIndex(program);
     this.organIndex = buildOrganIndex(program);
     this.signalPriorities = buildSignalPriorityMap(program);
     this.bus = opts.signalBus ?? new InMemorySignalBus();
@@ -329,6 +335,8 @@ export class CellRuntime {
     data: Record<string, unknown>,
     from: string,
   ): void {
+    const problems = payloadProblems(this.signalIndex, type, data);
+    if (problems.length > 0) throw new SignalPayloadError(type, problems);
     const payload = this.externalPayload(type, data);
     this.lastExternal = { type, data: payload.data };
     this.enqueue(payload, from);

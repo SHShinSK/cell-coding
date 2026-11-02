@@ -7,6 +7,8 @@
 
 > **한국어** | [English README](README.en.md)
 
+> **상태: 개념 공개 (experimental).** 이 저장소는 Cell Coding 개념과 참조 구현을 공개하기 위한 것이며, 활발한 개발을 약속하지 않습니다. 시뮬레이션과 예제 수준으로만 다루었고, 실제 로봇 검증 기록은 없습니다. 런타임은 단일 스레드 동기 방식이라 실행 중인 핸들러를 선점하지 못하고, 막의 지연 SLA는 처리 후에 판정됩니다. **안전이 중요한 제어나 비상정지 경로에 쓰지 마세요.**
+
 A biological programming paradigm for Physical AI, built on event-driven architecture.  
 Physical AI를 위한 이벤트 기반 생물학적 프로그래밍 패러다임.
 

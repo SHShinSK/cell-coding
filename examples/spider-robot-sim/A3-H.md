@@ -29,7 +29,7 @@ Organism·stream·membrane SLA는 그대로 두고, **Receptor만 교체**합니
 | `--source` | Input · 입력 | Dependency · 의존성 |
 |------------|-------------|---------------------|
 | `sim` | mock contrast/motion | none · A3-S · (없음) |
-| `camera` | OpenCV `VideoCapture` | `pip install cell-coding-bridge[camera]` |
+| `camera` | OpenCV `VideoCapture` | `pip install "./bridge-python[camera]"` |
 | `ros2` | `sensor_msgs/Image` topic | ROS2 + `rclpy` |
 | `ros2-replay` | JSON fixture | none · CI/Windows demo · (없음) |
 
@@ -65,7 +65,7 @@ python demo_spider_sim.py --source ros2-replay --ros2-replay ../examples/spider-
 ### 2) USB camera (A3-H)
 
 ```bash
-pip install cell-coding-bridge[camera]
+pip install "./bridge-python[camera]"
 python demo_spider_sim.py --source camera --camera-index 0
 python demo_spider_sim.py --source camera --samples 5 --interval-ms 33
 ```

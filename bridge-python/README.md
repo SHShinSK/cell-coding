@@ -19,7 +19,7 @@ Node.js 20+ and Python 3.10+. Requires **`@cell-coding/cli`** on PATH (or monore
 
 ```bash
 npm install -g @cell-coding/cli
-pip install cell-coding-bridge   # PyPI · after v0.1.0 release
+pip install ./bridge-python   # from a repo clone · 저장소 clone 기준 (not on PyPI · PyPI 미배포)
 ```
 
 Monorepo dev:
@@ -72,10 +72,12 @@ Environment · 환경 변수:
 | `CELL_CLI` | `cell` | Override `cell` binary path |
 | `CELL_FORCE_GLOBAL_CLI` | — | Use global `cell` even in monorepo |
 
-## PyPI package · PyPI 패키지
+## Install from source · 소스 설치
+
+Not published to PyPI · PyPI에는 배포되지 않았습니다.
 
 ```bash
-pip install cell-coding-bridge
+pip install ./bridge-python
 ```
 
 Requires `@cell-coding/cli` or monorepo `typescript/` for `run_cell_file()`.
@@ -141,6 +143,6 @@ Future: GPIO alarm hardware; see [`ROBOTICS.md`](ROBOTICS.md) for IMU/Joint/Visi
 Optional extras · 선택 의존성:
 
 ```bash
-pip install cell-coding-bridge[camera]   # USB camera (A3-H)
-pip install cell-coding-bridge[ros2]     # ROS2 live (requires sourced ROS env)
+pip install "./bridge-python[camera]"   # USB camera (A3-H)
+pip install "./bridge-python[ros2]"     # ROS2 live (requires sourced ROS env)
 ```
