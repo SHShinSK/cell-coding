@@ -169,7 +169,7 @@ python demo_spider_sim.py --source sim --motion 0.8 --publish-twist
 # A3 golden .cell (same actuator path)
 python demo_spider_sim.py --cell ../examples/spider-robot/spider-organism.cell --source sim --motion 0.8 --publish-twist
 
-# live ROS2 (requires sourced ROS + pip install cell-coding-bridge[ros2])
+# live ROS2 (requires sourced ROS + pip install "./bridge-python[ros2]")
 python demo_spider_sim.py --publish-twist --twist-sink ros2 --cmd-vel-topic /cmd_vel
 ```
 

@@ -124,7 +124,7 @@ python demo_spider_sim.py --samples 3 --interval-ms 33
 
 # A3-H hardware (same .cell · 동일 .cell)
 python demo_spider_sim.py --source ros2-replay
-pip install cell-coding-bridge[camera]
+pip install "./bridge-python[camera]"
 python demo_spider_sim.py --source camera --camera-index 0
 
 # Viewer JSON

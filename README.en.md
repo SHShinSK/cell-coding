@@ -7,6 +7,8 @@
 
 > [한국어 README](README.md) | **English**
 
+> **Status: concept release (experimental).** This repository publishes the Cell Coding concept and a reference implementation; active development is not promised. It covers simulation and examples only, with no recorded validation on a real robot. The runtime is single-threaded and synchronous, so it cannot preempt a running handler, and membrane latency SLAs are judged after processing. **Do not use it for safety-critical control or emergency-stop paths.**
+
 A biological programming paradigm for Physical AI, built on event-driven architecture.  
 피지컬 AI를 위한 이벤트 기반 생물학적 프로그래밍 패러다임.
 

@@ -93,7 +93,7 @@ class OwnerReceptor:
             from std_msgs.msg import Float32  # type: ignore
         except ImportError as exc:
             raise RuntimeError(
-                "ROS2 rclpy required · ROS2 필요: pip install cell-coding-bridge[ros2]"
+                "ROS2 rclpy required · ROS2 필요: pip install ./bridge-python[ros2]"
             ) from exc
 
         from cell_bridge.ros2_mapping import owner_ping_from_ros2_float_msg

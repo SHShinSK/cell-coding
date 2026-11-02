@@ -66,8 +66,8 @@ python demo_pet.py --source ros2-replay --samples 3 --interval-ms 500
 ## Optional deps · 선택 의존성
 
 ```bash
-pip install cell-coding-bridge[camera]   # VisionReceptor camera
-pip install cell-coding-bridge[ros2]     # live ros2 sources + Twist publish
+pip install "./bridge-python[camera]"   # VisionReceptor camera
+pip install "./bridge-python[ros2]"     # live ros2 sources + Twist publish
 ```
 
 ## Not in scope (yet) · 미구현

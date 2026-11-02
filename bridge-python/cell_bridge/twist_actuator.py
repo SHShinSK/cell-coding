@@ -103,7 +103,7 @@ class TwistActuator:
             from rclpy.node import Node  # type: ignore
         except ImportError as exc:
             raise RuntimeError(
-                "ROS2 rclpy required · ROS2 필요: pip install cell-coding-bridge[ros2]"
+                "ROS2 rclpy required · ROS2 필요: pip install ./bridge-python[ros2]"
             ) from exc
 
         ros = twist_command_to_ros2_dict(command)

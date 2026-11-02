@@ -212,7 +212,8 @@ def owner_ping_from_ros2_dict(record: dict[str, Any]) -> dict[str, Any]:
 
 def owner_ping_from_ros2_float_msg(msg: Any) -> dict[str, Any]:
     """Live rclpy std_msgs/Float32 (normalized RSSI) → OwnerPing."""
-    return make_owner_ping(rssi=float(msg.data))
+    # Float32 carries no stamp, so use receive time · 수신 시각 사용
+    return make_owner_ping(rssi=float(msg.data), timestamp=time.time() * 1000)
 
 
 def twist_command_to_ros2_dict(cmd: dict[str, Any]) -> dict[str, Any]:

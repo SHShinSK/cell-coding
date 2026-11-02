@@ -73,7 +73,7 @@ class VisionReceptor:
         except ImportError as exc:
             raise RuntimeError(
                 "OpenCV required for camera source · camera 소스는 opencv 필요: "
-                "pip install cell-coding-bridge[camera]"
+                "pip install ./bridge-python[camera]"
             ) from exc
 
         cap = cv2.VideoCapture(self.camera_index)
@@ -118,7 +118,7 @@ class VisionReceptor:
         except ImportError as exc:
             raise RuntimeError(
                 "ROS2 rclpy required · ROS2 필요: source ROS2 install, then "
-                "pip install cell-coding-bridge[ros2] (see A3-H.md)"
+                "pip install ./bridge-python[ros2] (see A3-H.md)"
             ) from exc
 
         holder: dict[str, Any] = {}

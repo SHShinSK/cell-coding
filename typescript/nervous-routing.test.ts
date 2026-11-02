@@ -86,14 +86,14 @@ describe('filterHandlersByOrganScope', () => {
 describe('nervous organ-scoped runtime', () => {
   it('blocks cross-organ delivery without nervous wiring', () => {
     const rt = runtimeFor(isolatedSource);
-    const trace = rt.send('Start', {});
+    const trace = rt.send('Start', { tag: 'x' });
     assert.ok(trace.some(t => t.signal.type === 'SharedPing'));
     assert.equal(trace.some(t => t.signal.type === 'DoneB'), false);
   });
 
   it('delivers across organs when nervous route exists', () => {
     const rt = runtimeFor(routedSource);
-    const trace = rt.send('Start', {});
+    const trace = rt.send('Start', { tag: 'x' });
     assert.deepEqual(
       trace.map(t => t.signal.type),
       ['Start', 'SharedPing', 'DoneB'],

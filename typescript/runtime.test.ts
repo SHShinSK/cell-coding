@@ -77,7 +77,7 @@ describe('Cell Coding runtime', () => {
 
   it('PET immune fallback emits ComfortAction on DistressSignal', () => {
     const rt = runtimeFor(petSource);
-    const trace = rt.send('OwnerPing', { rssi: 0.01 });
+    const trace = rt.send('OwnerPing', { rssi: 0.01, timestamp: 1 });
     assert.ok(trace.some(t => t.signal.type === 'DistressSignal'));
     const fallback = trace.find(t => t.from === 'immune:SafetyPolicy#fallback');
     assert.ok(fallback);
@@ -86,7 +86,7 @@ describe('Cell Coding runtime', () => {
 
   it('clean PET path does not trigger immune fallback', () => {
     const rt = runtimeFor(petSource);
-    const trace = rt.send('OwnerPing', { rssi: 0.8 });
+    const trace = rt.send('OwnerPing', { rssi: 0.8, timestamp: 1 });
     assert.equal(trace.filter(t => t.from.startsWith('immune:')).length, 0);
     assert.ok(trace.some(t => t.signal.type === 'OwnerPresence'));
   });
